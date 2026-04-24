@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0D0D0D">
+<title>Monitor de Passagens</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Inter:wght@300;400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0D0D0D;
+    --bg2: #141414;
+    --bg3: #1A1A1A;
+    --border: #1C1C1C;
+    --border2: #2A2A2A;
+    --text: #F0F0F0;
+    --text2: #888;
+    --text3: #444;
+    --text4: #333;
+    --green: #5A9E6F;
+    --red: #9E5A5A;
+    --accent: #F0F0F0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    padding: env(safe-area-inset-top, 16px) 24px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* HEADER */
+  .header { padding: 16px 24px 20px; }
+  .header-eyebrow { font-size: 11px; color: var(--text3); font-weight: 300; margin-bottom: 4px; }
+  .header-title { font-size: 26px; font-weight: 500; letter-spacing: -0.8px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    padding: 0 24px;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    font-size: 13px;
+    color: var(--text3);
+    padding-bottom: 12px;
+    cursor: pointer;
+    border-bottom: 1.5px solid transparent;
+    margin-bottom: -1px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+  /* PAGES */
+  .page { display: none; padding: 0 16px; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .card-body { padding: 16px 18px; }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .route { font-size: 22px; font-weight: 500; letter-spacing: -0.8px; }
+  .route-sep { color: var(--text4); font-weight: 300; margin: 0 2px; }
+
+  .price-block { text-align: right; }
+  .price { font-size: 20px; font-weight: 500; letter-spacing: -0.5px; }
+  .price-drop { font-size: 11px; color: var(--green); margin-top: 2px; }
+  .price-up { font-size: 11px; color: var(--red); margin-top: 2px; }
+  .price-neutral { font-size: 11px; color: var(--text4); margin-top: 2px; }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .dates { display: flex; flex-direction: column; gap: 3px; }
+  .date-row { font-size: 11px; color: var(--text3); font-weight: 300; }
+  .date-row strong { color: var(--text2); font-weight: 400; }
+  .airline { font-size: 11px; color: var(--text4); }
+  .airline.active { color: var(--green); }
+
+  .card-action {
+    border-top: 1px solid var(--border);
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .action-left { display: flex; flex-direction: column; gap: 2px; }
+  .action-title { font-size: 12px; color: var(--text); font-weight: 400; }
+  .action-sub { font-size: 10px; color: var(--text3); font-weight: 300; }
+  .action-arrow { font-size: 14px; color: var(--text4); }
+  .action-arrow.active { color: var(--green); }
+
+  /* AI BLOCK */
+  .ai-block {
+    margin-bottom: 10px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid #1A2E20;
+    background: #0F1A12;
+  }
+
+  .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .ai-verdict { font-size: 14px; color: var(--green); font-weight: 500; margin-bottom: 5px; letter-spacing: -0.3px; }
+  .ai-text { font-size: 12px; color: #2D5A38; line-height: 1.7; font-weight: 300; }
+
+  .ai-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid #1A2E20;
+    border-radius: 10px;
+    background: #0F1A12;
+    cursor: pointer;
+    font-size: 12px;
+    color: #2D5A38;
+    margin-top: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .ai-btn:active { border-color: var(--green); }
+
+  /* MONITOR DOT */
+  .monitor-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 2px 16px;
+  }
+
+  .monitor-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text4);
+    animation: blink 2.5s infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .monitor-text { font-size: 11px; color: var(--text4); font-weight: 300; }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text3);
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  /* HISTÓRICO */
+  .hist-item {
+    background: var(--bg2);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 13px 16px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hist-left { display: flex; flex-direction: column; gap: 3px; }
+  .hist-route { font-size: 14px; font-weight: 500; letter-spacing: -0.3px; }
+  .hist-meta { font-size: 10px; color: var(--text3); font-weight: 300; }
+  .hist-right { text-align: right; display: flex; flex-direction: column; gap: 3px; }
+  .hist-price { font-size: 14px; font-weight: 500; }
+  .hist-var { font-size: 10px; }
+
+  .hist-sep {
+    font-size: 10px;
+    color: var(--text4);
+    padding: 12px 2px 6px;
+    font-weight: 300;
+  }
+
+  /* CONFIG - ALERTAS */
+  .alerta-item {
+    background: var(--bg2);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .alerta-header {
+    padding: 14px 16px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .alerta-route { font-size: 18px; font-weight: 500; letter-spacing: -0.5px; }
+  .alerta-route span { color: var(--text4); font-weight: 300; }
+
+  .remove-btn {
+    font-size: 20px;
+    color: var(--text4);
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  .remove-btn:active { color: var(--red); }
+
+  .alerta-dates {
+    padding: 0 16px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .alerta-date { font-size: 11px; color: var(--text3); font-weight: 300; }
+  .alerta-date strong { color: var(--text2); font-weight: 400; }
+  .alerta-cia { font-size: 11px; color: var(--text4); }
+
+  /* FORM */
+  .section-label {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 400;
+    padding: 16px 2px 10px;
+    letter-spacing: 0.3px;
+  }
+
+  .form-card {
+    background: var(--bg2);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .form-row {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .form-row:last-child { border-bottom: none; }
+  .form-row.two-col { display: flex; justify-content: space-between; }
+  .form-col { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .form-col:last-child { text-align: right; }
+
+  .field-label { font-size: 10px; color: var(--text3); font-weight: 300; letter-spacing: 0.3px; text-transform: uppercase; }
+  .field-value { font-size: 15px; color: var(--text); font-weight: 400; letter-spacing: -0.3px; }
+  .field-placeholder { font-size: 15px; color: var(--text4); font-weight: 300; }
+
+  /* AUTOCOMPLETE */
+  .autocomplete-wrap { position: relative; }
+
+  .autocomplete-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    padding: 0;
+  }
+
+  .autocomplete-input::placeholder { color: var(--text4); font-weight: 300; }
+
+  .autocomplete-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: -16px;
+    right: -16px;
+    background: #1A1A1A;
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    overflow: hidden;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  .autocomplete-dropdown.open { display: block; }
+
+  .autocomplete-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.15s;
+  }
+
+  .autocomplete-item:last-child { border-bottom: none; }
+  .autocomplete-item:active { background: var(--bg3); }
+
+  .ac-code {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    min-width: 36px;
+  }
+
+  .ac-info { display: flex; flex-direction: column; gap: 2px; }
+  .ac-name { font-size: 12px; color: var(--text2); font-weight: 400; }
+  .ac-city { font-size: 10px; color: var(--text3); font-weight: 300; }
+
+  /* CALENDAR */
+  .calendar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .calendar-overlay.open { display: flex; }
+
+  .calendar-sheet {
+    background: #161616;
+    border-radius: 24px 24px 0 0;
+    border: 1px solid var(--border2);
+    border-bottom: none;
+    width: 100%;
+    max-width: 430px;
+    padding: 0 0 env(safe-area-inset-bottom, 20px);
+  }
+
+  .cal-handle {
+    width: 36px; height: 4px;
+    background: var(--border2);
+    border-radius: 2px;
+    margin: 12px auto 16px;
+  }
+
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 16px;
+  }
+
+  .cal-title { font-size: 16px; font-weight: 500; letter-spacing: -0.3px; }
+  .cal-nav { font-size: 20px; color: var(--text3); cursor: pointer; padding: 4px 8px; user-select: none; }
+  .cal-nav:active { color: var(--text); }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 0 12px;
+    margin-bottom: 8px;
+  }
+
+  .cal-wd {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text4);
+    font-weight: 400;
+    padding: 4px 0;
+  }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 0 12px 20px;
+    gap: 2px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text2);
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 400;
+    transition: background 0.15s;
+  }
+
+  .cal-day:active { background: var(--bg3); }
+  .cal-day.empty { pointer-events: none; }
+  .cal-day.past { color: var(--text4); pointer-events: none; }
+  .cal-day.today { color: var(--text); font-weight: 500; }
+  .cal-day.selected { background: var(--text); color: var(--bg); font-weight: 500; }
+  .cal-day.selected:active { background: var(--text2); }
+
+  .cal-confirm {
+    margin: 0 16px 8px;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: -0.3px;
+  }
+
+  /* SUBMIT BTN */
+  .submit-btn {
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: -0.3px;
+    margin-bottom: 24px;
+    transition: opacity 0.2s;
+  }
+
+  .submit-btn:active { opacity: 0.8; }
+  .submit-btn.loading { opacity: 0.5; pointer-events: none; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 12px;
+    color: var(--text2);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 300;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { color: var(--green); border-color: #1A3A22; }
+  .toast.error { color: var(--red); border-color: #3A1A1A; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    max-width: 430px;
+    margin: 0 auto;
+    background: rgba(13,13,13,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 12px 0 env(safe-area-inset-bottom, 20px);
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 20px; }
+  .nav-icon { font-size: 16px; color: var(--text4); }
+  .nav-icon.on { color: var(--text); }
+  .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.3px; }
+  .nav-label.on { color: var(--text2); }
+
+  /* LOADING SPINNER */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border2);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <span id="clock">--:--</span>
+  <span>●●●</span>
+</div>
+
+<div class="header">
+  <div class="header-eyebrow" id="eyebrow">carregando...</div>
+  <div class="header-title" id="page-title">Passagens</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('alertas')">Alertas</div>
+  <div class="tab" onclick="showTab('historico')">Histórico</div>
+  <div class="tab" onclick="showTab('config')">Config</div>
+</div>
+
+<!-- ABA ALERTAS -->
+<div id="tab-alertas" class="page active">
+  <div id="alertas-list">
+    <div class="empty">Carregando alertas...</div>
+  </div>
+</div>
+
+<!-- ABA HISTÓRICO -->
+<div id="tab-historico" class="page">
+  <div id="historico-list">
+    <div class="empty">Carregando histórico...</div>
+  </div>
+</div>
+
+<!-- ABA CONFIG -->
+<div id="tab-config" class="page">
+
+  <div class="section-label">meus alertas</div>
+  <div id="config-alertas-list"></div>
+
+  <div class="section-label">novo alerta</div>
+
+  <div class="form-card">
+    <div class="form-row two-col">
+      <div class="form-col autocomplete-wrap">
+        <div class="field-label">origem</div>
+        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="autocomplete(this, 'origem')" />
+        <div class="autocomplete-dropdown" id="drop-origem"></div>
+      </div>
+      <div class="form-col autocomplete-wrap" style="text-align:right;">
+        <div class="field-label">destino</div>
+        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="autocomplete(this, 'destino')" />
+        <div class="autocomplete-dropdown" id="drop-destino" style="left:auto;right:-16px;left:-16px;"></div>
+      </div>
+    </div>
+    <div class="form-row two-col">
+      <div class="form-col">
+        <div class="field-label">data ida</div>
+        <div class="field-placeholder" id="display-ida" onclick="openCal('ida')">selecionar</div>
+        <input type="hidden" id="input-ida" />
+      </div>
+      <div class="form-col" style="text-align:right;">
+        <div class="field-label">data volta</div>
+        <div class="field-placeholder" id="display-volta" onclick="openCal('volta')">opcional</div>
+        <input type="hidden" id="input-volta" />
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
+
+</div>
+
+<!-- CALENDÁRIO -->
+<div class="calendar-overlay" id="cal-overlay" onclick="closeCal(event)">
+  <div class="calendar-sheet">
+    <div class="cal-handle"></div>
+    <div class="cal-header">
+      <div class="cal-nav" onclick="calNav(-1)">‹</div>
+      <div class="cal-title" id="cal-title">—</div>
+      <div class="cal-nav" onclick="calNav(1)">›</div>
+    </div>
+    <div class="cal-weekdays">
+      <div class="cal-wd">D</div><div class="cal-wd">S</div><div class="cal-wd">T</div>
+      <div class="cal-wd">Q</div><div class="cal-wd">Q</div><div class="cal-wd">S</div>
+      <div class="cal-wd">S</div>
+    </div>
+    <div class="cal-days" id="cal-days"></div>
+    <div class="cal-confirm" onclick="confirmCal()">Confirmar</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="showTab('alertas')">
+    <div class="nav-icon on" id="nav-alertas">◈</div>
+    <div class="nav-label on" id="navl-alertas">alertas</div>
+  </div>
+  <div class="nav-item" onclick="showTab('historico')">
+    <div class="nav-icon" id="nav-historico">◇</div>
+    <div class="nav-label" id="navl-historico">histórico</div>
+  </div>
+  <div class="nav-item" onclick="showTab('config')">
+    <div class="nav-icon" id="nav-config">○</div>
+    <div class="nav-label" id="navl-config">config</div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQJBd0pL8Yxk42_EgRnaIebFczvxxPlXUSqRjWmRTuPYZDPBvUAQQj8TS36zPZep2Mog/exec';
+
+const AEROPORTOS = [
+  { code:'CGH', name:'Congonhas', city:'São Paulo, SP' },
+  { code:'GRU', name:'Guarulhos', city:'São Paulo, SP' },
+  { code:'VCP', name:'Viracopos', city:'Campinas, SP' },
+  { code:'FLN', name:'Hercílio Luz', city:'Florianópolis, SC' },
+  { code:'GIG', name:'Galeão', city:'Rio de Janeiro, RJ' },
+  { code:'SDU', name:'Santos Dumont', city:'Rio de Janeiro, RJ' },
+  { code:'BSB', name:'Juscelino Kubitschek', city:'Brasília, DF' },
+  { code:'SSA', name:'Luís Eduardo Magalhães', city:'Salvador, BA' },
+  { code:'REC', name:'Guararapes', city:'Recife, PE' },
+  { code:'FOR', name:'Pinto Martins', city:'Fortaleza, CE' },
+  { code:'BEL', name:'Val de Cans', city:'Belém, PA' },
+  { code:'MAO', name:'Eduardo Gomes', city:'Manaus, AM' },
+  { code:'CWB', name:'Afonso Pena', city:'Curitiba, PR' },
+  { code:'POA', name:'Salgado Filho', city:'Porto Alegre, RS' },
+  { code:'GYN', name:'Santa Genoveva', city:'Goiânia, GO' },
+  { code:'VIX', name:'Eurico Salles', city:'Vitória, ES' },
+  { code:'MCZ', name:'Zumbi dos Palmares', city:'Maceió, AL' },
+  { code:'NAT', name:'São Gonçalo do Amarante', city:'Natal, RN' },
+  { code:'THE', name:'Senador Petrônio Portela', city:'Teresina, PI' },
+  { code:'SLZ', name:'Marechal Cunha Machado', city:'São Luís, MA' },
+  { code:'JPA', name:'Presidente Castro Pinto', city:'João Pessoa, PB' },
+  { code:'AJU', name:'Santa Maria', city:'Aracaju, SE' },
+  { code:'PMW', name:'Brigadeiro Lysias Rodrigues', city:'Palmas, TO' },
+  { code:'CGB', name:'Marechal Rondon', city:'Cuiabá, MT' },
+  { code:'CGR', name:'Campo Grande', city:'Campo Grande, MS' },
+  { code:'PVH', name:'Governador Jorge Teixeira', city:'Porto Velho, RO' },
+  { code:'MCP', name:'Internacional de Macapá', city:'Macapá, AP' },
+  { code:'BVB', name:'Atlas Brasil Cantanhede', city:'Boa Vista, RR' },
+  { code:'RBR', name:'Plácido de Castro', city:'Rio Branco, AC' },
+  { code:'IGU', name:'Cataratas', city:'Foz do Iguaçu, PR' },
+  { code:'NVT', name:'Ministro Victor Konder', city:'Navegantes, SC' },
+  { code:'XAP', name:'Chapecó', city:'Chapecó, SC' },
+  { code:'LDB', name:'Governador José Richa', city:'Londrina, PR' },
+  { code:'MRN', name:'Turismo', city:'Maringá, PR' },
+  { code:'UDI', name:'Ten. Cel. Av. César Bombonato', city:'Uberlândia, MG' },
+  { code:'CNF', name:'Tancredo Neves', city:'Belo Horizonte, MG' },
+  { code:'PLU', name:'Carlos Drummond de Andrade', city:'Belo Horizonte, MG' },
+];
+
+let alertasData = [];
+let calTarget = null;
+let calDate = new Date();
+let calSelected = null;
+
+// CLOCK
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.getHours().toString().padStart(2,'0') + ':' +
+    now.getMinutes().toString().padStart(2,'0');
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// API
+async function api(action, data = {}) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(reject)
+      .handleAction(JSON.stringify({ action, ...data }));
+  });
+}
+
+// TABS
+function showTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.tab')[['alertas','historico','config'].indexOf(tab)].classList.add('active');
+
+  ['alertas','historico','config'].forEach(t => {
+    document.getElementById('nav-' + t).classList.toggle('on', t === tab);
+    document.getElementById('navl-' + t).classList.toggle('on', t === tab);
+  });
+
+  const titles = { alertas: 'Passagens', historico: 'Histórico', config: 'Config' };
+  document.getElementById('page-title').textContent = titles[tab];
+
+  if (tab === 'alertas' || tab === 'historico') carregarAlertas();
+  if (tab === 'config') renderConfigAlertas();
+}
+
+// CARREGAR
+async function carregarAlertas() {
+  try {
+    alertasData = await api('listar');
+    document.getElementById('eyebrow').textContent =
+      alertasData.length + ' alerta' + (alertasData.length !== 1 ? 's' : '') + ' ativo' + (alertasData.length !== 1 ? 's' : '');
+    renderAlertas();
+    renderHistorico();
+    renderConfigAlertas();
+  } catch(e) {
+    document.getElementById('eyebrow').textContent = 'erro ao carregar';
+  }
+}
+
+// RENDER ALERTAS
+function renderAlertas() {
+  const el = document.getElementById('alertas-list');
+  if (!alertasData.length) {
+    el.innerHTML = '<div class="empty">Nenhum alerta cadastrado.<br>Vá em Config para criar um.</div>';
+    return;
+  }
+
+  el.innerHTML = alertasData.map(a => {
+    const temQueda = a.variacao < -0.5;
+    const temAlta  = a.variacao > 0.5;
+    const varStr   = temQueda ? `↓ ${Math.abs(a.variacao)}%` : temAlta ? `↑ ${a.variacao}%` : '— sem variação';
+    const varClass = temQueda ? 'price-drop' : temAlta ? 'price-up' : 'price-neutral';
+    const precoStr = a.precoAtual > 0 ? 'R$ ' + a.precoAtual.toFixed(2).replace('.',',') : '—';
+
+    const compra = gerarLinkCompra(a);
+
+    return `
+      <div class="card ${temQueda ? 'alert' : ''}">
+        <div class="card-body">
+          <div class="card-top">
+            <div class="route">${a.origem}<span class="route-sep"> → </span>${a.destino}</div>
+            <div class="price-block">
+              <div class="price">${precoStr}</div>
+              <div class="${varClass}">${varStr}</div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="dates">
+              <div class="date-row">ida <strong>${formatData(a.dataIda)}</strong></div>
+              ${a.dataVolta ? `<div class="date-row">volta <strong>${formatData(a.dataVolta)}</strong></div>` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="card-action" onclick="window.open('${compra.url}', '_blank')">
+          <div class="action-left">
+            <div class="action-title">${compra.label}</div>
+            <div class="action-sub">${a.origem} → ${a.destino} · ${formatDataCurta(a.dataIda)}</div>
+          </div>
+          <div class="action-arrow ${temQueda ? 'active' : ''}">↗</div>
+        </div>
+      </div>
+      <div class="ai-btn" onclick="solicitarAnalise(${a.id}, this)">
+        <span>Analisar com IA</span>
+      </div>
+      <div id="ai-${a.id}" style="display:none;" class="ai-block">
+        <div class="ai-label">análise · ia</div>
+        <div class="ai-verdict" id="ai-verdict-${a.id}"></div>
+        <div class="ai-text" id="ai-text-${a.id}"></div>
+      </div>
+      <div style="height:8px;"></div>
+    `;
+  }).join('');
+
+  const monitor = document.createElement('div');
+  monitor.className = 'monitor-row';
+  monitor.innerHTML = '<div class="monitor-dot"></div><div class="monitor-text">verificando a cada 30 minutos</div>';
+  document.getElementById('alertas-list').appendChild(monitor);
+}
+
+// RENDER HISTÓRICO
+function renderHistorico() {
+  const el = document.getElementById('historico-list');
+  if (!alertasData.length) {
+    el.innerHTML = '<div class="empty">Nenhum histórico disponível.</div>';
+    return;
+  }
+
+  let html = '';
+  let lastDate = '';
+
+  const items = [];
+  alertasData.forEach(a => {
+    (a.historico || []).forEach(h => {
+      items.push({ ...h, rota: `${a.origem} → ${a.destino}`, dataIda: a.dataIda });
+    });
+  });
+
+  items.sort((x, y) => new Date(y.data) - new Date(x.data));
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">Histórico disponível após<br>a primeira verificação.</div>';
+    return;
+  }
+
+  items.forEach((item, i) => {
+    const d = new Date(item.data);
+    const dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    if (dateStr !== lastDate) {
+      html += `<div class="hist-sep">${dateStr}</div>`;
+      lastDate = dateStr;
+    }
+
+    const prev = items[i + 1];
+    let varStr = '— sem variação';
+    let varClass = 'hist-var';
+    if (prev) {
+      const diff = item.preco - prev.preco;
+      if (diff < -1) { varStr = `↓ R$ ${Math.abs(diff).toFixed(0)}`; varClass += ' down'; }
+      else if (diff > 1) { varStr = `↑ R$ ${diff.toFixed(0)}`; varClass += ' up'; }
+    }
+
+    html += `
+      <div class="hist-item">
+        <div class="hist-left">
+          <div class="hist-route">${item.rota}</div>
+          <div class="hist-meta">${timeStr} · ida ${formatData(item.dataIda)}</div>
+        </div>
+        <div class="hist-right">
+          <div class="hist-price">R$ ${item.preco.toFixed(2).replace('.',',')}</div>
+          <div class="${varClass}">${varStr}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+// RENDER CONFIG ALERTAS
+function renderConfigAlertas() {
+  const el = document.getElementById('config-alertas-list');
+  if (!alertasData.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 2px 12px;font-weight:300;">Nenhum alerta cadastrado ainda.</div>';
+    return;
+  }
+
+  el.innerHTML = alertasData.map(a => `
+    <div class="alerta-item">
+      <div class="alerta-header">
+        <div class="alerta-route">${a.origem} <span>→</span> ${a.destino}</div>
+        <div class="remove-btn" onclick="removerAlerta(${a.indice})">×</div>
+      </div>
+      <div class="alerta-dates">
+        <div class="alerta-date">ida <strong>${formatData(a.dataIda)}</strong>${a.dataVolta ? ` · volta <strong>${formatData(a.dataVolta)}</strong>` : ''}</div>
+        <div class="alerta-cia">R$ ${a.precoAtual > 0 ? a.precoAtual.toFixed(2).replace('.',',') : '—'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ANÁLISE IA
+async function solicitarAnalise(id, btn) {
+  btn.innerHTML = '<div class="spinner"></div><span>Analisando...</span>';
+  btn.style.pointerEvents = 'none';
+
+  try {
+    const res = await api('analisar', { id });
+    const el = document.getElementById('ai-' + id);
+
+    if (res.erro) {
+      showToast(res.erro, 'error');
+      btn.innerHTML = '<span>Analisar com IA</span>';
+      btn.style.pointerEvents = '';
+      return;
+    }
+
+    const linhas = res.analise.split('\n');
+    const verdict = linhas[0];
+    const texto = linhas.slice(1).join('\n').trim();
+
+    document.getElementById('ai-verdict-' + id).textContent = verdict;
+    document.getElementById('ai-text-' + id).textContent = texto;
+    el.style.display = 'block';
+    btn.style.display = 'none';
+  } catch(e) {
+    showToast('Erro ao analisar', 'error');
+    btn.innerHTML = '<span>Analisar com IA</span>';
+    btn.style.pointerEvents = '';
+  }
+}
+
+// ADICIONAR ALERTA
+async function adicionarAlerta() {
+  const origem  = document.getElementById('input-origem').value.trim().toUpperCase();
+  const destino = document.getElementById('input-destino').value.trim().toUpperCase();
+  const dataIda = document.getElementById('input-ida').value;
+  const dataVolta = document.getElementById('input-volta').value;
+
+  if (!origem || origem.length !== 3) { showToast('Informe a origem', 'error'); return; }
+  if (!destino || destino.length !== 3) { showToast('Informe o destino', 'error'); return; }
+  if (!dataIda) { showToast('Informe a data de ida', 'error'); return; }
+
+  const btn = document.getElementById('btn-adicionar');
+  btn.classList.add('loading');
+  btn.textContent = 'Criando...';
+
+  try {
+    const res = await api('adicionar', { origem, destino, dataIda, dataVolta: dataVolta || null });
+    if (res.erro) {
+      showToast(res.erro, 'error');
+    } else {
+      showToast('Alerta criado!', 'success');
+      document.getElementById('input-origem').value = '';
+      document.getElementById('input-destino').value = '';
+      document.getElementById('input-ida').value = '';
+      document.getElementById('input-volta').value = '';
+      document.getElementById('display-ida').textContent = 'selecionar';
+      document.getElementById('display-ida').className = 'field-placeholder';
+      document.getElementById('display-volta').textContent = 'opcional';
+      document.getElementById('display-volta').className = 'field-placeholder';
+      carregarAlertas();
+    }
+  } catch(e) {
+    showToast('Erro ao criar alerta', 'error');
+  }
+
+  btn.classList.remove('loading');
+  btn.textContent = 'Criar alerta';
+}
+
+// REMOVER ALERTA
+async function removerAlerta(indice) {
+  const res = await api('remover', { indice });
+  if (res.erro) { showToast(res.erro, 'error'); return; }
+  showToast('Alerta removido', 'success');
+  carregarAlertas();
+}
+
+// AUTOCOMPLETE
+function autocomplete(input, tipo) {
+  const val = input.value.toUpperCase();
+  const dropId = 'drop-' + tipo;
+  const drop = document.getElementById(dropId);
+
+  if (val.length === 0) { drop.classList.remove('open'); return; }
+
+  const matches = AEROPORTOS.filter(a =>
+    a.code.startsWith(val) ||
+    a.name.toUpperCase().includes(val) ||
+    a.city.toUpperCase().includes(val)
+  ).slice(0, 5);
+
+  if (!matches.length) { drop.classList.remove('open'); return; }
+
+  drop.innerHTML = matches.map(a => `
+    <div class="autocomplete-item" onclick="selectAirport('${a.code}', '${a.name}', '${tipo}')">
+      <div class="ac-code">${a.code}</div>
+      <div class="ac-info">
+        <div class="ac-name">${a.name}</div>
+        <div class="ac-city">${a.city}</div>
+      </div>
+    </div>
+  `).join('');
+
+  drop.classList.add('open');
+}
+
+function selectAirport(code, name, tipo) {
+  document.getElementById('input-' + tipo).value = code;
+  document.getElementById('drop-' + tipo).classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.autocomplete-wrap')) {
+    document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+
+// CALENDÁRIO
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function openCal(target) {
+  calTarget = target;
+  calDate = new Date();
+  calSelected = null;
+  renderCal();
+  document.getElementById('cal-overlay').classList.add('open');
+}
+
+function closeCal(e) {
+  if (e.target === document.getElementById('cal-overlay')) {
+    document.getElementById('cal-overlay').classList.remove('open');
+  }
+}
+
+function calNav(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCal();
+}
+
+function renderCal() {
+  document.getElementById('cal-title').textContent = MESES[calDate.getMonth()] + ' ' + calDate.getFullYear();
+
+  const year  = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const first = new Date(year, month, 1).getDay();
+  const days  = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  let html = '';
+  for (let i = 0; i < first; i++) html += '<div class="cal-day empty"></div>';
+
+  for (let d = 1; d <= days; d++) {
+    const dt = new Date(year, month, d);
+    dt.setHours(0,0,0,0);
+    const isPast = dt < today;
+    const isToday = dt.getTime() === today.getTime();
+    const isSel = calSelected && dt.getTime() === calSelected.getTime();
+    const cls = ['cal-day', isPast ? 'past' : '', isToday ? 'today' : '', isSel ? 'selected' : ''].filter(Boolean).join(' ');
+    html += `<div class="${cls}" onclick="selectDay(${d})">${d}</div>`;
+  }
+
+  document.getElementById('cal-days').innerHTML = html;
+}
+
+function selectDay(d) {
+  calSelected = new Date(calDate.getFullYear(), calDate.getMonth(), d);
+  renderCal();
+}
+
+function confirmCal() {
+  if (!calSelected) { showToast('Selecione uma data', 'error'); return; }
+
+  const y = calSelected.getFullYear();
+  const m = String(calSelected.getMonth() + 1).padStart(2, '0');
+  const d = String(calSelected.getDate()).padStart(2, '0');
+  const iso = `${y}-${m}-${d}`;
+  const display = `${d}/${m}/${y}`;
+
+  document.getElementById('input-' + calTarget).value = iso;
+  const displayEl = document.getElementById('display-' + calTarget);
+  displayEl.textContent = display;
+  displayEl.className = 'field-value';
+
+  document.getElementById('cal-overlay').classList.remove('open');
+}
+
+// LINK DE COMPRA
+function gerarLinkCompra(a) {
+  const origemIATA = a.origem;
+  const destinoIATA = a.destino;
+  const ida = a.dataIda ? a.dataIda.replace(/-/g, '') : '';
+  const volta = a.dataVolta ? a.dataVolta.replace(/-/g, '') : '';
+
+  let url, label;
+
+  if (volta) {
+    url = `https://www.google.com/travel/flights?q=Voos+${origemIATA}+${destinoIATA}+${ida}+${volta}`;
+    label = 'Buscar no Google Flights';
+  } else {
+    url = `https://www.google.com/travel/flights?q=Voos+${origemIATA}+${destinoIATA}+${ida}`;
+    label = 'Buscar no Google Flights';
+  }
+
+  return { url, label };
+}
+
+// TOAST
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+// HELPERS
+function formatData(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return `${d} ${meses[parseInt(m)-1]} ${y}`;
+}
+
+function formatDataCurta(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  return `${d}/${m}`;
+}
+
+// INIT
+carregarAlertas();
+setInterval(carregarAlertas, 5 * 60 * 1000);
+</script>
+</body>
+</html>
