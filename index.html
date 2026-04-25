@@ -691,11 +691,18 @@ setInterval(updateClock, 10000);
 
 // API
 async function api(action, data = {}) {
-  const resp = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({ action, ...data }),
-  });
-  return resp.json();
+  try {
+    const resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action, ...data }),
+    });
+    return resp.json();
+  } catch(e) {
+    console.error('API erro:', e);
+    return null;
+  }
 }
 
 // TABS
