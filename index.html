@@ -311,22 +311,22 @@
   .autocomplete-dropdown {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
-    left: -16px;
-    right: -16px;
-    background: #1A1A1A;
-    border: 1px solid var(--border2);
+    top: calc(100% + 6px);
+    left: -18px;
+    right: -18px;
+    background: #1C1C1E;
+    border: 1px solid #3A3A3A;
     border-radius: 14px;
     overflow: hidden;
     z-index: 100;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
   }
 
   .autocomplete-dropdown.open { display: block; }
 
   .autocomplete-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
+    padding: 13px 16px;
+    border-bottom: 1px solid #2A2A2A;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -335,26 +335,26 @@
   }
 
   .autocomplete-item:last-child { border-bottom: none; }
-  .autocomplete-item:active { background: var(--bg3); }
+  .autocomplete-item:active { background: #2A2A2A; }
 
   .ac-code {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    color: #F0F0F0;
     letter-spacing: 0.5px;
-    min-width: 36px;
+    min-width: 40px;
   }
 
   .ac-info { display: flex; flex-direction: column; gap: 2px; }
-  .ac-name { font-size: 12px; color: var(--text2); font-weight: 400; }
-  .ac-city { font-size: 10px; color: var(--text3); font-weight: 300; }
+  .ac-name { font-size: 13px; color: #AAA; font-weight: 400; }
+  .ac-city { font-size: 11px; color: #666; font-weight: 300; }
 
   /* CALENDAR */
   .calendar-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     z-index: 200;
     align-items: flex-end;
     justify-content: center;
@@ -363,53 +363,53 @@
   .calendar-overlay.open { display: flex; }
 
   .calendar-sheet {
-    background: #161616;
+    background: #1C1C1E;
     border-radius: 24px 24px 0 0;
-    border: 1px solid var(--border2);
-    border-bottom: none;
+    border-top: 1px solid #3A3A3A;
     width: 100%;
     max-width: 430px;
-    padding: 0 0 env(safe-area-inset-bottom, 20px);
+    padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 
   .cal-handle {
     width: 36px; height: 4px;
-    background: var(--border2);
+    background: #3A3A3A;
     border-radius: 2px;
-    margin: 12px auto 16px;
+    margin: 14px auto 16px;
   }
 
   .cal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px 16px;
+    padding: 0 24px 14px;
+    border-bottom: 1px solid #2A2A2A;
+    margin-bottom: 8px;
   }
 
-  .cal-title { font-size: 16px; font-weight: 500; letter-spacing: -0.3px; }
-  .cal-nav { font-size: 20px; color: var(--text3); cursor: pointer; padding: 4px 8px; user-select: none; }
-  .cal-nav:active { color: var(--text); }
+  .cal-title { font-size: 17px; font-weight: 600; color: #F0F0F0; letter-spacing: -0.3px; }
+  .cal-nav { font-size: 22px; color: #888; cursor: pointer; padding: 4px 10px; user-select: none; }
+  .cal-nav:active { color: #F0F0F0; }
 
   .cal-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    padding: 0 12px;
-    margin-bottom: 8px;
+    padding: 4px 16px 6px;
   }
 
   .cal-wd {
     text-align: center;
-    font-size: 10px;
-    color: var(--text4);
-    font-weight: 400;
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
     padding: 4px 0;
   }
 
   .cal-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    padding: 0 12px 20px;
-    gap: 2px;
+    padding: 4px 16px 16px;
+    gap: 6px;
   }
 
   .cal-day {
@@ -417,33 +417,36 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    color: var(--text2);
+    font-size: 16px;
+    color: #E0E0E0;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 400;
     transition: background 0.15s;
+    min-height: 42px;
   }
 
-  .cal-day:active { background: var(--bg3); }
+  .cal-day:active { background: #2A2A2A; }
   .cal-day.empty { pointer-events: none; }
-  .cal-day.past { color: var(--text4); pointer-events: none; }
-  .cal-day.today { color: var(--text); font-weight: 500; }
-  .cal-day.selected { background: var(--text); color: var(--bg); font-weight: 500; }
-  .cal-day.selected:active { background: var(--text2); }
+  .cal-day.past { color: #3A3A3A; pointer-events: none; }
+  .cal-day.today { color: #F0F0F0; font-weight: 700; border: 1.5px solid #666; }
+  .cal-day.selected { background: #F0F0F0; color: #0D0D0D; font-weight: 600; }
+  .cal-day.selected:active { background: #CCC; }
 
   .cal-confirm {
-    margin: 0 16px 8px;
-    background: var(--text);
-    color: var(--bg);
+    margin: 4px 16px 12px;
+    background: #F0F0F0;
+    color: #0D0D0D;
     border-radius: 14px;
-    padding: 14px;
+    padding: 15px;
     text-align: center;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     letter-spacing: -0.3px;
   }
+
+  .cal-confirm:active { opacity: 0.8; }
 
   /* SUBMIT BTN */
   .submit-btn {
@@ -563,12 +566,12 @@
     <div class="form-row two-col">
       <div class="form-col autocomplete-wrap">
         <div class="field-label">origem</div>
-        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="autocomplete(this, 'origem')" />
+        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="autocomplete(this, 'origem')" onkeyup="autocomplete(this, 'origem')" />
         <div class="autocomplete-dropdown" id="drop-origem"></div>
       </div>
       <div class="form-col autocomplete-wrap" style="text-align:right;">
         <div class="field-label">destino</div>
-        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="autocomplete(this, 'destino')" />
+        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="autocomplete(this, 'destino')" onkeyup="autocomplete(this, 'destino')" />
         <div class="autocomplete-dropdown" id="drop-destino" style="left:auto;right:-16px;left:-16px;"></div>
       </div>
     </div>
@@ -629,7 +632,7 @@
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQJBd0pL8Yxk42_EgRnaIebFczvxxPlXUSqRjWmRTuPYZDPBvUAQQj8TS36zPZep2Mog/exec';
+const SCRIPT_URL = 'COLE_SUA_URL_AQUI';
 
 const AEROPORTOS = [
   { code:'CGH', name:'Congonhas', city:'São Paulo, SP' },
@@ -690,8 +693,6 @@ setInterval(updateClock, 10000);
 async function api(action, data = {}) {
   const resp = await fetch(SCRIPT_URL, {
     method: 'POST',
-    redirect: 'follow',
-    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ action, ...data }),
   });
   return resp.json();
@@ -953,22 +954,22 @@ async function removerAlerta(indice) {
 
 // AUTOCOMPLETE
 function autocomplete(input, tipo) {
-  const val = input.value.toUpperCase();
+  const val = input.value.toUpperCase().trim();
   const dropId = 'drop-' + tipo;
   const drop = document.getElementById(dropId);
 
-  if (val.length === 0) { drop.classList.remove('open'); return; }
+  if (val.length === 0) { drop.classList.remove('open'); drop.innerHTML = ''; return; }
 
   const matches = AEROPORTOS.filter(a =>
     a.code.startsWith(val) ||
     a.name.toUpperCase().includes(val) ||
     a.city.toUpperCase().includes(val)
-  ).slice(0, 5);
+  ).slice(0, 6);
 
   if (!matches.length) { drop.classList.remove('open'); return; }
 
   drop.innerHTML = matches.map(a => `
-    <div class="autocomplete-item" onclick="selectAirport('${a.code}', '${a.name}', '${tipo}')">
+    <div class="autocomplete-item" onmousedown="selectAirport('${a.code}', '${tipo}')" ontouchend="selectAirport('${a.code}', '${tipo}')">
       <div class="ac-code">${a.code}</div>
       <div class="ac-info">
         <div class="ac-name">${a.name}</div>
@@ -980,14 +981,21 @@ function autocomplete(input, tipo) {
   drop.classList.add('open');
 }
 
-function selectAirport(code, name, tipo) {
-  document.getElementById('input-' + tipo).value = code;
-  document.getElementById('drop-' + tipo).classList.remove('open');
+function selectAirport(code, tipo) {
+  const input = document.getElementById('input-' + tipo);
+  const drop  = document.getElementById('drop-' + tipo);
+  input.value = code;
+  drop.classList.remove('open');
+  drop.innerHTML = '';
+  input.blur();
 }
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.autocomplete-wrap')) {
-    document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.autocomplete-dropdown').forEach(d => {
+      d.classList.remove('open');
+      d.innerHTML = '';
+    });
   }
 });
 
