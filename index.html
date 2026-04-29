@@ -388,6 +388,7 @@
   .cal-day.past { color: #444; pointer-events: none; cursor: default; }
   .cal-day.today { color: #F5F5F5; font-weight: 700; border: 1.5px solid #666; }
   .cal-day.selected { background: #F5F5F5; color: #0D0D0D; font-weight: 700; }
+  .cal-day.in-range { background: #2A2A2A; color: #D0D0D0; border-radius: 0; }
 
   .cal-confirm {
     margin: 8px 16px 0;
@@ -548,17 +549,11 @@
         <div class="autocomplete-dropdown" id="drop-destino"></div>
       </div>
     </div>
-    <div class="form-row two-col">
-      <div class="form-col">
-        <div class="field-label">data ida</div>
-        <div class="field-placeholder" id="display-ida" onclick="openCal('ida')">selecionar</div>
-        <input type="hidden" id="input-ida" />
-      </div>
-      <div class="form-col" style="align-items:flex-end;">
-        <div class="field-label">data volta</div>
-        <div class="field-placeholder" id="display-volta" onclick="openCal('volta')" style="text-align:right;">opcional</div>
-        <input type="hidden" id="input-volta" />
-      </div>
+    <div class="form-row" onclick="openCal('range')" style="cursor:pointer;">
+      <div class="field-label">período</div>
+      <div id="display-range" class="field-placeholder">selecionar datas</div>
+      <input type="hidden" id="input-ida" />
+      <input type="hidden" id="input-volta" />
     </div>
   </div>
 
@@ -574,6 +569,8 @@
       <div class="cal-title" id="cal-title">—</div>
       <div class="cal-nav" onclick="calNav(1)">›</div>
     </div>
+    <div id="cal-step" style="text-align:center; font-size:12px; color:#888; padding: 0 20px 10px; border-bottom: 1px solid #2A2A2A; margin-bottom: 4px;">Selecione a data de ida</div>
+    <div id="cal-range-preview" style="display:none; text-align:center; font-size:12px; padding: 8px 20px; color:#5A9E6F;"></div>
     <table class="cal-table" id="cal-table">
       <thead>
         <tr>
@@ -607,7 +604,7 @@
 // ============================================================
 //  CONFIGURAÇÃO — substitua se hospedar fora do Apps Script
 // ============================================================
-const SCRIPT_URL = 'https://passagens-proxy.felipe-akuma.workers.dev/';
+const SCRIPT_URL = 'COLE_SUA_URL_AQUI';
 
 // Detecta se está rodando dentro do Apps Script
 const IS_GAS = typeof google !== 'undefined' && google.script;
@@ -857,10 +854,8 @@ function adicionarAlerta() {
       document.getElementById('input-destino').value = '';
       document.getElementById('input-ida').value = '';
       document.getElementById('input-volta').value = '';
-      document.getElementById('display-ida').textContent = 'selecionar';
-      document.getElementById('display-ida').className = 'field-placeholder';
-      document.getElementById('display-volta').textContent = 'opcional';
-      document.getElementById('display-volta').className = 'field-placeholder';
+      document.getElementById('display-range').textContent = 'selecionar datas';
+      document.getElementById('display-range').className = 'field-placeholder';
       carregarAlertas();
     }
     btn.classList.remove('loading');
@@ -924,11 +919,20 @@ document.addEventListener('click', function(e) {
 
 // CALENDÁRIO
 var MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var calRangeStep = 'ida'; // 'ida' ou 'volta'
+var calSelectedIda = null;
+var calSelectedVolta = null;
 
 function openCal(target) {
   calTarget = target;
   calDate = new Date();
   calSelected = null;
+  calRangeStep = 'ida';
+  calSelectedIda = null;
+  calSelectedVolta = null;
+  document.getElementById('cal-step').textContent = 'Selecione a data de ida';
+  document.getElementById('cal-range-preview').style.display = 'none';
+  document.getElementById('cal-range-preview').textContent = '';
   renderCal();
   document.getElementById('cal-overlay').classList.add('open');
 }
@@ -953,7 +957,6 @@ function renderCal() {
   var day = 1;
   var row = 0;
 
-  // Build table rows
   while (day <= days) {
     html += '<tr>';
     for (var col = 0; col < 7; col++) {
@@ -965,9 +968,18 @@ function renderCal() {
         var dt = new Date(year, month, day);
         dt.setHours(0,0,0,0);
         var isPast = dt < today;
+        var isIda   = calSelectedIda  && dt.getTime() === calSelectedIda.getTime();
+        var isVolta = calSelectedVolta && dt.getTime() === calSelectedVolta.getTime();
+        var isRange = calSelectedIda && calSelectedVolta &&
+                      dt > calSelectedIda && dt < calSelectedVolta;
         var isToday = dt.getTime() === today.getTime();
-        var isSel = calSelected && dt.getTime() === calSelected.getTime();
-        var cls = 'cal-day' + (isPast ? ' past' : '') + (isToday ? ' today' : '') + (isSel ? ' selected' : '');
+
+        var cls = 'cal-day';
+        if (isPast) cls += ' past';
+        else if (isToday) cls += ' today';
+        if (isIda || isVolta) cls += ' selected';
+        if (isRange) cls += ' in-range';
+
         var onclick = isPast ? '' : ' onclick="selectDay(' + day + ')"';
         html += '<td><div class="' + cls + '"' + onclick + '>' + day + '</div></td>';
         day++;
@@ -975,27 +987,64 @@ function renderCal() {
     }
     html += '</tr>';
     row++;
-    if (row === 0 && first === 0) day++;
   }
 
   document.getElementById('cal-body').innerHTML = html;
 }
 
 function selectDay(d) {
-  calSelected = new Date(calDate.getFullYear(), calDate.getMonth(), d);
+  var dt = new Date(calDate.getFullYear(), calDate.getMonth(), d);
+  dt.setHours(0,0,0,0);
+
+  if (calRangeStep === 'ida') {
+    calSelectedIda = dt;
+    calSelectedVolta = null;
+    calRangeStep = 'volta';
+    document.getElementById('cal-step').textContent = 'Agora selecione a data de volta (opcional)';
+    var preview = document.getElementById('cal-range-preview');
+    preview.textContent = 'Ida: ' + formatDataCurta2(dt);
+    preview.style.display = 'block';
+  } else {
+    if (dt <= calSelectedIda) {
+      showToast('A volta deve ser depois da ida', 'error');
+      return;
+    }
+    calSelectedVolta = dt;
+    var preview = document.getElementById('cal-range-preview');
+    preview.textContent = 'Ida: ' + formatDataCurta2(calSelectedIda) + '  →  Volta: ' + formatDataCurta2(dt);
+  }
+
   renderCal();
 }
 
 function confirmCal() {
-  if (!calSelected) { showToast('Selecione uma data', 'error'); return; }
-  var y = calSelected.getFullYear();
-  var m = String(calSelected.getMonth() + 1).padStart(2,'0');
-  var d = String(calSelected.getDate()).padStart(2,'0');
-  document.getElementById('input-' + calTarget).value = y + '-' + m + '-' + d;
-  var el = document.getElementById('display-' + calTarget);
-  el.textContent = d + '/' + m + '/' + y;
+  if (!calSelectedIda) { showToast('Selecione a data de ida', 'error'); return; }
+
+  var toISO = function(dt) {
+    var y = dt.getFullYear();
+    var m = String(dt.getMonth() + 1).padStart(2,'0');
+    var d = String(dt.getDate()).padStart(2,'0');
+    return y + '-' + m + '-' + d;
+  };
+
+  document.getElementById('input-ida').value = toISO(calSelectedIda);
+  document.getElementById('input-volta').value = calSelectedVolta ? toISO(calSelectedVolta) : '';
+
+  // Atualiza o campo de exibição
+  var el = document.getElementById('display-range');
+  if (calSelectedVolta) {
+    el.textContent = formatDataCurta2(calSelectedIda) + ' → ' + formatDataCurta2(calSelectedVolta);
+  } else {
+    el.textContent = formatDataCurta2(calSelectedIda) + ' (só ida)';
+  }
   el.className = 'field-value';
+
   document.getElementById('cal-overlay').classList.remove('open');
+}
+
+function formatDataCurta2(dt) {
+  var meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return dt.getDate() + ' ' + meses[dt.getMonth()];
 }
 
 // TOAST
