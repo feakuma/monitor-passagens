@@ -498,6 +498,157 @@
 </head>
 <body>
 
+ <div id="tela-login" style="display:none;">
+  <div style="
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    background: #0D0D0D;
+  ">
+    <!-- Logo / título -->
+    <div style="text-align:center; margin-bottom:48px;">
+      <div style="font-size:36px; margin-bottom:12px;">✈️</div>
+      <div style="font-size:24px; font-weight:600; color:#F0F0F0; letter-spacing:-0.8px;">Monitor de Passagens</div>
+      <div style="font-size:13px; color:#444; margin-top:6px;">Faça login para continuar</div>
+    </div>
+ 
+    <!-- Etapa 1: e-mail -->
+    <div id="login-step-email" style="width:100%; max-width:320px;">
+      <div style="
+        background:#141414;
+        border:1px solid #1C1C1C;
+        border-radius:18px;
+        overflow:hidden;
+        margin-bottom:12px;
+      ">
+        <div style="padding:16px 18px;">
+          <div style="font-size:10px; color:#444; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">e-mail</div>
+          <input
+            id="login-email"
+            type="email"
+            placeholder="seu@email.com"
+            style="
+              width:100%;
+              background:transparent;
+              border:none;
+              outline:none;
+              font-size:16px;
+              color:#F0F0F0;
+              font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+              padding:0;
+            "
+            onkeyup="if(event.key==='Enter') solicitarOTP()"
+          />
+        </div>
+      </div>
+ 
+      <div id="login-email-erro" style="font-size:12px; color:#9E5A5A; padding:4px 4px 8px; display:none;"></div>
+ 
+      <div
+        id="btn-solicitar-otp"
+        onclick="solicitarOTP()"
+        style="
+          background:#F0F0F0;
+          color:#0D0D0D;
+          border-radius:14px;
+          padding:16px;
+          text-align:center;
+          font-size:15px;
+          font-weight:600;
+          cursor:pointer;
+          letter-spacing:-0.3px;
+        "
+      >Enviar código</div>
+    </div>
+ 
+    <!-- Etapa 2: código OTP -->
+    <div id="login-step-otp" style="width:100%; max-width:320px; display:none;">
+      <div style="text-align:center; margin-bottom:24px;">
+        <div style="font-size:13px; color:#888;">Código enviado para</div>
+        <div id="login-email-display" style="font-size:14px; color:#F0F0F0; font-weight:500; margin-top:4px;"></div>
+      </div>
+ 
+      <div style="
+        background:#141414;
+        border:1px solid #1C1C1C;
+        border-radius:18px;
+        overflow:hidden;
+        margin-bottom:12px;
+      ">
+        <div style="padding:16px 18px;">
+          <div style="font-size:10px; color:#444; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">código de 6 dígitos</div>
+          <input
+            id="login-otp"
+            type="number"
+            placeholder="000000"
+            maxlength="6"
+            style="
+              width:100%;
+              background:transparent;
+              border:none;
+              outline:none;
+              font-size:28px;
+              color:#F0F0F0;
+              font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+              font-weight:600;
+              letter-spacing:6px;
+              padding:0;
+            "
+            onkeyup="if(event.key==='Enter') verificarOTP()"
+          />
+        </div>
+      </div>
+ 
+      <div id="login-otp-erro" style="font-size:12px; color:#9E5A5A; padding:4px 4px 8px; display:none;"></div>
+ 
+      <div
+        id="btn-verificar-otp"
+        onclick="verificarOTP()"
+        style="
+          background:#F0F0F0;
+          color:#0D0D0D;
+          border-radius:14px;
+          padding:16px;
+          text-align:center;
+          font-size:15px;
+          font-weight:600;
+          cursor:pointer;
+          letter-spacing:-0.3px;
+          margin-bottom:12px;
+        "
+      >Entrar</div>
+ 
+      <div
+        onclick="voltarParaEmail()"
+        style="
+          text-align:center;
+          font-size:13px;
+          color:#444;
+          cursor:pointer;
+          padding:8px;
+        "
+      >← Usar outro e-mail</div>
+ 
+      <div
+        id="btn-reenviar-otp"
+        onclick="solicitarOTP(true)"
+        style="
+          text-align:center;
+          font-size:13px;
+          color:#444;
+          cursor:pointer;
+          padding:8px;
+          display:none;
+        "
+      >Reenviar código</div>
+    </div>
+ 
+  </div>
+</div>
+ 
 <div class="status-bar">
   <span id="clock">--:--</span>
   <span>●●●</span>
@@ -601,6 +752,201 @@
 </div>
 
 <script>
+
+<script>
+// ============================================================
+//  CONFIGURAÇÃO
+// ============================================================
+const WORKER_URL = 'https://passagens-proxy.felipe-akuma.workers.dev';
+ 
+// ============================================================
+//  SESSÃO
+// ============================================================
+function salvarSessao(token, usuario) {
+  localStorage.setItem('pm_token',   token);
+  localStorage.setItem('pm_usuario', JSON.stringify(usuario));
+}
+ 
+function getSessao() {
+  const token   = localStorage.getItem('pm_token');
+  const usuario = localStorage.getItem('pm_usuario');
+  if (!token || !usuario) return null;
+  return { token, usuario: JSON.parse(usuario) };
+}
+ 
+function limparSessao() {
+  localStorage.removeItem('pm_token');
+  localStorage.removeItem('pm_usuario');
+}
+ 
+// ============================================================
+//  INICIALIZAÇÃO — verifica sessão ao carregar
+// ============================================================
+function inicializarApp() {
+  const sessao = getSessao();
+  if (sessao) {
+    // Sessão válida — mostra a interface principal
+    document.getElementById('tela-login').style.display = 'none';
+    document.querySelector('.status-bar').style.display = '';
+    document.querySelector('.header').style.display = '';
+    document.querySelector('.tabs').style.display = '';
+    document.querySelectorAll('.page').forEach(function(p) { p.style.display = ''; });
+    document.querySelector('.bottom-nav').style.display = '';
+    carregarAlertas();
+  } else {
+    // Sem sessão — mostra tela de login
+    mostrarTelaLogin();
+  }
+}
+ 
+function mostrarTelaLogin() {
+  document.getElementById('tela-login').style.display = 'block';
+  document.querySelector('.status-bar').style.display = 'none';
+  document.querySelector('.header').style.display = 'none';
+  document.querySelector('.tabs').style.display = 'none';
+  document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
+  document.querySelector('.bottom-nav').style.display = 'none';
+}
+ 
+// ============================================================
+//  SOLICITAR OTP
+// ============================================================
+function solicitarOTP(reenvio) {
+  var email = document.getElementById('login-email').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    mostrarErroLogin('email', 'Informe um e-mail válido');
+    return;
+  }
+ 
+  var btn = document.getElementById('btn-solicitar-otp');
+  btn.textContent = 'Enviando...';
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+  document.getElementById('login-email-erro').style.display = 'none';
+ 
+  fetch(WORKER_URL + '/auth/request-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    btn.textContent = 'Enviar código';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = '';
+ 
+    if (data.erro) {
+      mostrarErroLogin('email', data.erro);
+      return;
+    }
+ 
+    // Avança para etapa do código
+    document.getElementById('login-step-email').style.display = 'none';
+    document.getElementById('login-step-otp').style.display = 'block';
+    document.getElementById('login-email-display').textContent = email;
+    document.getElementById('login-otp').focus();
+ 
+    // Mostra botão reenviar após 30s
+    setTimeout(function() {
+      document.getElementById('btn-reenviar-otp').style.display = 'block';
+    }, 30000);
+  })
+  .catch(function() {
+    btn.textContent = 'Enviar código';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = '';
+    mostrarErroLogin('email', 'Erro ao enviar. Tente novamente.');
+  });
+}
+ 
+// ============================================================
+//  VERIFICAR OTP
+// ============================================================
+function verificarOTP() {
+  var email  = document.getElementById('login-email').value.trim().toLowerCase();
+  var codigo = document.getElementById('login-otp').value.trim();
+ 
+  if (!codigo || codigo.length !== 6) {
+    mostrarErroLogin('otp', 'Digite o código de 6 dígitos');
+    return;
+  }
+ 
+  var btn = document.getElementById('btn-verificar-otp');
+  btn.textContent = 'Verificando...';
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+  document.getElementById('login-otp-erro').style.display = 'none';
+ 
+  fetch(WORKER_URL + '/auth/verify-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, codigo: codigo }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    btn.textContent = 'Entrar';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = '';
+ 
+    if (data.erro) {
+      mostrarErroLogin('otp', data.erro);
+      return;
+    }
+ 
+    // Login bem sucedido
+    salvarSessao(data.token, data.usuario);
+    document.getElementById('tela-login').style.display = 'none';
+    document.querySelector('.status-bar').style.display = '';
+    document.querySelector('.header').style.display = '';
+    document.querySelector('.tabs').style.display = '';
+    document.querySelectorAll('.page').forEach(function(p) { p.style.display = ''; });
+    document.querySelector('.bottom-nav').style.display = '';
+    carregarAlertas();
+  })
+  .catch(function() {
+    btn.textContent = 'Entrar';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = '';
+    mostrarErroLogin('otp', 'Erro ao verificar. Tente novamente.');
+  });
+}
+ 
+// ============================================================
+//  LOGOUT
+// ============================================================
+function logout() {
+  var sessao = getSessao();
+  if (sessao) {
+    fetch(WORKER_URL + '/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + sessao.token },
+    });
+  }
+  limparSessao();
+  mostrarTelaLogin();
+}
+ 
+// ============================================================
+//  HELPERS
+// ============================================================
+function voltarParaEmail() {
+  document.getElementById('login-step-otp').style.display = 'none';
+  document.getElementById('login-step-email').style.display = 'block';
+  document.getElementById('login-otp').value = '';
+  document.getElementById('login-otp-erro').style.display = 'none';
+  document.getElementById('btn-reenviar-otp').style.display = 'none';
+}
+ 
+function mostrarErroLogin(tipo, msg) {
+  var el = document.getElementById('login-' + tipo + '-erro');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+ 
+// Inicia o app verificando a sessão
+inicializarApp();
+</script>
+ 
 // ============================================================
 //  CONFIGURAÇÃO — substitua se hospedar fora do cloudfire
 // ============================================================
