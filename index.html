@@ -35,150 +35,54 @@
     padding-bottom: 80px;
   }
 
-  .status-bar {
-    padding: 16px 24px 0;
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--text3);
-  }
-
+  .status-bar { padding: 16px 24px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
   .header { padding: 16px 24px 20px; }
   .header-eyebrow { font-size: 11px; color: var(--text3); font-weight: 300; margin-bottom: 4px; }
   .header-title { font-size: 26px; font-weight: 600; letter-spacing: -0.8px; }
 
-  .tabs {
-    display: flex;
-    padding: 0 24px;
-    gap: 20px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 20px;
-  }
-
-  .tab {
-    font-size: 13px;
-    color: var(--text3);
-    padding-bottom: 12px;
-    cursor: pointer;
-    border-bottom: 1.5px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.2s;
-  }
-
+  .tabs { display: flex; padding: 0 24px; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab { font-size: 13px; color: var(--text3); padding-bottom: 12px; cursor: pointer; border-bottom: 1.5px solid transparent; margin-bottom: -1px; transition: color 0.2s; }
   .tab.active { color: var(--text); border-bottom-color: var(--text); }
 
   .page { display: none; padding: 0 16px; }
   .page.active { display: block; }
 
-  .card {
-    background: var(--bg2);
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-
+  .card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
   .card-body { padding: 16px 18px; }
-
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 12px;
-  }
-
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
   .route { font-size: 22px; font-weight: 600; letter-spacing: -0.8px; }
   .route-sep { color: var(--text4); font-weight: 300; margin: 0 2px; }
-
   .price-block { text-align: right; }
   .price { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
   .price-drop { font-size: 11px; color: var(--green); margin-top: 2px; }
   .price-up { font-size: 11px; color: var(--red); margin-top: 2px; }
   .price-neutral { font-size: 11px; color: var(--text4); margin-top: 2px; }
-
   .card-meta { display: flex; justify-content: space-between; align-items: flex-end; }
   .dates { display: flex; flex-direction: column; gap: 3px; }
   .date-row { font-size: 11px; color: var(--text3); font-weight: 300; }
   .date-row strong { color: var(--text2); font-weight: 500; }
 
-  .card-action {
-    border-top: 1px solid var(--border);
-    padding: 12px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-
+  .card-action { border-top: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .action-left { display: flex; flex-direction: column; gap: 2px; }
   .action-title { font-size: 12px; color: var(--text); font-weight: 400; }
   .action-sub { font-size: 10px; color: var(--text3); font-weight: 300; }
   .action-arrow { font-size: 14px; color: var(--text4); }
   .action-arrow.active { color: var(--green); }
 
-  .ai-block {
-    margin-bottom: 10px;
-    padding: 14px 18px;
-    border-radius: 14px;
-    border: 1px solid #1A2E20;
-    background: #0F1A12;
-  }
-
+  .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: 14px; border: 1px solid #1A2E20; background: #0F1A12; }
   .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.5px; margin-bottom: 6px; }
   .ai-verdict { font-size: 14px; color: var(--green); font-weight: 600; margin-bottom: 5px; }
   .ai-text { font-size: 12px; color: #3A7A4A; line-height: 1.7; }
+  .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid #1A2E20; border-radius: 12px; background: #0F1A12; cursor: pointer; font-size: 12px; color: #3A7A4A; margin-top: 8px; }
 
-  .ai-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 11px;
-    border: 1px solid #1A2E20;
-    border-radius: 12px;
-    background: #0F1A12;
-    cursor: pointer;
-    font-size: 12px;
-    color: #3A7A4A;
-    margin-top: 8px;
-  }
-
-  .monitor-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 4px 2px 16px;
-  }
-
-  .monitor-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--text4);
-    animation: blink 2.5s infinite;
-  }
-
+  .monitor-row { display: flex; align-items: center; gap: 7px; padding: 4px 2px 16px; }
+  .monitor-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text4); animation: blink 2.5s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
   .monitor-text { font-size: 11px; color: var(--text4); }
 
-  .empty {
-    text-align: center;
-    padding: 48px 24px;
-    color: var(--text3);
-    font-size: 13px;
-    line-height: 1.7;
-  }
+  .empty { text-align: center; padding: 48px 24px; color: var(--text3); font-size: 13px; line-height: 1.7; }
 
-  .hist-item {
-    background: var(--bg2);
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    padding: 13px 16px;
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
+  .hist-item { background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); padding: 13px 16px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
   .hist-left { display: flex; flex-direction: column; gap: 3px; }
   .hist-route { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; }
   .hist-meta { font-size: 10px; color: var(--text3); }
@@ -189,466 +93,138 @@
   .hist-var.up { color: var(--red); }
   .hist-sep { font-size: 10px; color: var(--text4); padding: 12px 2px 6px; }
 
-  .alerta-item {
-    background: var(--bg2);
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-
-  .alerta-header {
-    padding: 14px 16px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
+  .alerta-item { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
+  .alerta-header { padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
   .alerta-route { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
   .alerta-route span { color: var(--text4); font-weight: 300; }
-
-  .remove-btn {
-    font-size: 22px;
-    color: var(--text4);
-    cursor: pointer;
-    padding: 0 4px;
-    line-height: 1;
-  }
-
+  .remove-btn { font-size: 22px; color: var(--text4); cursor: pointer; padding: 0 4px; line-height: 1; }
   .remove-btn:active { color: var(--red); }
-
-  .alerta-dates {
-    padding: 0 16px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
+  .alerta-dates { padding: 0 16px 14px; display: flex; justify-content: space-between; align-items: center; }
   .alerta-date { font-size: 11px; color: var(--text3); }
   .alerta-date strong { color: var(--text2); font-weight: 500; }
   .alerta-cia { font-size: 11px; color: var(--text4); }
 
-  .section-label {
-    font-size: 11px;
-    color: var(--text3);
-    padding: 16px 2px 10px;
-    letter-spacing: 0.3px;
-  }
-
-  .form-card {
-    background: var(--bg2);
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    overflow: visible;
-    margin-bottom: 10px;
-  }
-
-  .form-row {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
+  .section-label { font-size: 11px; color: var(--text3); padding: 16px 2px 10px; letter-spacing: 0.3px; }
+  .form-card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: visible; margin-bottom: 10px; }
+  .form-row { padding: 14px 16px; border-bottom: 1px solid var(--border); position: relative; }
   .form-row:last-child { border-bottom: none; }
   .form-row.two-col { display: flex; justify-content: space-between; gap: 8px; }
   .form-col { display: flex; flex-direction: column; gap: 5px; flex: 1; position: relative; }
   .form-col:last-child { text-align: right; align-items: flex-end; }
-
   .field-label { font-size: 10px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
   .field-value { font-size: 15px; color: var(--text); font-weight: 500; letter-spacing: -0.3px; }
   .field-placeholder { font-size: 15px; color: var(--text4); cursor: pointer; }
 
   .autocomplete-wrap { position: relative; overflow: visible; }
-
-  .autocomplete-input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 15px;
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 500;
-    letter-spacing: -0.3px;
-    padding: 0;
-    -webkit-appearance: none;
-  }
-
+  .autocomplete-input { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; letter-spacing: -0.3px; padding: 0; -webkit-appearance: none; }
   .autocomplete-input::placeholder { color: var(--text4); font-weight: 400; }
-
-  .autocomplete-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: -16px;
-    right: -16px;
-    background: #202020;
-    border: 1px solid #3A3A3A;
-    border-radius: 16px;
-    overflow: hidden;
-    z-index: 999;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.9);
-  }
-
+  .autocomplete-dropdown { display: none; position: absolute; top: calc(100% + 8px); left: -16px; right: -16px; background: #202020; border: 1px solid #3A3A3A; border-radius: 16px; overflow: hidden; z-index: 999; box-shadow: 0 12px 40px rgba(0,0,0,0.9); }
   .autocomplete-dropdown.open { display: block; }
-
-  .autocomplete-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid #2A2A2A;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
+  .autocomplete-item { padding: 14px 16px; border-bottom: 1px solid #2A2A2A; cursor: pointer; display: flex; align-items: center; gap: 12px; }
   .autocomplete-item:last-child { border-bottom: none; }
   .autocomplete-item:active { background: #2A2A2A; }
-
   .ac-code { font-size: 15px; font-weight: 700; color: #F0F0F0; min-width: 42px; letter-spacing: 0.5px; }
   .ac-info { display: flex; flex-direction: column; gap: 2px; }
   .ac-name { font-size: 13px; color: #AAA; }
   .ac-city { font-size: 11px; color: #666; }
 
-  /* CALENDÁRIO */
-  .calendar-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 1000;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
+  .calendar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; justify-content: center; }
   .calendar-overlay.open { display: flex; }
-
-  .calendar-sheet {
-    background: #1C1C1E;
-    border-radius: 24px 24px 0 0;
-    border-top: 1px solid #3A3A3A;
-    width: 100%;
-    padding-bottom: 20px;
-  }
-
-  .cal-handle {
-    width: 40px; height: 4px;
-    background: #3A3A3A;
-    border-radius: 2px;
-    margin: 14px auto 18px;
-  }
-
-  .cal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px 16px;
-    border-bottom: 1px solid #2A2A2A;
-    margin-bottom: 8px;
-  }
-
+  .calendar-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding-bottom: 20px; }
+  .cal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 14px auto 18px; }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px 16px; border-bottom: 1px solid #2A2A2A; margin-bottom: 8px; }
   .cal-title { font-size: 17px; font-weight: 700; color: #F5F5F5; }
   .cal-nav { font-size: 24px; color: #888; cursor: pointer; padding: 4px 12px; user-select: none; }
   .cal-nav:active { color: #F0F0F0; }
-
-  .cal-table {
-    width: 100%;
-    border-collapse: collapse;
-    padding: 0 8px;
-    table-layout: fixed;
-  }
-
-  .cal-table th {
-    text-align: center;
-    font-size: 12px;
-    color: #555;
-    font-weight: 600;
-    padding: 8px 0;
-  }
-
-  .cal-table td {
-    text-align: center;
-    padding: 4px 0;
-  }
-
-  .cal-day {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    font-size: 15px;
-    color: #D0D0D0;
-    border-radius: 50%;
-    cursor: pointer;
-    font-weight: 400;
-    margin: 0 auto;
-  }
-
+  .cal-table { width: 100%; border-collapse: collapse; padding: 0 8px; table-layout: fixed; }
+  .cal-table th { text-align: center; font-size: 12px; color: #555; font-weight: 600; padding: 8px 0; }
+  .cal-table td { text-align: center; padding: 4px 0; }
+  .cal-day { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; font-size: 15px; color: #D0D0D0; border-radius: 50%; cursor: pointer; font-weight: 400; margin: 0 auto; }
   .cal-day:active { background: #2A2A2A; }
   .cal-day.past { color: #444; pointer-events: none; cursor: default; }
   .cal-day.today { color: #F5F5F5; font-weight: 700; border: 1.5px solid #666; }
   .cal-day.selected { background: #F5F5F5; color: #0D0D0D; font-weight: 700; }
   .cal-day.in-range { background: #2A2A2A; color: #D0D0D0; border-radius: 0; }
-
-  .cal-confirm {
-    margin: 8px 16px 0;
-    background: #F5F5F5;
-    color: #0D0D0D;
-    border-radius: 14px;
-    padding: 16px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .cal-confirm:active { opacity: 0.8; }
-    cursor: pointer;
-    font-weight: 400;
-    min-height: 40px;
-  }
-
-  .cal-day:active { background: #2A2A2A; }
-  .cal-day.empty { pointer-events: none; color: transparent; }
-  .cal-day.past { color: #333; pointer-events: none; }
-  .cal-day.today { color: #F5F5F5; font-weight: 700; border: 1.5px solid #666; }
-  .cal-day.selected { background: #F5F5F5; color: #0D0D0D; font-weight: 700; }
-
-  .cal-confirm {
-    margin: 4px 16px 0;
-    background: #F5F5F5;
-    color: #0D0D0D;
-    border-radius: 14px;
-    padding: 16px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: -0.3px;
-  }
-
+  .cal-confirm { margin: 8px 16px 0; background: #F5F5F5; color: #0D0D0D; border-radius: 14px; padding: 16px; text-align: center; font-size: 16px; font-weight: 700; cursor: pointer; }
   .cal-confirm:active { opacity: 0.8; }
 
-  .submit-btn {
-    background: var(--text);
-    color: var(--bg);
-    border-radius: 16px;
-    padding: 16px;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 24px;
-  }
-
+  .submit-btn { background: var(--text); color: var(--bg); border-radius: 16px; padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; }
   .submit-btn:active { opacity: 0.8; }
   .submit-btn.loading { opacity: 0.5; pointer-events: none; }
 
-  .toast {
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #202020;
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-size: 13px;
-    color: var(--text2);
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 300;
-    white-space: nowrap;
-  }
-
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #202020; border: 1px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; color: var(--text2); opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { color: var(--green); border-color: #1A3A22; }
   .toast.error { color: var(--red); border-color: #3A1A1A; }
 
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    max-width: 430px;
-    margin: 0 auto;
-    background: rgba(13,13,13,0.97);
-    border-top: 1px solid var(--border);
-    padding: 12px 0 20px;
-    display: flex;
-    justify-content: space-around;
-  }
-
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(13,13,13,0.97); border-top: 1px solid var(--border); padding: 12px 0 20px; display: flex; justify-content: space-around; }
   .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 20px; }
   .nav-icon { font-size: 16px; color: var(--text4); }
   .nav-icon.on { color: var(--text); }
   .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.3px; }
   .nav-label.on { color: var(--text2); }
 
-  .spinner {
-    width: 14px; height: 14px;
-    border: 1.5px solid var(--border2);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    display: inline-block;
-  }
-
+  .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ADMIN */
+  .usuario-card { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
+  .usuario-header { padding: 14px 16px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .usuario-nome { font-size: 15px; font-weight: 600; color: var(--text); }
+  .usuario-email { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .usuario-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 9px; padding: 3px 8px; border-radius: 10px; font-weight: 500; }
+  .badge-green { background: #0D2A1A; color: #5A9E6F; border: 1px solid #1A4A2E; }
+  .badge-red { background: #2A0D0D; color: #9E5A5A; border: 1px solid #4A1A1A; }
+  .badge-gray { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
+  .badge-purple { background: #1A1030; color: #9B8FE8; border: 1px solid #3a3560; }
+  .usuario-meta { padding: 0 16px 10px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .usuario-meta-item { font-size: 11px; color: var(--text3); }
+  .usuario-meta-item strong { color: var(--text2); font-weight: 500; }
+  .usuario-actions { border-top: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-small { font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); }
+  .btn-small:active { opacity: 0.7; }
+  .btn-small.danger { color: var(--red); border-color: #4A1A1A; }
 </style>
 </head>
 <body>
 
- <div id="tela-login" style="display:none;">
-  <div style="
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 24px;
-    background: #0D0D0D;
-  ">
-    <!-- Logo / título -->
-    <div style="text-align:center; margin-bottom:48px;">
-      <div style="font-size:36px; margin-bottom:12px;">✈️</div>
-      <div style="font-size:24px; font-weight:600; color:#F0F0F0; letter-spacing:-0.8px;">Monitor de Passagens</div>
-      <div style="font-size:13px; color:#444; margin-top:6px;">Faça login para continuar</div>
+<div id="tela-login" style="display:none;">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#0D0D0D;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:36px;margin-bottom:12px;">✈️</div>
+      <div style="font-size:24px;font-weight:600;color:#F0F0F0;letter-spacing:-0.8px;">Monitor de Passagens</div>
+      <div style="font-size:13px;color:#444;margin-top:6px;">Faça login para continuar</div>
     </div>
- 
-    <!-- Etapa 1: e-mail -->
-    <div id="login-step-email" style="width:100%; max-width:320px;">
-      <div style="
-        background:#141414;
-        border:1px solid #1C1C1C;
-        border-radius:18px;
-        overflow:hidden;
-        margin-bottom:12px;
-      ">
+    <div id="login-step-email" style="width:100%;max-width:320px;">
+      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
-          <div style="font-size:10px; color:#444; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">e-mail</div>
-          <input
-            id="login-email"
-            type="email"
-            placeholder="seu@email.com"
-            style="
-              width:100%;
-              background:transparent;
-              border:none;
-              outline:none;
-              font-size:16px;
-              color:#F0F0F0;
-              font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-              padding:0;
-            "
-            onkeyup="if(event.key==='Enter') solicitarOTP()"
-          />
+          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">e-mail</div>
+          <input id="login-email" type="email" placeholder="seu@email.com" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" onkeyup="if(event.key==='Enter') solicitarOTP()" />
         </div>
       </div>
- 
-      <div id="login-email-erro" style="font-size:12px; color:#9E5A5A; padding:4px 4px 8px; display:none;"></div>
- 
-      <div
-        id="btn-solicitar-otp"
-        onclick="solicitarOTP()"
-        style="
-          background:#F0F0F0;
-          color:#0D0D0D;
-          border-radius:14px;
-          padding:16px;
-          text-align:center;
-          font-size:15px;
-          font-weight:600;
-          cursor:pointer;
-          letter-spacing:-0.3px;
-        "
-      >Enviar código</div>
+      <div id="login-email-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
+      <div id="btn-solicitar-otp" onclick="solicitarOTP()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">Enviar código</div>
     </div>
- 
-    <!-- Etapa 2: código OTP -->
-    <div id="login-step-otp" style="width:100%; max-width:320px; display:none;">
-      <div style="text-align:center; margin-bottom:24px;">
-        <div style="font-size:13px; color:#888;">Código enviado para</div>
-        <div id="login-email-display" style="font-size:14px; color:#F0F0F0; font-weight:500; margin-top:4px;"></div>
+    <div id="login-step-otp" style="width:100%;max-width:320px;display:none;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:13px;color:#888;">Código enviado para</div>
+        <div id="login-email-display" style="font-size:14px;color:#F0F0F0;font-weight:500;margin-top:4px;"></div>
       </div>
- 
-      <div style="
-        background:#141414;
-        border:1px solid #1C1C1C;
-        border-radius:18px;
-        overflow:hidden;
-        margin-bottom:12px;
-      ">
+      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
-          <div style="font-size:10px; color:#444; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">código de 6 dígitos</div>
-          <input
-            id="login-otp"
-            type="number"
-            placeholder="000000"
-            maxlength="6"
-            style="
-              width:100%;
-              background:transparent;
-              border:none;
-              outline:none;
-              font-size:28px;
-              color:#F0F0F0;
-              font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-              font-weight:600;
-              letter-spacing:6px;
-              padding:0;
-            "
-            onkeyup="if(event.key==='Enter') verificarOTP()"
-          />
+          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">código de 6 dígitos</div>
+          <input id="login-otp" type="number" placeholder="000000" maxlength="6" style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;letter-spacing:6px;padding:0;" onkeyup="if(event.key==='Enter') verificarOTP()" />
         </div>
       </div>
- 
-      <div id="login-otp-erro" style="font-size:12px; color:#9E5A5A; padding:4px 4px 8px; display:none;"></div>
- 
-      <div
-        id="btn-verificar-otp"
-        onclick="verificarOTP()"
-        style="
-          background:#F0F0F0;
-          color:#0D0D0D;
-          border-radius:14px;
-          padding:16px;
-          text-align:center;
-          font-size:15px;
-          font-weight:600;
-          cursor:pointer;
-          letter-spacing:-0.3px;
-          margin-bottom:12px;
-        "
-      >Entrar</div>
- 
-      <div
-        onclick="voltarParaEmail()"
-        style="
-          text-align:center;
-          font-size:13px;
-          color:#444;
-          cursor:pointer;
-          padding:8px;
-        "
-      >← Usar outro e-mail</div>
- 
-      <div
-        id="btn-reenviar-otp"
-        onclick="solicitarOTP(true)"
-        style="
-          text-align:center;
-          font-size:13px;
-          color:#444;
-          cursor:pointer;
-          padding:8px;
-          display:none;
-        "
-      >Reenviar código</div>
+      <div id="login-otp-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
+      <div id="btn-verificar-otp" onclick="verificarOTP()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;">Entrar</div>
+      <div onclick="voltarParaEmail()" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;">← Usar outro e-mail</div>
+      <div id="btn-reenviar-otp" onclick="solicitarOTP(true)" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;display:none;">Reenviar código</div>
     </div>
- 
   </div>
 </div>
- 
+
 <div class="status-bar">
   <span id="clock">--:--</span>
   <span>●●●</span>
@@ -663,6 +239,7 @@
   <div class="tab active" onclick="showTab('alertas')">Alertas</div>
   <div class="tab" onclick="showTab('historico')">Histórico</div>
   <div class="tab" onclick="showTab('config')">Config</div>
+  <div class="tab" id="tab-admin-btn" style="display:none;" onclick="showTab('admin')">Admin</div>
 </div>
 
 <div id="tab-alertas" class="page active">
@@ -676,27 +253,17 @@
 <div id="tab-config" class="page">
   <div class="section-label">meus alertas</div>
   <div id="config-alertas-list"></div>
-
   <div class="section-label">novo alerta</div>
-
   <div class="form-card">
     <div class="form-row two-col">
       <div class="form-col autocomplete-wrap">
         <div class="field-label">origem</div>
-        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH"
-          maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters"
-          spellcheck="false"
-          oninput="doAutocomplete(this,'origem')"
-          onkeyup="doAutocomplete(this,'origem')" />
+        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="doAutocomplete(this,'origem')" onkeyup="doAutocomplete(this,'origem')" />
         <div class="autocomplete-dropdown" id="drop-origem"></div>
       </div>
       <div class="form-col autocomplete-wrap">
         <div class="field-label" style="text-align:right;">destino</div>
-        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN"
-          maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters"
-          spellcheck="false" style="text-align:right;"
-          oninput="doAutocomplete(this,'destino')"
-          onkeyup="doAutocomplete(this,'destino')" />
+        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="doAutocomplete(this,'destino')" onkeyup="doAutocomplete(this,'destino')" />
         <div class="autocomplete-dropdown" id="drop-destino"></div>
       </div>
     </div>
@@ -707,8 +274,52 @@
       <input type="hidden" id="input-volta" />
     </div>
   </div>
-
   <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
+  <div class="section-label" style="margin-top:8px;">conta</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-action" onclick="logout()" style="cursor:pointer;">
+      <div class="action-left">
+        <div class="action-title" style="color:var(--red);">Sair</div>
+        <div class="action-sub" id="sessao-email"></div>
+      </div>
+      <div class="action-arrow">→</div>
+    </div>
+  </div>
+</div>
+
+<!-- ABA ADMIN -->
+<div id="tab-admin" class="page">
+  <div class="section-label">usuários cadastrados</div>
+  <div id="admin-usuarios-list"><div class="empty">Carregando...</div></div>
+  <div class="section-label">novo usuário</div>
+  <div class="form-card">
+    <div class="form-row">
+      <div class="field-label">nome</div>
+      <input class="autocomplete-input" id="admin-nome" placeholder="Nome completo" autocomplete="off" style="margin-top:4px;" />
+    </div>
+    <div class="form-row">
+      <div class="field-label">e-mail</div>
+      <input class="autocomplete-input" id="admin-email" placeholder="email@exemplo.com" type="email" autocomplete="off" style="margin-top:4px;" />
+    </div>
+    <div class="form-row">
+      <div class="field-label">telegram chat id</div>
+      <input class="autocomplete-input" id="admin-chatid" placeholder="ex: 6315959431" type="number" autocomplete="off" style="margin-top:4px;" />
+    </div>
+    <div class="form-row two-col">
+      <div class="form-col">
+        <div class="field-label">análise de ia</div>
+        <select id="admin-ia" style="background:transparent;border:none;color:var(--text);font-size:14px;margin-top:4px;outline:none;">
+          <option value="false">Não</option>
+          <option value="true">Sim</option>
+        </select>
+      </div>
+      <div class="form-col" style="text-align:right;">
+        <div class="field-label">queda mínima %</div>
+        <input class="autocomplete-input" id="admin-pct" placeholder="0" type="number" min="0" max="100" style="text-align:right;margin-top:4px;" value="0" />
+      </div>
+    </div>
+  </div>
+  <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
 </div>
 
 <!-- CALENDÁRIO -->
@@ -720,14 +331,10 @@
       <div class="cal-title" id="cal-title">—</div>
       <div class="cal-nav" onclick="calNav(1)">›</div>
     </div>
-    <div id="cal-step" style="text-align:center; font-size:12px; color:#888; padding: 0 20px 10px; border-bottom: 1px solid #2A2A2A; margin-bottom: 4px;">Selecione a data de ida</div>
-    <div id="cal-range-preview" style="display:none; text-align:center; font-size:12px; padding: 8px 20px; color:#5A9E6F;"></div>
+    <div id="cal-step" style="text-align:center;font-size:12px;color:#888;padding:0 20px 10px;border-bottom:1px solid #2A2A2A;margin-bottom:4px;">Selecione a data de ida</div>
+    <div id="cal-range-preview" style="display:none;text-align:center;font-size:12px;padding:8px 20px;color:#5A9E6F;"></div>
     <table class="cal-table" id="cal-table">
-      <thead>
-        <tr>
-          <th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th>
-        </tr>
-      </thead>
+      <thead><tr><th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th></tr></thead>
       <tbody id="cal-body"></tbody>
     </table>
     <div class="cal-confirm" onclick="confirmCal()">Confirmar</div>
@@ -752,52 +359,49 @@
 </div>
 
 <script>
-
-// ============================================================
-//  CONFIGURAÇÃO
-// ============================================================
 const WORKER_URL = 'https://passagens-proxy.felipe-akuma.workers.dev';
- 
-// ============================================================
-//  SESSÃO
-// ============================================================
-function salvarSessao(token, usuario) {
-  localStorage.setItem('pm_token',   token);
-  localStorage.setItem('pm_usuario', JSON.stringify(usuario));
+const IS_GAS = typeof google !== 'undefined' && google.script;
+
+// SESSÃO
+function salvarSessao(token, usuario) { localStorage.setItem('pm_token', token); localStorage.setItem('pm_usuario', JSON.stringify(usuario)); }
+function getSessao() { var t = localStorage.getItem('pm_token'); var u = localStorage.getItem('pm_usuario'); if (!t || !u) return null; return { token: t, usuario: JSON.parse(u) }; }
+function limparSessao() { localStorage.removeItem('pm_token'); localStorage.removeItem('pm_usuario'); }
+
+// API
+function api(action, data) {
+  data = data || {};
+  var sessao = getSessao();
+  var headers = { 'Content-Type': 'text/plain' };
+  if (sessao) headers['Authorization'] = 'Bearer ' + sessao.token;
+  if (IS_GAS) {
+    return new Promise(function(resolve, reject) {
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).handleAction(JSON.stringify(Object.assign({ action: action }, data)));
+    });
+  }
+  return fetch(WORKER_URL, { method: 'POST', redirect: 'follow', headers: headers, body: JSON.stringify(Object.assign({ action: action }, data)) }).then(function(r) { return r.json(); });
 }
- 
-function getSessao() {
-  const token   = localStorage.getItem('pm_token');
-  const usuario = localStorage.getItem('pm_usuario');
-  if (!token || !usuario) return null;
-  return { token, usuario: JSON.parse(usuario) };
-}
- 
-function limparSessao() {
-  localStorage.removeItem('pm_token');
-  localStorage.removeItem('pm_usuario');
-}
- 
-// ============================================================
-//  INICIALIZAÇÃO — verifica sessão ao carregar
-// ============================================================
+
+// INICIALIZAR
 function inicializarApp() {
-  const sessao = getSessao();
+  var sessao = getSessao();
   if (sessao) {
-    // Sessão válida — mostra a interface principal
     document.getElementById('tela-login').style.display = 'none';
     document.querySelector('.status-bar').style.display = '';
     document.querySelector('.header').style.display = '';
     document.querySelector('.tabs').style.display = '';
     document.querySelectorAll('.page').forEach(function(p) { p.style.display = ''; });
     document.querySelector('.bottom-nav').style.display = '';
+    if (sessao.usuario && sessao.usuario.isAdmin) {
+      document.getElementById('tab-admin-btn').style.display = '';
+    }
+    var emailEl = document.getElementById('sessao-email');
+    if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;
     carregarAlertas();
   } else {
-    // Sem sessão — mostra tela de login
     mostrarTelaLogin();
   }
 }
- 
+
 function mostrarTelaLogin() {
   document.getElementById('tela-login').style.display = 'block';
   document.querySelector('.status-bar').style.display = 'none';
@@ -806,128 +410,53 @@ function mostrarTelaLogin() {
   document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
   document.querySelector('.bottom-nav').style.display = 'none';
 }
- 
-// ============================================================
-//  SOLICITAR OTP
-// ============================================================
+
+// LOGIN
 function solicitarOTP(reenvio) {
   var email = document.getElementById('login-email').value.trim().toLowerCase();
-  if (!email || !email.includes('@')) {
-    mostrarErroLogin('email', 'Informe um e-mail válido');
-    return;
-  }
- 
+  if (!email || !email.includes('@')) { mostrarErroLogin('email', 'Informe um e-mail válido'); return; }
   var btn = document.getElementById('btn-solicitar-otp');
-  btn.textContent = 'Enviando...';
-  btn.style.opacity = '0.6';
-  btn.style.pointerEvents = 'none';
+  btn.textContent = 'Enviando...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   document.getElementById('login-email-erro').style.display = 'none';
- 
-  fetch(WORKER_URL + '/auth/request-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email }),
-  })
+  fetch(WORKER_URL + '/auth/request-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) })
   .then(function(r) { return r.json(); })
   .then(function(data) {
-    btn.textContent = 'Enviar código';
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = '';
- 
-    if (data.erro) {
-      mostrarErroLogin('email', data.erro);
-      return;
-    }
- 
-    // Avança para etapa do código
+    btn.textContent = 'Enviar código'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
+    if (data.erro) { mostrarErroLogin('email', data.erro); return; }
     document.getElementById('login-step-email').style.display = 'none';
     document.getElementById('login-step-otp').style.display = 'block';
     document.getElementById('login-email-display').textContent = email;
     document.getElementById('login-otp').focus();
- 
-    // Mostra botão reenviar após 30s
-    setTimeout(function() {
-      document.getElementById('btn-reenviar-otp').style.display = 'block';
-    }, 30000);
+    setTimeout(function() { document.getElementById('btn-reenviar-otp').style.display = 'block'; }, 30000);
   })
-  .catch(function() {
-    btn.textContent = 'Enviar código';
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = '';
-    mostrarErroLogin('email', 'Erro ao enviar. Tente novamente.');
-  });
+  .catch(function() { btn.textContent = 'Enviar código'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroLogin('email', 'Erro ao enviar. Tente novamente.'); });
 }
- 
-// ============================================================
-//  VERIFICAR OTP
-// ============================================================
+
 function verificarOTP() {
-  var email  = document.getElementById('login-email').value.trim().toLowerCase();
+  var email = document.getElementById('login-email').value.trim().toLowerCase();
   var codigo = document.getElementById('login-otp').value.trim();
- 
-  if (!codigo || codigo.length !== 6) {
-    mostrarErroLogin('otp', 'Digite o código de 6 dígitos');
-    return;
-  }
- 
+  if (!codigo || codigo.length !== 6) { mostrarErroLogin('otp', 'Digite o código de 6 dígitos'); return; }
   var btn = document.getElementById('btn-verificar-otp');
-  btn.textContent = 'Verificando...';
-  btn.style.opacity = '0.6';
-  btn.style.pointerEvents = 'none';
+  btn.textContent = 'Verificando...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   document.getElementById('login-otp-erro').style.display = 'none';
- 
-  fetch(WORKER_URL + '/auth/verify-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, codigo: codigo }),
-  })
+  fetch(WORKER_URL + '/auth/verify-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, codigo: codigo }) })
   .then(function(r) { return r.json(); })
   .then(function(data) {
-    btn.textContent = 'Entrar';
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = '';
- 
-    if (data.erro) {
-      mostrarErroLogin('otp', data.erro);
-      return;
-    }
- 
-    // Login bem sucedido
+    btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
+    if (data.erro) { mostrarErroLogin('otp', data.erro); return; }
     salvarSessao(data.token, data.usuario);
-    document.getElementById('tela-login').style.display = 'none';
-    document.querySelector('.status-bar').style.display = '';
-    document.querySelector('.header').style.display = '';
-    document.querySelector('.tabs').style.display = '';
-    document.querySelectorAll('.page').forEach(function(p) { p.style.display = ''; });
-    document.querySelector('.bottom-nav').style.display = '';
-    carregarAlertas();
+    inicializarApp();
   })
-  .catch(function() {
-    btn.textContent = 'Entrar';
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = '';
-    mostrarErroLogin('otp', 'Erro ao verificar. Tente novamente.');
-  });
+  .catch(function() { btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroLogin('otp', 'Erro ao verificar. Tente novamente.'); });
 }
- 
-// ============================================================
-//  LOGOUT
-// ============================================================
+
 function logout() {
   var sessao = getSessao();
-  if (sessao) {
-    fetch(WORKER_URL + '/auth/logout', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + sessao.token },
-    });
-  }
+  if (sessao) fetch(WORKER_URL + '/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao.token } });
   limparSessao();
   mostrarTelaLogin();
 }
- 
-// ============================================================
-//  HELPERS
-// ============================================================
+
 function voltarParaEmail() {
   document.getElementById('login-step-otp').style.display = 'none';
   document.getElementById('login-step-email').style.display = 'block';
@@ -935,50 +464,10 @@ function voltarParaEmail() {
   document.getElementById('login-otp-erro').style.display = 'none';
   document.getElementById('btn-reenviar-otp').style.display = 'none';
 }
- 
-function mostrarErroLogin(tipo, msg) {
-  var el = document.getElementById('login-' + tipo + '-erro');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
- 
- // ============================================================
-//  CONFIGURAÇÃO — substitua se hospedar fora do cloudfire
-// ============================================================
-const SCRIPT_URL = 'https://passagens-proxy.felipe-akuma.workers.dev/';
 
-// Detecta se está rodando dentro do Apps Script
-const IS_GAS = typeof google !== 'undefined' && google.script;
+function mostrarErroLogin(tipo, msg) { var el = document.getElementById('login-' + tipo + '-erro'); el.textContent = msg; el.style.display = 'block'; }
 
-// ============================================================
-//  API — usa google.script.run ou fetch dependendo do ambiente
-// ============================================================
-function api(action, data) {
-  data = data || {};
-  var sessao = getSessao();
-  var headers = { 'Content-Type': 'text/plain' };
-  if (sessao) headers['Authorization'] = 'Bearer ' + sessao.token;
-
-  if (IS_GAS) {
-    return new Promise(function(resolve, reject) {
-      google.script.run
-        .withSuccessHandler(resolve)
-        .withFailureHandler(reject)
-        .handleAction(JSON.stringify(Object.assign({ action: action }, data)));
-    });
-  } else {
-    return fetch(SCRIPT_URL, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: headers,
-      body: JSON.stringify(Object.assign({ action: action }, data)),
-    }).then(function(r) { return r.json(); });
-  }
-}
-
-// ============================================================
-//  AEROPORTOS
-// ============================================================
+// AEROPORTOS
 var AEROPORTOS = [
   { code:'CGH', name:'Congonhas', city:'Sao Paulo, SP' },
   { code:'GRU', name:'Guarulhos', city:'Sao Paulo, SP' },
@@ -1009,13 +498,7 @@ var calTarget = null;
 var calDate = new Date();
 var calSelected = null;
 
-// CLOCK
-function updateClock() {
-  var now = new Date();
-  var h = now.getHours().toString().padStart(2,'0');
-  var m = now.getMinutes().toString().padStart(2,'0');
-  document.getElementById('clock').textContent = h + ':' + m;
-}
+function updateClock() { var now = new Date(); document.getElementById('clock').textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0'); }
 updateClock();
 setInterval(updateClock, 10000);
 
@@ -1023,17 +506,22 @@ setInterval(updateClock, 10000);
 function showTab(tab) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('tab-' + tab).classList.add('active');
-  var tabs = ['alertas','historico','config'];
-  document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
-  tabs.forEach(function(t) {
-    document.getElementById('nav-' + t).classList.toggle('on', t === tab);
-    document.getElementById('navl-' + t).classList.toggle('on', t === tab);
+  var el = document.getElementById('tab-' + tab);
+  if (el) el.classList.add('active');
+  var tabs = ['alertas','historico','config','admin'];
+  var tabBtn = document.querySelectorAll('.tab')[tabs.indexOf(tab)];
+  if (tabBtn) tabBtn.classList.add('active');
+  ['alertas','historico','config'].forEach(function(t) {
+    var ni = document.getElementById('nav-' + t);
+    var nl = document.getElementById('navl-' + t);
+    if (ni) ni.classList.toggle('on', t === tab);
+    if (nl) nl.classList.toggle('on', t === tab);
   });
-  var titles = { alertas: 'Passagens', historico: 'Historico', config: 'Config' };
-  document.getElementById('page-title').textContent = titles[tab];
+  var titles = { alertas: 'Passagens', historico: 'Historico', config: 'Config', admin: 'Admin' };
+  document.getElementById('page-title').textContent = titles[tab] || 'Passagens';
   if (tab === 'alertas' || tab === 'historico') carregarAlertas();
   if (tab === 'config') renderConfigAlertas();
+  if (tab === 'admin') carregarUsuarios();
 }
 
 // CARREGAR
@@ -1042,55 +530,23 @@ function carregarAlertas() {
     alertasData = data || [];
     var n = alertasData.length;
     document.getElementById('eyebrow').textContent = n + ' alerta' + (n !== 1 ? 's' : '') + ' ativo' + (n !== 1 ? 's' : '');
-    renderAlertas();
-    renderHistorico();
-    renderConfigAlertas();
-  }).catch(function(e) {
-    console.error(e);
-    document.getElementById('eyebrow').textContent = 'erro ao carregar';
-  });
+    renderAlertas(); renderHistorico(); renderConfigAlertas();
+  }).catch(function(e) { console.error(e); document.getElementById('eyebrow').textContent = 'erro ao carregar'; });
 }
 
 // RENDER ALERTAS
 function renderAlertas() {
   var el = document.getElementById('alertas-list');
-  if (!alertasData.length) {
-    el.innerHTML = '<div class="empty">Nenhum alerta cadastrado.<br>Va em Config para criar um.</div>';
-    return;
-  }
-
+  if (!alertasData.length) { el.innerHTML = '<div class="empty">Nenhum alerta cadastrado.<br>Va em Config para criar um.</div>'; return; }
   el.innerHTML = alertasData.map(function(a) {
     var temQueda = a.variacao < -0.5;
-    var temAlta  = a.variacao > 0.5;
-    var varStr   = temQueda ? ('↓ ' + Math.abs(a.variacao) + '%') : temAlta ? ('↑ ' + a.variacao + '%') : '— sem variacao';
+    var temAlta = a.variacao > 0.5;
+    var varStr = temQueda ? ('↓ ' + Math.abs(a.variacao) + '%') : temAlta ? ('↑ ' + a.variacao + '%') : '— sem variacao';
     var varClass = temQueda ? 'price-drop' : temAlta ? 'price-up' : 'price-neutral';
     var precoStr = a.precoAtual > 0 ? 'R$ ' + a.precoAtual.toFixed(2).replace('.',',') : '—';
     var url = 'https://www.google.com/travel/flights?q=Voos+' + a.origem + '+' + a.destino + '+' + (a.dataIda||'').replace(/-/g,'') + (a.dataVolta ? '+' + a.dataVolta.replace(/-/g,'') : '');
-
-    return '<div class="card">' +
-      '<div class="card-body">' +
-        '<div class="card-top">' +
-          '<div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div>' +
-          '<div class="price-block"><div class="price">' + precoStr + '</div><div class="' + varClass + '">' + varStr + '</div></div>' +
-        '</div>' +
-        '<div class="card-meta"><div class="dates">' +
-          '<div class="date-row">ida <strong>' + formatData(a.dataIda) + '</strong></div>' +
-          (a.dataVolta ? '<div class="date-row">volta <strong>' + formatData(a.dataVolta) + '</strong></div>' : '') +
-        '</div></div>' +
-      '</div>' +
-      '<div class="card-action" onclick="window.open(\'' + url + '\',\'_blank\')">' +
-        '<div class="action-left"><div class="action-title">Buscar no Google Flights</div><div class="action-sub">' + a.origem + ' → ' + a.destino + ' · ' + formatDataCurta(a.dataIda) + '</div></div>' +
-        '<div class="action-arrow ' + (temQueda ? 'active' : '') + '">↗</div>' +
-      '</div></div>' +
-      '<div class="ai-btn" id="btn-ai-' + a.id + '" onclick="solicitarAnalise(' + a.id + ')"><span>Analisar com IA</span></div>' +
-      '<div id="ai-' + a.id + '" style="display:none;" class="ai-block">' +
-        '<div class="ai-label">analise · ia</div>' +
-        '<div class="ai-verdict" id="ai-verdict-' + a.id + '"></div>' +
-        '<div class="ai-text" id="ai-text-' + a.id + '"></div>' +
-      '</div>' +
-      '<div style="height:8px;"></div>';
+    return '<div class="card"><div class="card-body"><div class="card-top"><div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div><div class="price-block"><div class="price">' + precoStr + '</div><div class="' + varClass + '">' + varStr + '</div></div></div><div class="card-meta"><div class="dates"><div class="date-row">ida <strong>' + formatData(a.dataIda) + '</strong></div>' + (a.dataVolta ? '<div class="date-row">volta <strong>' + formatData(a.dataVolta) + '</strong></div>' : '') + '</div></div></div><div class="card-action" onclick="window.open(\'' + url + '\',\'_blank\')"><div class="action-left"><div class="action-title">Buscar no Google Flights</div><div class="action-sub">' + a.origem + ' → ' + a.destino + ' · ' + formatDataCurta(a.dataIda) + '</div></div><div class="action-arrow ' + (temQueda ? 'active' : '') + '">↗</div></div></div><div class="ai-btn" id="btn-ai-' + a.id + '" onclick="solicitarAnalise(' + a.id + ')"><span>Analisar com IA</span></div><div id="ai-' + a.id + '" style="display:none;" class="ai-block"><div class="ai-label">analise · ia</div><div class="ai-verdict" id="ai-verdict-' + a.id + '"></div><div class="ai-text" id="ai-text-' + a.id + '"></div></div><div style="height:8px;"></div>';
   }).join('');
-
   var m = document.createElement('div');
   m.className = 'monitor-row';
   m.innerHTML = '<div class="monitor-dot"></div><div class="monitor-text">verificando 4x por dia</div>';
@@ -1101,34 +557,18 @@ function renderAlertas() {
 function renderHistorico() {
   var el = document.getElementById('historico-list');
   var items = [];
-  alertasData.forEach(function(a) {
-    (a.historico || []).forEach(function(h) {
-      items.push({ preco: h.preco, data: h.data, rota: a.origem + ' → ' + a.destino, dataIda: a.dataIda });
-    });
-  });
+  alertasData.forEach(function(a) { (a.historico || []).forEach(function(h) { items.push({ preco: h.preco, data: h.data, rota: a.origem + ' → ' + a.destino, dataIda: a.dataIda }); }); });
   items.sort(function(x,y) { return new Date(y.data) - new Date(x.data); });
-
-  if (!items.length) {
-    el.innerHTML = '<div class="empty">Historico disponivel apos a primeira verificacao.</div>';
-    return;
-  }
-
-  var html = '';
-  var lastDate = '';
+  if (!items.length) { el.innerHTML = '<div class="empty">Historico disponivel apos a primeira verificacao.</div>'; return; }
+  var html = ''; var lastDate = '';
   items.forEach(function(item, i) {
     var d = new Date(item.data);
     var dateStr = d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
     var timeStr = d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
     if (dateStr !== lastDate) { html += '<div class="hist-sep">' + dateStr + '</div>'; lastDate = dateStr; }
-    var prev = items[i+1];
-    var varStr = '— sem variacao'; var varClass = 'hist-var';
-    if (prev) {
-      var diff = item.preco - prev.preco;
-      if (diff < -1) { varStr = '↓ R$ ' + Math.abs(diff).toFixed(0); varClass = 'hist-var down'; }
-      else if (diff > 1) { varStr = '↑ R$ ' + diff.toFixed(0); varClass = 'hist-var up'; }
-    }
-    html += '<div class="hist-item"><div class="hist-left"><div class="hist-route">' + item.rota + '</div><div class="hist-meta">' + timeStr + ' · ida ' + formatData(item.dataIda) + '</div></div>' +
-      '<div class="hist-right"><div class="hist-price">R$ ' + item.preco.toFixed(2).replace('.',',') + '</div><div class="' + varClass + '">' + varStr + '</div></div></div>';
+    var prev = items[i+1]; var varStr = '— sem variacao'; var varClass = 'hist-var';
+    if (prev) { var diff = item.preco - prev.preco; if (diff < -1) { varStr = '↓ R$ ' + Math.abs(diff).toFixed(0); varClass = 'hist-var down'; } else if (diff > 1) { varStr = '↑ R$ ' + diff.toFixed(0); varClass = 'hist-var up'; } }
+    html += '<div class="hist-item"><div class="hist-left"><div class="hist-route">' + item.rota + '</div><div class="hist-meta">' + timeStr + ' · ida ' + formatData(item.dataIda) + '</div></div><div class="hist-right"><div class="hist-price">R$ ' + item.preco.toFixed(2).replace('.',',') + '</div><div class="' + varClass + '">' + varStr + '</div></div></div>';
   });
   el.innerHTML = html;
 }
@@ -1136,17 +576,9 @@ function renderHistorico() {
 // RENDER CONFIG
 function renderConfigAlertas() {
   var el = document.getElementById('config-alertas-list');
-  if (!alertasData.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 2px 12px;">Nenhum alerta cadastrado ainda.</div>';
-    return;
-  }
+  if (!alertasData.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 2px 12px;">Nenhum alerta cadastrado ainda.</div>'; return; }
   el.innerHTML = alertasData.map(function(a) {
-    return '<div class="alerta-item">' +
-      '<div class="alerta-header"><div class="alerta-route">' + a.origem + ' <span>→</span> ' + a.destino + '</div>' +
-      '<div class="remove-btn" onclick="removerAlerta(' + a.indice + ')">×</div></div>' +
-      '<div class="alerta-dates"><div class="alerta-date">ida <strong>' + formatData(a.dataIda) + '</strong>' +
-      (a.dataVolta ? ' · volta <strong>' + formatData(a.dataVolta) + '</strong>' : '') + '</div>' +
-      '<div class="alerta-cia">R$ ' + (a.precoAtual > 0 ? a.precoAtual.toFixed(2).replace('.',',') : '—') + '</div></div></div>';
+    return '<div class="alerta-item"><div class="alerta-header"><div class="alerta-route">' + a.origem + ' <span>→</span> ' + a.destino + '</div><div class="remove-btn" onclick="removerAlerta(' + a.indice + ')">×</div></div><div class="alerta-dates"><div class="alerta-date">ida <strong>' + formatData(a.dataIda) + '</strong>' + (a.dataVolta ? ' · volta <strong>' + formatData(a.dataVolta) + '</strong>' : '') + '</div><div class="alerta-cia">R$ ' + (a.precoAtual > 0 ? a.precoAtual.toFixed(2).replace('.',',') : '—') + '</div></div></div>';
   }).join('');
 }
 
@@ -1155,45 +587,29 @@ function solicitarAnalise(id) {
   var btn = document.getElementById('btn-ai-' + id);
   btn.innerHTML = '<div class="spinner"></div><span>Analisando...</span>';
   btn.style.pointerEvents = 'none';
-
   api('analisar', { id: id }).then(function(res) {
-    if (!res || res.erro) {
-      showToast(res ? res.erro : 'Erro ao analisar', 'error');
-      btn.innerHTML = '<span>Analisar com IA</span>';
-      btn.style.pointerEvents = '';
-      return;
-    }
+    if (!res || res.erro) { showToast(res ? res.erro : 'Erro ao analisar', 'error'); btn.innerHTML = '<span>Analisar com IA</span>'; btn.style.pointerEvents = ''; return; }
     var linhas = res.analise.split('\n');
     document.getElementById('ai-verdict-' + id).textContent = linhas[0];
     document.getElementById('ai-text-' + id).textContent = linhas.slice(1).join('\n').trim();
     document.getElementById('ai-' + id).style.display = 'block';
     btn.style.display = 'none';
-  }).catch(function() {
-    showToast('Erro ao analisar', 'error');
-    btn.innerHTML = '<span>Analisar com IA</span>';
-    btn.style.pointerEvents = '';
-  });
+  }).catch(function() { showToast('Erro ao analisar', 'error'); btn.innerHTML = '<span>Analisar com IA</span>'; btn.style.pointerEvents = ''; });
 }
 
 // ADICIONAR
 function adicionarAlerta() {
-  var origem  = document.getElementById('input-origem').value.trim().toUpperCase();
+  var origem = document.getElementById('input-origem').value.trim().toUpperCase();
   var destino = document.getElementById('input-destino').value.trim().toUpperCase();
   var dataIda = document.getElementById('input-ida').value;
   var dataVolta = document.getElementById('input-volta').value;
-
   if (!origem || origem.length !== 3) { showToast('Informe a origem', 'error'); return; }
   if (!destino || destino.length !== 3) { showToast('Informe o destino', 'error'); return; }
   if (!dataIda) { showToast('Informe a data de ida', 'error'); return; }
-
   var btn = document.getElementById('btn-adicionar');
-  btn.classList.add('loading');
-  btn.textContent = 'Criando...';
-
+  btn.classList.add('loading'); btn.textContent = 'Criando...';
   api('adicionar', { origem: origem, destino: destino, dataIda: dataIda, dataVolta: dataVolta || null }).then(function(res) {
-    if (!res || res.erro) {
-      showToast(res ? res.erro : 'Erro ao criar', 'error');
-    } else {
+    if (!res || res.erro) { showToast(res ? res.erro : 'Erro ao criar', 'error'); } else {
       showToast('Alerta criado!', 'success');
       document.getElementById('input-origem').value = '';
       document.getElementById('input-destino').value = '';
@@ -1203,12 +619,15 @@ function adicionarAlerta() {
       document.getElementById('display-range').className = 'field-placeholder';
       carregarAlertas();
     }
-    btn.classList.remove('loading');
-    btn.textContent = 'Criar alerta';
-  }).catch(function() {
-    showToast('Erro ao criar', 'error');
-    btn.classList.remove('loading');
-    btn.textContent = 'Criar alerta';
+    btn.classList.remove('loading'); btn.textContent = 'Criar alerta';
+  }).catch(function() { showToast('Erro ao criar', 'error'); btn.classList.remove('loading'); btn.textContent = 'Criar alerta'; });
+}
+
+// REMOVER
+function removerAlerta(indice) {
+  api('remover', { indice: indice }).then(function(res) {
+    if (!res || res.erro) { showToast(res ? res.erro : 'Erro', 'error'); return; }
+    showToast('Alerta removido', 'success'); carregarAlertas();
   });
 }
 
@@ -1216,201 +635,171 @@ function adicionarAlerta() {
 function doAutocomplete(input, tipo) {
   var val = input.value.toUpperCase().trim();
   var drop = document.getElementById('drop-' + tipo);
-
   if (val.length === 0) { drop.classList.remove('open'); drop.innerHTML = ''; return; }
-
-  var matches = AEROPORTOS.filter(function(a) {
-    return a.code.indexOf(val) === 0 ||
-           a.name.toUpperCase().indexOf(val) >= 0 ||
-           a.city.toUpperCase().indexOf(val) >= 0;
-  }).slice(0, 5);
-
+  var matches = AEROPORTOS.filter(function(a) { return a.code.indexOf(val) === 0 || a.name.toUpperCase().indexOf(val) >= 0 || a.city.toUpperCase().indexOf(val) >= 0; }).slice(0, 5);
   if (!matches.length) { drop.classList.remove('open'); return; }
-
-  drop.innerHTML = matches.map(function(a) {
-    return '<div class="autocomplete-item" onmousedown="pickAirport(\'' + a.code + '\',\'' + tipo + '\')" ontouchstart="pickAirport(\'' + a.code + '\',\'' + tipo + '\')">' +
-      '<div class="ac-code">' + a.code + '</div>' +
-      '<div class="ac-info"><div class="ac-name">' + a.name + '</div><div class="ac-city">' + a.city + '</div></div>' +
-      '</div>';
-  }).join('');
-
+  drop.innerHTML = matches.map(function(a) { return '<div class="autocomplete-item" onmousedown="pickAirport(\'' + a.code + '\',\'' + tipo + '\')" ontouchstart="pickAirport(\'' + a.code + '\',\'' + tipo + '\')"><div class="ac-code">' + a.code + '</div><div class="ac-info"><div class="ac-name">' + a.name + '</div><div class="ac-city">' + a.city + '</div></div></div>'; }).join('');
   drop.classList.add('open');
 }
-
-function pickAirport(code, tipo) {
-  document.getElementById('input-' + tipo).value = code;
-  var drop = document.getElementById('drop-' + tipo);
-  drop.classList.remove('open');
-  drop.innerHTML = '';
-  document.getElementById('input-' + tipo).blur();
-}
-
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.autocomplete-wrap')) {
-    document.querySelectorAll('.autocomplete-dropdown').forEach(function(d) {
-      d.classList.remove('open'); d.innerHTML = '';
-    });
-  }
-});
+function pickAirport(code, tipo) { document.getElementById('input-' + tipo).value = code; var drop = document.getElementById('drop-' + tipo); drop.classList.remove('open'); drop.innerHTML = ''; document.getElementById('input-' + tipo).blur(); }
+document.addEventListener('click', function(e) { if (!e.target.closest('.autocomplete-wrap')) { document.querySelectorAll('.autocomplete-dropdown').forEach(function(d) { d.classList.remove('open'); d.innerHTML = ''; }); } });
 
 // CALENDÁRIO
 var MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-var calRangeStep = 'ida'; // 'ida' ou 'volta'
+var calRangeStep = 'ida';
 var calSelectedIda = null;
 var calSelectedVolta = null;
 
 function openCal(target) {
-  calTarget = target;
-  calDate = new Date();
-  calSelected = null;
-  calRangeStep = 'ida';
-  calSelectedIda = null;
-  calSelectedVolta = null;
+  calTarget = target; calDate = new Date(); calSelected = null; calRangeStep = 'ida'; calSelectedIda = null; calSelectedVolta = null;
   document.getElementById('cal-step').textContent = 'Selecione a data de ida';
   document.getElementById('cal-range-preview').style.display = 'none';
   document.getElementById('cal-range-preview').textContent = '';
-  renderCal();
-  document.getElementById('cal-overlay').classList.add('open');
+  renderCal(); document.getElementById('cal-overlay').classList.add('open');
 }
-
-document.getElementById('cal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) this.classList.remove('open');
-});
-
-function calNav(dir) {
-  calDate = new Date(calDate.getFullYear(), calDate.getMonth() + dir, 1);
-  renderCal();
-}
-
+document.getElementById('cal-overlay').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+function calNav(dir) { calDate = new Date(calDate.getFullYear(), calDate.getMonth() + dir, 1); renderCal(); }
 function renderCal() {
   document.getElementById('cal-title').textContent = MESES[calDate.getMonth()] + ' ' + calDate.getFullYear();
   var year = calDate.getFullYear(), month = calDate.getMonth();
   var first = new Date(year, month, 1).getDay();
-  var days  = new Date(year, month + 1, 0).getDate();
+  var days = new Date(year, month + 1, 0).getDate();
   var today = new Date(); today.setHours(0,0,0,0);
-
-  var html = '';
-  var day = 1;
-  var row = 0;
-
+  var html = ''; var day = 1; var row = 0;
   while (day <= days) {
     html += '<tr>';
     for (var col = 0; col < 7; col++) {
-      if (row === 0 && col < first) {
-        html += '<td></td>';
-      } else if (day > days) {
-        html += '<td></td>';
-      } else {
-        var dt = new Date(year, month, day);
-        dt.setHours(0,0,0,0);
+      if (row === 0 && col < first) { html += '<td></td>'; }
+      else if (day > days) { html += '<td></td>'; }
+      else {
+        var dt = new Date(year, month, day); dt.setHours(0,0,0,0);
         var isPast = dt < today;
-        var isIda   = calSelectedIda  && dt.getTime() === calSelectedIda.getTime();
+        var isIda = calSelectedIda && dt.getTime() === calSelectedIda.getTime();
         var isVolta = calSelectedVolta && dt.getTime() === calSelectedVolta.getTime();
-        var isRange = calSelectedIda && calSelectedVolta &&
-                      dt > calSelectedIda && dt < calSelectedVolta;
+        var isRange = calSelectedIda && calSelectedVolta && dt > calSelectedIda && dt < calSelectedVolta;
         var isToday = dt.getTime() === today.getTime();
-
-        var cls = 'cal-day';
-        if (isPast) cls += ' past';
-        else if (isToday) cls += ' today';
-        if (isIda || isVolta) cls += ' selected';
-        if (isRange) cls += ' in-range';
-
+        var cls = 'cal-day' + (isPast ? ' past' : '') + (isToday && !isPast ? ' today' : '') + ((isIda || isVolta) ? ' selected' : '') + (isRange ? ' in-range' : '');
         var onclick = isPast ? '' : ' onclick="selectDay(' + day + ')"';
         html += '<td><div class="' + cls + '"' + onclick + '>' + day + '</div></td>';
         day++;
       }
     }
-    html += '</tr>';
-    row++;
+    html += '</tr>'; row++;
   }
-
   document.getElementById('cal-body').innerHTML = html;
 }
-
 function selectDay(d) {
-  var dt = new Date(calDate.getFullYear(), calDate.getMonth(), d);
-  dt.setHours(0,0,0,0);
-
+  var dt = new Date(calDate.getFullYear(), calDate.getMonth(), d); dt.setHours(0,0,0,0);
   if (calRangeStep === 'ida') {
-    calSelectedIda = dt;
-    calSelectedVolta = null;
-    calRangeStep = 'volta';
+    calSelectedIda = dt; calSelectedVolta = null; calRangeStep = 'volta';
     document.getElementById('cal-step').textContent = 'Agora selecione a data de volta (opcional)';
     var preview = document.getElementById('cal-range-preview');
-    preview.textContent = 'Ida: ' + formatDataCurta2(dt);
-    preview.style.display = 'block';
+    preview.textContent = 'Ida: ' + formatDataCurta2(dt); preview.style.display = 'block';
   } else {
-    if (dt <= calSelectedIda) {
-      showToast('A volta deve ser depois da ida', 'error');
-      return;
-    }
+    if (dt <= calSelectedIda) { showToast('A volta deve ser depois da ida', 'error'); return; }
     calSelectedVolta = dt;
-    var preview = document.getElementById('cal-range-preview');
-    preview.textContent = 'Ida: ' + formatDataCurta2(calSelectedIda) + '  →  Volta: ' + formatDataCurta2(dt);
+    document.getElementById('cal-range-preview').textContent = 'Ida: ' + formatDataCurta2(calSelectedIda) + '  →  Volta: ' + formatDataCurta2(dt);
   }
-
   renderCal();
 }
-
 function confirmCal() {
   if (!calSelectedIda) { showToast('Selecione a data de ida', 'error'); return; }
-
-  var toISO = function(dt) {
-    var y = dt.getFullYear();
-    var m = String(dt.getMonth() + 1).padStart(2,'0');
-    var d = String(dt.getDate()).padStart(2,'0');
-    return y + '-' + m + '-' + d;
-  };
-
+  var toISO = function(dt) { return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0'); };
   document.getElementById('input-ida').value = toISO(calSelectedIda);
   document.getElementById('input-volta').value = calSelectedVolta ? toISO(calSelectedVolta) : '';
-
-  // Atualiza o campo de exibição
   var el = document.getElementById('display-range');
-  if (calSelectedVolta) {
-    el.textContent = formatDataCurta2(calSelectedIda) + ' → ' + formatDataCurta2(calSelectedVolta);
-  } else {
-    el.textContent = formatDataCurta2(calSelectedIda) + ' (só ida)';
-  }
+  el.textContent = calSelectedVolta ? (formatDataCurta2(calSelectedIda) + ' → ' + formatDataCurta2(calSelectedVolta)) : (formatDataCurta2(calSelectedIda) + ' (só ida)');
   el.className = 'field-value';
-
   document.getElementById('cal-overlay').classList.remove('open');
 }
+function formatDataCurta2(dt) { var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return dt.getDate() + ' ' + m[dt.getMonth()]; }
 
-function formatDataCurta2(dt) {
-  var meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  return dt.getDate() + ' ' + meses[dt.getMonth()];
+// ADMIN
+function carregarUsuarios() {
+  var el = document.getElementById('admin-usuarios-list');
+  el.innerHTML = '<div class="empty">Carregando...</div>';
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function(r) { return r.json(); })
+  .then(function(usuarios) {
+    if (!usuarios || usuarios.erro) { el.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>'; return; }
+    if (!usuarios.length) { el.innerHTML = '<div class="empty">Nenhum usuário cadastrado.</div>'; return; }
+    el.innerHTML = usuarios.map(function(u) {
+      return '<div class="usuario-card"><div class="usuario-header"><div><div class="usuario-nome">' + u.nome + '</div><div class="usuario-email">' + u.email + '</div></div><div class="usuario-badges">' +
+        (u.isAdmin ? '<span class="badge badge-purple">admin</span>' : '') +
+        (u.ativo ? '<span class="badge badge-green">ativo</span>' : '<span class="badge badge-red">inativo</span>') +
+        (u.analiseIA ? '<span class="badge badge-green">IA ✓</span>' : '<span class="badge badge-gray">sem IA</span>') +
+        '</div></div><div class="usuario-meta"><div class="usuario-meta-item">Chat ID: <strong>' + u.chatId + '</strong></div><div class="usuario-meta-item">Alertas: <strong>' + (u.totalAlertas || 0) + '</strong></div><div class="usuario-meta-item">Queda mín: <strong>' + (u.percentualMinimo || 0) + '%</strong></div></div>' +
+        '<div class="usuario-actions">' +
+        (u.analiseIA ? '<div class="btn-small" onclick="adminToggleIA(\'' + u.email + '\', false)">Desativar IA</div>' : '<div class="btn-small" onclick="adminToggleIA(\'' + u.email + '\', true)">Ativar IA</div>') +
+        (u.ativo ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', false)">Desativar</div>' : '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', true)">Ativar</div>') +
+        (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + u.email + '\', \'' + u.nome + '\')">Remover</div>' : '') +
+        '</div></div>';
+    }).join('');
+  })
+  .catch(function() { el.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>'; });
+}
+
+function adminCriarUsuario() {
+  var nome = document.getElementById('admin-nome').value.trim();
+  var email = document.getElementById('admin-email').value.trim().toLowerCase();
+  var chatId = document.getElementById('admin-chatid').value.trim();
+  var ia = document.getElementById('admin-ia').value === 'true';
+  var pct = parseInt(document.getElementById('admin-pct').value || '0');
+  if (!nome || !email || !chatId) { showToast('Preencha todos os campos', 'error'); return; }
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ nome: nome, email: email, chatId: chatId, analiseIA: ia, percentualMinimo: pct }) })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Usuário cadastrado!', 'success');
+    document.getElementById('admin-nome').value = '';
+    document.getElementById('admin-email').value = '';
+    document.getElementById('admin-chatid').value = '';
+    document.getElementById('admin-pct').value = '0';
+    carregarUsuarios();
+  })
+  .catch(function() { showToast('Erro ao cadastrar', 'error'); });
+}
+
+function adminToggleIA(email, ativo) {
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ analiseIA: ativo }) })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { if (data.erro) { showToast(data.erro, 'error'); return; } showToast('Atualizado!', 'success'); carregarUsuarios(); })
+  .catch(function() { showToast('Erro ao atualizar', 'error'); });
+}
+
+function adminToggleAtivo(email, ativo) {
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ ativo: ativo }) })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { if (data.erro) { showToast(data.erro, 'error'); return; } showToast(ativo ? 'Usuário ativado!' : 'Usuário desativado!', 'success'); carregarUsuarios(); })
+  .catch(function() { showToast('Erro ao atualizar', 'error'); });
+}
+
+function adminRemoverUsuario(email, nome) {
+  if (!confirm('Remover ' + nome + '? Todos os alertas serão apagados.')) return;
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email), { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { if (data.erro) { showToast(data.erro, 'error'); return; } showToast('Usuário removido!', 'success'); carregarUsuarios(); })
+  .catch(function() { showToast('Erro ao remover', 'error'); });
 }
 
 // TOAST
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  setTimeout(function() { t.className = 'toast'; }, 3000);
-}
+function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show' + (type ? ' ' + type : ''); setTimeout(function() { t.className = 'toast'; }, 3000); }
 
 // HELPERS
-function formatData(str) {
-  if (!str) return '—';
-  var p = str.split('-');
-  var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  return p[2] + ' ' + m[parseInt(p[1])-1] + ' ' + p[0];
-}
+function formatData(str) { if (!str) return '—'; var p = str.split('-'); var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return p[2] + ' ' + m[parseInt(p[1])-1] + ' ' + p[0]; }
+function formatDataCurta(str) { if (!str) return '—'; var p = str.split('-'); return p[2] + '/' + p[1]; }
 
-function formatDataCurta(str) {
-  if (!str) return '—';
-  var p = str.split('-');
-  return p[2] + '/' + p[1];
-}
-
-// Inicia o app verificando a sessão
+// INIT
 inicializarApp();
 setInterval(carregarAlertas, 5 * 60 * 1000);
 </script>
- <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#222; letter-spacing:0.5px;">
-  v2026.04.30 · build 3
+<div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#222; letter-spacing:0.5px;">
+  v2026.04.30 · build 4
 </div>
 </body>
 </html>
