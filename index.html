@@ -942,9 +942,6 @@ function mostrarErroLogin(tipo, msg) {
   el.style.display = 'block';
 }
  
-// Inicia o app verificando a sessão
-inicializarApp();
-
  // ============================================================
 //  CONFIGURAÇÃO — substitua se hospedar fora do cloudfire
 // ============================================================
@@ -1211,15 +1208,6 @@ function adicionarAlerta() {
   });
 }
 
-// REMOVER
-function removerAlerta(indice) {
-  api('remover', { indice: indice }).then(function(res) {
-    if (!res || res.erro) { showToast(res ? res.erro : 'Erro', 'error'); return; }
-    showToast('Alerta removido', 'success');
-    carregarAlertas();
-  });
-}
-
 // AUTOCOMPLETE
 function doAutocomplete(input, tipo) {
   var val = input.value.toUpperCase().trim();
@@ -1413,8 +1401,8 @@ function formatDataCurta(str) {
   return p[2] + '/' + p[1];
 }
 
-// INIT
-carregarAlertas();
+// Inicia o app verificando a sessão
+inicializarApp();
 setInterval(carregarAlertas, 5 * 60 * 1000);
 </script>
  <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#222; letter-spacing:0.5px;">
