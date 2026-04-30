@@ -538,6 +538,7 @@ function carregarAlertas() {
 function renderAlertas() {
   var el = document.getElementById('alertas-list');
   if (!alertasData.length) { el.innerHTML = '<div class="empty">Nenhum alerta cadastrado.<br>Va em Config para criar um.</div>'; return; }
+ var temIA = getSessao() && getSessao().usuario && getSessao().usuario.analiseIA;
   el.innerHTML = alertasData.map(function(a) {
     var temQueda = a.variacao < -0.5;
     var temAlta = a.variacao > 0.5;
@@ -546,7 +547,7 @@ function renderAlertas() {
     var precoStr = a.precoAtual > 0 ? 'R$ ' + a.precoAtual.toFixed(2).replace('.',',') : '—';
     var url = 'https://www.google.com/travel/flights?q=Voos+' + a.origem + '+' + a.destino + '+' + (a.dataIda||'').replace(/-/g,'') + (a.dataVolta ? '+' + a.dataVolta.replace(/-/g,'') : '');
     return '<div class="card"><div class="card-body"><div class="card-top"><div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div><div class="price-block"><div class="price">' + precoStr + '</div><div class="' + varClass + '">' + varStr + '</div></div></div><div class="card-meta"><div class="dates"><div class="date-row">ida <strong>' + formatData(a.dataIda) + '</strong></div>' + (a.dataVolta ? '<div class="date-row">volta <strong>' + formatData(a.dataVolta) + '</strong></div>' : '') + '</div></div></div><div class="card-action" onclick="window.open(\'' + url + '\',\'_blank\')"><div class="action-left"><div class="action-title">Buscar no Google Flights</div><div class="action-sub">' + a.origem + ' → ' + a.destino + ' · ' + formatDataCurta(a.dataIda) + '</div></div><div class="action-arrow ' + (temQueda ? 'active' : '') + '">↗</div></div></div>
-     (getSessao() && getSessao().usuario && getSessao().usuario.analiseIA ? '<div class="ai-btn" id="btn-ai-' + a.id + '" onclick="solicitarAnalise(' + a.id + ')"><span>Analisar com IA</span></div>' : '') +<div id="ai-' + a.id + '" style="display:none;" class="ai-block"><div class="ai-label">analise · ia</div><div class="ai-verdict" id="ai-verdict-' + a.id + '"></div><div class="ai-text" id="ai-text-' + a.id + '"></div></div><div style="height:8px;"></div>';
+     (temIA ? '<div class="ai-btn" id="btn-ai-' + a.id + '" onclick="solicitarAnalise(' + a.id + ')"><span>Analisar com IA</span></div>' : '') +<div id="ai-' + a.id + '" style="display:none;" class="ai-block"><div class="ai-label">analise · ia</div><div class="ai-verdict" id="ai-verdict-' + a.id + '"></div><div class="ai-text" id="ai-text-' + a.id + '"></div></div><div style="height:8px;"></div>';
   }).join('');
   var m = document.createElement('div');
   m.className = 'monitor-row';
