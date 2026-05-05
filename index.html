@@ -275,6 +275,19 @@
     </div>
   </div>
   <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
+ <div class="section-label" style="margin-top:8px;">minhas configurações</div>
+<div class="card" style="margin-bottom:10px;">
+  <div class="card-body">
+    <div class="card-top" style="margin-bottom:8px;">
+      <div style="font-size:13px;color:var(--text2);">Queda mínima para alerta</div>
+      <div style="font-size:15px;font-weight:600;" id="cfg-pct">—</div>
+    </div>
+    <div class="card-top" style="margin-bottom:0;">
+      <div style="font-size:13px;color:var(--text2);">Análise de IA</div>
+      <div style="font-size:13px;font-weight:500;" id="cfg-ia">—</div>
+    </div>
+  </div>
+</div>
   <div class="section-label" style="margin-top:8px;">conta</div>
   <div class="card" style="margin-bottom:10px;">
     <div class="card-action" onclick="logout()" style="cursor:pointer;">
@@ -388,7 +401,20 @@ function api(action, data) {
     return r.json();
   });
 }
-
+function renderConfigs() {
+  var sessao = getSessao();
+  if (!sessao || !sessao.usuario) return;
+  fetch(WORKER_URL + '/auth/me', {
+    headers: { 'Authorization': 'Bearer ' + sessao.token }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(u) {
+    var pctEl = document.getElementById('cfg-pct');
+    var iaEl  = document.getElementById('cfg-ia');
+    if (pctEl) pctEl.textContent = (u.percentualMinimo || 0) + '%';
+    if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa' : '❌ Inativa';
+  });
+}
 // INICIALIZAR
 function inicializarApp() {
   var sessao = getSessao();
@@ -528,7 +554,7 @@ function showTab(tab) {
   var titles = { alertas: 'Passagens', historico: 'Historico', config: 'Config', admin: 'Admin' };
   document.getElementById('page-title').textContent = titles[tab] || 'Passagens';
   if (tab === 'alertas' || tab === 'historico') carregarAlertas();
-  if (tab === 'config') renderConfigAlertas();
+  if (tab === 'config') { renderConfigAlertas(); renderConfigs(); }
   if (tab === 'admin') carregarUsuarios();
 }
 
