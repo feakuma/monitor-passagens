@@ -199,7 +199,7 @@
         </div>
         <div style="padding:16px 18px;">
           <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">telegram chat id</div>
-          <input id="convite-chatid" type="number" placeholder="ex: 123456789" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+          <input id="convite-chatid" type="number" placeholder="ex: 123456789 (opcional)" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
         </div>
       </div>
       <div style="background:#141414;border:1px solid #1C1C1C;border-radius:12px;padding:14px 16px;margin-bottom:16px;">
@@ -342,6 +342,28 @@
     </div>
   </div>
   <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
+</div>
+
+
+<!-- MODAL CHAT ID OPCIONAL -->
+<div id="modal-sem-chatid" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px;padding:28px;max-width:320px;width:100%;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:32px;margin-bottom:12px;">📧</div>
+      <div style="font-size:17px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">Sem Telegram?</div>
+      <div style="font-size:13px;color:#888;line-height:1.6;">Sem problema! Você receberá os alertas de queda de preço diretamente no seu <strong style="color:#F0F0F0;">e-mail</strong>.</div>
+    </div>
+    <div style="background:#1A1A1A;border-radius:12px;padding:14px;margin-bottom:20px;">
+      <div style="font-size:12px;color:#666;line-height:1.7;">
+        💡 Se quiser ativar o Telegram depois:<br>
+        1. Busque <strong style="color:#888;">@userinfobot</strong> no Telegram<br>
+        2. Envie /start para obter seu Chat ID<br>
+        3. Atualize seu perfil nas configurações
+      </div>
+    </div>
+    <div onclick="confirmarSemChatId()" style="background:#F0F0F0;color:#0D0D0D;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">Entendido, continuar</div>
+    <div onclick="fecharModalSemChatId()" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;">← Voltar e adicionar Chat ID</div>
+  </div>
 </div>
 
 <!-- CALENDÁRIO -->
@@ -510,11 +532,39 @@ function verificarConviteURL() {
   return true;
 }
 
+var _pendingNome = null;
+var _pendingChatId = null;
+var _pendingTipo = null; // 'convite' ou 'manual'
+
 function criarContaConvite() {
   var nome = document.getElementById('convite-nome').value.trim();
   var chatId = document.getElementById('convite-chatid').value.trim();
   if (!nome) { mostrarErroConvite('Informe seu nome'); return; }
-  if (!chatId) { mostrarErroConvite('Informe seu Chat ID do Telegram'); return; }
+  if (!chatId) {
+    _pendingNome = nome;
+    _pendingChatId = '';
+    _pendingTipo = 'convite';
+    document.getElementById('modal-sem-chatid').style.display = 'flex';
+    return;
+  }
+  _executarCriarContaConvite(nome, chatId);
+}
+
+function confirmarSemChatId() {
+  document.getElementById('modal-sem-chatid').style.display = 'none';
+  if (_pendingTipo === 'convite') {
+    _executarCriarContaConvite(_pendingNome, '');
+  } else if (_pendingTipo === 'manual') {
+    _executarCriarUsuarioManual();
+  }
+}
+
+function fecharModalSemChatId() {
+  document.getElementById('modal-sem-chatid').style.display = 'none';
+  _pendingNome = null; _pendingChatId = null; _pendingTipo = null;
+}
+
+function _executarCriarContaConvite(nome, chatId) {
   var btn = document.getElementById('btn-criar-conta');
   btn.textContent = 'Criando conta...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   fetch(WORKER_URL + '/convite/' + _conviteToken, {
@@ -975,7 +1025,23 @@ function adminCriarUsuario() {
   var chatId = document.getElementById('admin-chatid').value.trim();
   var ia = document.getElementById('admin-ia').value === 'true';
   var pct = parseInt(document.getElementById('admin-pct').value || '0');
-  if (!nome || !email || !chatId) { showToast('Preencha todos os campos', 'error'); return; }
+  if (!nome || !email) { showToast('Preencha nome e e-mail', 'error'); return; }
+  if (!chatId) {
+    _pendingNome = nome;
+    _pendingChatId = '';
+    _pendingTipo = 'manual';
+    document.getElementById('modal-sem-chatid').style.display = 'flex';
+    return;
+  }
+  _executarCriarUsuarioManual();
+}
+
+function _executarCriarUsuarioManual() {
+  var nome = document.getElementById('admin-nome').value.trim();
+  var email = document.getElementById('admin-email').value.trim().toLowerCase();
+  var chatId = document.getElementById('admin-chatid').value.trim();
+  var ia = document.getElementById('admin-ia').value === 'true';
+  var pct = parseInt(document.getElementById('admin-pct').value || '0');
   var sessao = getSessao();
   fetch(WORKER_URL + '/admin/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ nome: nome, email: email, chatId: chatId, analiseIA: ia, percentualMinimo: pct }) })
   .then(function(r) { return r.json(); })
@@ -986,6 +1052,7 @@ function adminCriarUsuario() {
     document.getElementById('admin-email').value = '';
     document.getElementById('admin-chatid').value = '';
     document.getElementById('admin-pct').value = '0';
+    _pendingNome = null; _pendingChatId = null; _pendingTipo = null;
     carregarUsuarios();
   })
   .catch(function() { showToast('Erro ao cadastrar', 'error'); });
@@ -1030,7 +1097,7 @@ if (!verificarConviteURL()) {
 setInterval(carregarAlertas, 5 * 60 * 1000);
 </script>
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.05 · build 18
+  v2026.05.05 · build 14
 </div>
 </body>
 </html>
