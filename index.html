@@ -520,6 +520,7 @@ function inicializarApp() {
     var emailEl = document.getElementById('sessao-email');
     if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;
     carregarAlertas();
+    setTimeout(inicializarPush, 3000);
   } else {
     mostrarTelaLogin();
   }
@@ -570,6 +571,7 @@ function verificarOTP() {
     salvarSessao(data.token, data.usuario);
     inicializarApp();
     if (!localStorage.getItem('pwa_install_dismissed') && !_isInStandalone) setTimeout(mostrarInstallToast, 2000);
+    setTimeout(inicializarPush, 4000);
   })
   .catch(function() { btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroLogin('otp', 'Erro ao verificar. Tente novamente.'); });
 }
@@ -1184,6 +1186,69 @@ if (!verificarConviteURL()) {
 setInterval(carregarAlertas, 5 * 60 * 1000);
 
 
+
+// PUSH NOTIFICATIONS
+var _pushAtivo = false;
+
+async function inicializarPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (localStorage.getItem('push_negado')) return;
+  var sessao = getSessao();
+  if (!sessao) return;
+
+  try {
+    var reg = await navigator.serviceWorker.ready;
+
+    // Busca chave pública VAPID
+    var resp = await fetch(WORKER_URL + '/push/vapidkey');
+    var { publicKey } = await resp.json();
+
+    // Verifica se já tem subscription
+    var existingSub = await reg.pushManager.getSubscription();
+    if (existingSub) {
+      _pushAtivo = true;
+      await salvarSubscription(existingSub, sessao.token);
+      return;
+    }
+
+    // Pede permissão
+    var perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      localStorage.setItem('push_negado', '1');
+      return;
+    }
+
+    // Cria subscription
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
+    });
+
+    await salvarSubscription(sub, sessao.token);
+    _pushAtivo = true;
+    showToast('🔔 Notificações ativadas!', 'success');
+  } catch (err) {
+    console.log('Push error:', err);
+  }
+}
+
+async function salvarSubscription(sub, token) {
+  await fetch(WORKER_URL + '/push/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify(sub.toJSON())
+  });
+}
+
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
 // PWA INSTALL
 var _deferredPrompt = null;
 var _isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
@@ -1244,7 +1309,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.05 · build 24
+  v2026.05.05 · build 14
 </div>
 </body>
 </html>
