@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#0D0D0D">
 <title>Monitor de Passagens</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   :root { --bg: #0D0D0D; --bg2: #141414; --bg3: #1A1A1A; --border: #1C1C1C; --border2: #2A2A2A; --text: #F0F0F0; --text2: #888; --text3: #444; --text4: #333; --green: #5A9E6F; --red: #9E5A5A; }
@@ -676,6 +677,78 @@ function renderAlertas() {
   m.className = 'monitor-row';
   m.innerHTML = '<div class="monitor-dot"></div><div class="monitor-text">verificando 4x por dia</div>';
   el.appendChild(m);
+
+  // Renderiza gráficos após DOM atualizado
+  setTimeout(function() {
+    alertasData.forEach(function(a) {
+      if (!a.historico || a.historico.length <= 1) return;
+      var canvas = document.getElementById('chart-' + a.id);
+      if (!canvas) return;
+
+      // Filtra últimos 15 dias
+      var quinzeDiasAtras = new Date();
+      quinzeDiasAtras.setDate(quinzeDiasAtras.getDate() - 15);
+      var hist = a.historico.filter(function(h) { return new Date(h.data) >= quinzeDiasAtras; });
+      if (hist.length <= 1) hist = a.historico;
+
+      var labels = hist.map(function(h) {
+        var d = new Date(h.data);
+        return d.getDate() + '/' + (d.getMonth()+1) + ' ' + d.getHours().toString().padStart(2,'0') + 'h';
+      });
+      var precos = hist.map(function(h) { return h.preco; });
+      var minPreco = Math.min.apply(null, precos);
+      var maxPreco = Math.max.apply(null, precos);
+      var temQueda = precos[precos.length-1] < precos[0];
+
+      // Destrói chart anterior se existir
+      if (canvas._chartInstance) canvas._chartInstance.destroy();
+
+      canvas._chartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: precos,
+            borderColor: temQueda ? '#5A9E6F' : '#9E5A5A',
+            backgroundColor: temQueda ? 'rgba(90,158,111,0.08)' : 'rgba(158,90,90,0.08)',
+            borderWidth: 1.5,
+            pointRadius: hist.length <= 6 ? 3 : 0,
+            pointHoverRadius: 4,
+            tension: 0.3,
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) { return 'R$ ' + ctx.parsed.y.toFixed(2); }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#444', font: { size: 9 }, maxTicksLimit: 5 },
+              grid: { color: '#1C1C1C' }
+            },
+            y: {
+              ticks: {
+                color: '#444',
+                font: { size: 9 },
+                callback: function(v) { return 'R$' + v.toFixed(0); }
+              },
+              grid: { color: '#1C1C1C' },
+              suggestedMin: minPreco * 0.98,
+              suggestedMax: maxPreco * 1.02,
+            }
+          }
+        }
+      });
+    });
+  }, 100);
 }
 
 // RENDER HISTÓRICO
@@ -957,7 +1030,7 @@ if (!verificarConviteURL()) {
 setInterval(carregarAlertas, 5 * 60 * 1000);
 </script>
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.05 · build 17
+  v2026.05.05 · build 14
 </div>
 </body>
 </html>
