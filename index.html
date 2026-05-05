@@ -639,9 +639,16 @@ function showTab(tab) {
   if (tab === 'admin') carregarUsuarios();
 }
 
-// CARREGAR
+// CARREGAR — lê alertas do Redis via Worker
 function carregarAlertas() {
-  api('listar').then(function(data) {
+  var sessao = getSessao();
+  if (!sessao) return;
+  fetch(WORKER_URL + '/alertas', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function(r) {
+    if (r.status === 401) { limparSessao(); mostrarTelaLogin(); return Promise.reject('Sessão expirada'); }
+    return r.json();
+  })
+  .then(function(data) {
     alertasData = data || [];
     var n = alertasData.length;
     document.getElementById('eyebrow').textContent = n + ' alerta' + (n !== 1 ? 's' : '') + ' ativo' + (n !== 1 ? 's' : '');
@@ -715,7 +722,7 @@ function solicitarAnalise(id) {
   }).catch(function() { showToast('Erro ao analisar', 'error'); btn.innerHTML = '<span>Analisar com IA</span>'; btn.style.pointerEvents = ''; });
 }
 
-// ADICIONAR
+// ADICIONAR — salva alerta no Redis via Worker
 function adicionarAlerta() {
   var origem = document.getElementById('input-origem').value.trim().toUpperCase();
   var destino = document.getElementById('input-destino').value.trim().toUpperCase();
@@ -726,7 +733,14 @@ function adicionarAlerta() {
   if (!dataIda) { showToast('Informe a data de ida', 'error'); return; }
   var btn = document.getElementById('btn-adicionar');
   btn.classList.add('loading'); btn.textContent = 'Criando...';
-  api('adicionar', { origem: origem, destino: destino, dataIda: dataIda, dataVolta: dataVolta || null }).then(function(res) {
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/alertas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ origem: origem, destino: destino, dataIda: dataIda, dataVolta: dataVolta || null })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
     if (!res || res.erro) { showToast(res ? res.erro : 'Erro ao criar', 'error'); } else {
       showToast('Alerta criado!', 'success');
       document.getElementById('input-origem').value = '';
@@ -741,12 +755,18 @@ function adicionarAlerta() {
   }).catch(function() { showToast('Erro ao criar', 'error'); btn.classList.remove('loading'); btn.textContent = 'Criar alerta'; });
 }
 
-// REMOVER
+// REMOVER — remove alerta do Redis via Worker
 function removerAlerta(indice) {
-  api('remover', { indice: indice }).then(function(res) {
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/alertas/' + indice, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + sessao.token }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
     if (!res || res.erro) { showToast(res ? res.erro : 'Erro', 'error'); return; }
     showToast('Alerta removido', 'success'); carregarAlertas();
-  });
+  }).catch(function() { showToast('Erro ao remover', 'error'); });
 }
 
 // AUTOCOMPLETE
@@ -937,7 +957,7 @@ if (!verificarConviteURL()) {
 setInterval(carregarAlertas, 5 * 60 * 1000);
 </script>
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.05 · build 16
+  v2026.05.05 · build 14
 </div>
 </body>
 </html>
