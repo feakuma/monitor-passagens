@@ -10,43 +10,17 @@
 <title>Monitor de Passagens</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  :root {
-    --bg: #0D0D0D;
-    --bg2: #141414;
-    --bg3: #1A1A1A;
-    --border: #1C1C1C;
-    --border2: #2A2A2A;
-    --text: #F0F0F0;
-    --text2: #888;
-    --text3: #444;
-    --text4: #333;
-    --green: #5A9E6F;
-    --red: #9E5A5A;
-  }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    max-width: 430px;
-    margin: 0 auto;
-    padding-bottom: 80px;
-  }
-
+  :root { --bg: #0D0D0D; --bg2: #141414; --bg3: #1A1A1A; --border: #1C1C1C; --border2: #2A2A2A; --text: #F0F0F0; --text2: #888; --text3: #444; --text4: #333; --green: #5A9E6F; --red: #9E5A5A; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; max-width: 430px; margin: 0 auto; padding-bottom: 80px; }
   .status-bar { padding: 16px 24px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
   .header { padding: 16px 24px 20px; }
   .header-eyebrow { font-size: 11px; color: var(--text3); font-weight: 300; margin-bottom: 4px; }
   .header-title { font-size: 26px; font-weight: 600; letter-spacing: -0.8px; }
-
   .tabs { display: flex; padding: 0 24px; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
   .tab { font-size: 13px; color: var(--text3); padding-bottom: 12px; cursor: pointer; border-bottom: 1.5px solid transparent; margin-bottom: -1px; transition: color 0.2s; }
   .tab.active { color: var(--text); border-bottom-color: var(--text); }
-
   .page { display: none; padding: 0 16px; }
   .page.active { display: block; }
-
   .card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
   .card-body { padding: 16px 18px; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
@@ -61,27 +35,22 @@
   .dates { display: flex; flex-direction: column; gap: 3px; }
   .date-row { font-size: 11px; color: var(--text3); font-weight: 300; }
   .date-row strong { color: var(--text2); font-weight: 500; }
-
   .card-action { border-top: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .action-left { display: flex; flex-direction: column; gap: 2px; }
   .action-title { font-size: 12px; color: var(--text); font-weight: 400; }
   .action-sub { font-size: 10px; color: var(--text3); font-weight: 300; }
   .action-arrow { font-size: 14px; color: var(--text4); }
   .action-arrow.active { color: var(--green); }
-
   .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: 14px; border: 1px solid #1A2E20; background: #0F1A12; }
   .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.5px; margin-bottom: 6px; }
   .ai-verdict { font-size: 14px; color: var(--green); font-weight: 600; margin-bottom: 5px; }
   .ai-text { font-size: 12px; color: #3A7A4A; line-height: 1.7; }
   .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid #1A2E20; border-radius: 12px; background: #0F1A12; cursor: pointer; font-size: 12px; color: #3A7A4A; margin-top: 8px; }
-
   .monitor-row { display: flex; align-items: center; gap: 7px; padding: 4px 2px 16px; }
   .monitor-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text4); animation: blink 2.5s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
   .monitor-text { font-size: 11px; color: var(--text4); }
-
   .empty { text-align: center; padding: 48px 24px; color: var(--text3); font-size: 13px; line-height: 1.7; }
-
   .hist-item { background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); padding: 13px 16px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
   .hist-left { display: flex; flex-direction: column; gap: 3px; }
   .hist-route { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; }
@@ -92,7 +61,6 @@
   .hist-var.down { color: var(--green); }
   .hist-var.up { color: var(--red); }
   .hist-sep { font-size: 10px; color: var(--text4); padding: 12px 2px 6px; }
-
   .alerta-item { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
   .alerta-header { padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
   .alerta-route { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
@@ -103,7 +71,6 @@
   .alerta-date { font-size: 11px; color: var(--text3); }
   .alerta-date strong { color: var(--text2); font-weight: 500; }
   .alerta-cia { font-size: 11px; color: var(--text4); }
-
   .section-label { font-size: 11px; color: var(--text3); padding: 16px 2px 10px; letter-spacing: 0.3px; }
   .form-card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: visible; margin-bottom: 10px; }
   .form-row { padding: 14px 16px; border-bottom: 1px solid var(--border); position: relative; }
@@ -114,7 +81,6 @@
   .field-label { font-size: 10px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
   .field-value { font-size: 15px; color: var(--text); font-weight: 500; letter-spacing: -0.3px; }
   .field-placeholder { font-size: 15px; color: var(--text4); cursor: pointer; }
-
   .autocomplete-wrap { position: relative; overflow: visible; }
   .autocomplete-input { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; letter-spacing: -0.3px; padding: 0; -webkit-appearance: none; }
   .autocomplete-input::placeholder { color: var(--text4); font-weight: 400; }
@@ -127,7 +93,6 @@
   .ac-info { display: flex; flex-direction: column; gap: 2px; }
   .ac-name { font-size: 13px; color: #AAA; }
   .ac-city { font-size: 11px; color: #666; }
-
   .calendar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; justify-content: center; }
   .calendar-overlay.open { display: flex; }
   .calendar-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding-bottom: 20px; }
@@ -147,26 +112,21 @@
   .cal-day.in-range { background: #2A2A2A; color: #D0D0D0; border-radius: 0; }
   .cal-confirm { margin: 8px 16px 0; background: #F5F5F5; color: #0D0D0D; border-radius: 14px; padding: 16px; text-align: center; font-size: 16px; font-weight: 700; cursor: pointer; }
   .cal-confirm:active { opacity: 0.8; }
-
   .submit-btn { background: var(--text); color: var(--bg); border-radius: 16px; padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; }
   .submit-btn:active { opacity: 0.8; }
   .submit-btn.loading { opacity: 0.5; pointer-events: none; }
-
   .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #202020; border: 1px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; color: var(--text2); opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { color: var(--green); border-color: #1A3A22; }
   .toast.error { color: var(--red); border-color: #3A1A1A; }
-
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(13,13,13,0.97); border-top: 1px solid var(--border); padding: 12px 0 20px; display: flex; justify-content: space-around; }
   .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 20px; }
   .nav-icon { font-size: 16px; color: var(--text4); }
   .nav-icon.on { color: var(--text); }
   .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.3px; }
   .nav-label.on { color: var(--text2); }
-
   .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   /* ADMIN */
   .usuario-card { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
   .usuario-header { padding: 14px 16px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -196,6 +156,7 @@
       <div style="font-size:24px;font-weight:600;color:#F0F0F0;letter-spacing:-0.8px;">Monitor de Passagens</div>
       <div style="font-size:13px;color:#444;margin-top:6px;">Faça login para continuar</div>
     </div>
+    <!-- ETAPA 1: E-MAIL -->
     <div id="login-step-email" style="width:100%;max-width:320px;">
       <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
@@ -206,6 +167,7 @@
       <div id="login-email-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
       <div id="btn-solicitar-otp" onclick="solicitarOTP()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">Enviar código</div>
     </div>
+    <!-- ETAPA 2: OTP -->
     <div id="login-step-otp" style="width:100%;max-width:320px;display:none;">
       <div style="text-align:center;margin-bottom:24px;">
         <div style="font-size:13px;color:#888;">Código enviado para</div>
@@ -222,14 +184,33 @@
       <div onclick="voltarParaEmail()" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;">← Usar outro e-mail</div>
       <div id="btn-reenviar-otp" onclick="solicitarOTP(true)" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;display:none;">Reenviar código</div>
     </div>
+    <!-- ETAPA 3: CADASTRO VIA CONVITE -->
+    <div id="login-step-convite" style="width:100%;max-width:320px;display:none;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:20px;margin-bottom:8px;">🎉</div>
+        <div style="font-size:16px;color:#F0F0F0;font-weight:600;">Criar sua conta</div>
+        <div id="convite-email-display" style="font-size:13px;color:#888;margin-top:6px;"></div>
+      </div>
+      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
+        <div style="padding:16px 18px;border-bottom:1px solid #1C1C1C;">
+          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">seu nome</div>
+          <input id="convite-nome" type="text" placeholder="Como quer ser chamado?" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+        </div>
+        <div style="padding:16px 18px;">
+          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">telegram chat id</div>
+          <input id="convite-chatid" type="number" placeholder="ex: 123456789" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+        </div>
+      </div>
+      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+        <div style="font-size:12px;color:#666;line-height:1.6;">💡 Para obter seu Chat ID:<br>1. Abra o Telegram<br>2. Busque <strong style="color:#888;">@userinfobot</strong><br>3. Envie /start e copie o ID</div>
+      </div>
+      <div id="convite-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
+      <div id="btn-criar-conta" onclick="criarContaConvite()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">Criar minha conta</div>
+    </div>
   </div>
 </div>
 
-<div class="status-bar">
-  <span id="clock">--:--</span>
-  <span>●●●</span>
-</div>
-
+<div class="status-bar"><span id="clock">--:--</span><span>●●●</span></div>
 <div class="header">
   <div class="header-eyebrow" id="eyebrow">carregando...</div>
   <div class="header-title" id="page-title">Passagens</div>
@@ -275,19 +256,34 @@
     </div>
   </div>
   <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
- <div class="section-label" style="margin-top:8px;">minhas configurações</div>
-<div class="card" style="margin-bottom:10px;">
-  <div class="card-body">
-    <div class="card-top" style="margin-bottom:8px;">
-      <div style="font-size:13px;color:var(--text2);">Queda mínima para alerta</div>
-      <div style="font-size:15px;font-weight:600;" id="cfg-pct">—</div>
+
+  <!-- MINHAS CONFIGURAÇÕES -->
+  <div class="section-label" style="margin-top:8px;">minhas configurações</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-body">
+      <div class="card-top" style="margin-bottom:8px;">
+        <div style="font-size:13px;color:var(--text2);">Queda mínima para alerta</div>
+        <div style="font-size:15px;font-weight:600;" id="cfg-pct">—</div>
+      </div>
+      <div class="card-top" style="margin-bottom:0;">
+        <div style="font-size:13px;color:var(--text2);">Análise de IA</div>
+        <div style="font-size:13px;font-weight:500;" id="cfg-ia">—</div>
+      </div>
     </div>
-    <div class="card-top" style="margin-bottom:0;">
-      <div style="font-size:13px;color:var(--text2);">Análise de IA</div>
-      <div style="font-size:13px;font-weight:500;" id="cfg-ia">—</div>
+    <div id="cfg-edit-form" style="display:none;border-top:1px solid var(--border);padding:14px 18px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">queda mínima %</div>
+      <input id="cfg-pct-input" type="number" min="0" max="100" placeholder="0" style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;" />
+      <div style="display:flex;gap:8px;">
+        <div onclick="salvarConfigs()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
+        <div onclick="cancelarEditConfigs()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
+      </div>
+    </div>
+    <div class="card-action" onclick="editarConfigs()" style="cursor:pointer;">
+      <div class="action-left"><div class="action-title">Editar configurações</div></div>
+      <div class="action-arrow">→</div>
     </div>
   </div>
-</div>
+
   <div class="section-label" style="margin-top:8px;">conta</div>
   <div class="card" style="margin-bottom:10px;">
     <div class="card-action" onclick="logout()" style="cursor:pointer;">
@@ -304,7 +300,19 @@
 <div id="tab-admin" class="page">
   <div class="section-label">usuários cadastrados</div>
   <div id="admin-usuarios-list"><div class="empty">Carregando...</div></div>
-  <div class="section-label">novo usuário</div>
+
+  <!-- CONVIDAR POR E-MAIL -->
+  <div class="section-label">convidar por e-mail</div>
+  <div class="form-card">
+    <div class="form-row">
+      <div class="field-label">e-mail do convidado</div>
+      <input class="autocomplete-input" id="convite-email" placeholder="email@exemplo.com" type="email" autocomplete="off" style="margin-top:4px;" />
+    </div>
+  </div>
+  <div class="submit-btn" onclick="adminEnviarConvite()" style="margin-bottom:8px;">Enviar convite</div>
+
+  <!-- CADASTRO MANUAL -->
+  <div class="section-label">cadastro manual</div>
   <div class="form-card">
     <div class="form-row">
       <div class="field-label">nome</div>
@@ -357,18 +365,9 @@
 <div class="toast" id="toast"></div>
 
 <div class="bottom-nav">
-  <div class="nav-item" onclick="showTab('alertas')">
-    <div class="nav-icon on" id="nav-alertas">◈</div>
-    <div class="nav-label on" id="navl-alertas">alertas</div>
-  </div>
-  <div class="nav-item" onclick="showTab('historico')">
-    <div class="nav-icon" id="nav-historico">◇</div>
-    <div class="nav-label" id="navl-historico">histórico</div>
-  </div>
-  <div class="nav-item" onclick="showTab('config')">
-    <div class="nav-icon" id="nav-config">○</div>
-    <div class="nav-label" id="navl-config">config</div>
-  </div>
+  <div class="nav-item" onclick="showTab('alertas')"><div class="nav-icon on" id="nav-alertas">◈</div><div class="nav-label on" id="navl-alertas">alertas</div></div>
+  <div class="nav-item" onclick="showTab('historico')"><div class="nav-icon" id="nav-historico">◇</div><div class="nav-label" id="navl-historico">histórico</div></div>
+  <div class="nav-item" onclick="showTab('config')"><div class="nav-icon" id="nav-config">○</div><div class="nav-label" id="navl-config">config</div></div>
 </div>
 
 <script>
@@ -393,28 +392,11 @@ function api(action, data) {
   }
   return fetch(WORKER_URL, { method: 'POST', redirect: 'follow', headers: headers, body: JSON.stringify(Object.assign({ action: action }, data)) })
   .then(function(r) {
-    if (r.status === 401) {
-      limparSessao();
-      mostrarTelaLogin();
-      return Promise.reject('Sessão expirada');
-    }
+    if (r.status === 401) { limparSessao(); mostrarTelaLogin(); return Promise.reject('Sessão expirada'); }
     return r.json();
   });
 }
-function renderConfigs() {
-  var sessao = getSessao();
-  if (!sessao || !sessao.usuario) return;
-  fetch(WORKER_URL + '/auth/me', {
-    headers: { 'Authorization': 'Bearer ' + sessao.token }
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(u) {
-    var pctEl = document.getElementById('cfg-pct');
-    var iaEl  = document.getElementById('cfg-ia');
-    if (pctEl) pctEl.textContent = (u.percentualMinimo || 0) + '%';
-    if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa' : '❌ Inativa';
-  });
-}
+
 // INICIALIZAR
 function inicializarApp() {
   var sessao = getSessao();
@@ -425,9 +407,7 @@ function inicializarApp() {
     document.querySelector('.tabs').style.display = '';
     document.querySelectorAll('.page').forEach(function(p) { p.style.display = ''; });
     document.querySelector('.bottom-nav').style.display = '';
-    if (sessao.usuario && sessao.usuario.isAdmin) {
-      document.getElementById('tab-admin-btn').style.display = '';
-    }
+    if (sessao.usuario && sessao.usuario.isAdmin) document.getElementById('tab-admin-btn').style.display = '';
     var emailEl = document.getElementById('sessao-email');
     if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;
     carregarAlertas();
@@ -487,8 +467,7 @@ function verificarOTP() {
 function logout() {
   var sessao = getSessao();
   if (sessao) fetch(WORKER_URL + '/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao.token } });
-  limparSessao();
-  mostrarTelaLogin();
+  limparSessao(); mostrarTelaLogin();
 }
 
 function voltarParaEmail() {
@@ -500,6 +479,108 @@ function voltarParaEmail() {
 }
 
 function mostrarErroLogin(tipo, msg) { var el = document.getElementById('login-' + tipo + '-erro'); el.textContent = msg; el.style.display = 'block'; }
+
+// CONVITE
+var _conviteToken = null;
+var _conviteEmail = null;
+
+function verificarConviteURL() {
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('convite');
+  if (!token) return false;
+  fetch(WORKER_URL + '/convite/' + token)
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.erro) { mostrarTelaLogin(); showToast('Convite inválido ou expirado.', 'error'); return; }
+    document.getElementById('tela-login').style.display = 'block';
+    document.querySelector('.status-bar').style.display = 'none';
+    document.querySelector('.header').style.display = 'none';
+    document.querySelector('.tabs').style.display = 'none';
+    document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
+    document.querySelector('.bottom-nav').style.display = 'none';
+    document.getElementById('login-step-email').style.display = 'none';
+    document.getElementById('login-step-otp').style.display = 'none';
+    document.getElementById('login-step-convite').style.display = 'block';
+    document.getElementById('convite-email-display').textContent = data.email;
+    _conviteToken = token;
+    _conviteEmail = data.email;
+  })
+  .catch(function() { mostrarTelaLogin(); });
+  return true;
+}
+
+function criarContaConvite() {
+  var nome = document.getElementById('convite-nome').value.trim();
+  var chatId = document.getElementById('convite-chatid').value.trim();
+  if (!nome) { mostrarErroConvite('Informe seu nome'); return; }
+  if (!chatId) { mostrarErroConvite('Informe seu Chat ID do Telegram'); return; }
+  var btn = document.getElementById('btn-criar-conta');
+  btn.textContent = 'Criando conta...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
+  fetch(WORKER_URL + '/convite/' + _conviteToken, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome: nome, chatId: chatId })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    btn.textContent = 'Criar minha conta'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
+    if (data.erro) { mostrarErroConvite(data.erro); return; }
+    document.getElementById('login-step-convite').style.display = 'none';
+    document.getElementById('login-step-email').style.display = 'block';
+    document.getElementById('login-email').value = _conviteEmail;
+    showToast('Conta criada! Faça login para continuar.', 'success');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  })
+  .catch(function() { btn.textContent = 'Criar minha conta'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroConvite('Erro ao criar conta. Tente novamente.'); });
+}
+
+function mostrarErroConvite(msg) { var el = document.getElementById('convite-erro'); el.textContent = msg; el.style.display = 'block'; }
+
+// CONFIGS DO USUÁRIO
+var _cfgPctAtual = 0;
+
+function renderConfigs() {
+  var sessao = getSessao();
+  if (!sessao || !sessao.usuario) return;
+  fetch(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function(r) { return r.json(); })
+  .then(function(u) {
+    _cfgPctAtual = u.percentualMinimo || 0;
+    var pctEl = document.getElementById('cfg-pct');
+    var iaEl  = document.getElementById('cfg-ia');
+    if (pctEl) pctEl.textContent = _cfgPctAtual + '%';
+    if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa' : '❌ Inativa (solicite ao admin)';
+  });
+}
+
+function editarConfigs() {
+  var form = document.getElementById('cfg-edit-form');
+  var input = document.getElementById('cfg-pct-input');
+  if (!form || !input) return;
+  input.value = _cfgPctAtual;
+  form.style.display = 'block';
+}
+
+function cancelarEditConfigs() { document.getElementById('cfg-edit-form').style.display = 'none'; }
+
+function salvarConfigs() {
+  var pct = parseInt(document.getElementById('cfg-pct-input').value || '0');
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/auth/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ percentualMinimo: pct })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    _cfgPctAtual = pct;
+    document.getElementById('cfg-pct').textContent = pct + '%';
+    document.getElementById('cfg-edit-form').style.display = 'none';
+    showToast('Configuração salva!', 'success');
+  })
+  .catch(function() { showToast('Erro ao salvar', 'error'); });
+}
 
 // AEROPORTOS
 var AEROPORTOS = [
@@ -777,6 +858,24 @@ function carregarUsuarios() {
   .catch(function() { el.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>'; });
 }
 
+function adminEnviarConvite() {
+  var email = document.getElementById('convite-email').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) { showToast('Informe um e-mail válido', 'error'); return; }
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/convite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ email: email })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Convite enviado!', 'success');
+    document.getElementById('convite-email').value = '';
+  })
+  .catch(function() { showToast('Erro ao enviar convite', 'error'); });
+}
+
 function adminCriarUsuario() {
   var nome = document.getElementById('admin-nome').value.trim();
   var email = document.getElementById('admin-email').value.trim().toLowerCase();
@@ -831,11 +930,13 @@ function showToast(msg, type) { var t = document.getElementById('toast'); t.text
 function formatData(str) { if (!str) return '—'; var p = str.split('-'); var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return p[2] + ' ' + m[parseInt(p[1])-1] + ' ' + p[0]; }
 function formatDataCurta(str) { if (!str) return '—'; var p = str.split('-'); return p[2] + '/' + p[1]; }
 
-// INIT
-inicializarApp();
+// INIT — verifica convite antes de inicializar
+if (!verificarConviteURL()) {
+  inicializarApp();
+}
 setInterval(carregarAlertas, 5 * 60 * 1000);
 </script>
-<div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#255; letter-spacing:0.5px;">
+<div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
   v2026.05.05 · build 14
 </div>
 </body>
