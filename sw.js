@@ -1,8 +1,3 @@
-// ============================================================
-//  Service Worker — Monitor de Passagens
-//  Cache offline + Push Notifications
-// ============================================================
-
 const CACHE_NAME = 'passagens-v2';
 const ASSETS = [
   '/',
@@ -32,16 +27,24 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
+  // Ignora requisições não-GET — não podem ser cacheadas
+  if (event.request.method !== 'GET') return;
+
+  // Ignora APIs externas
   if (event.request.url.includes('passagens-proxy') ||
       event.request.url.includes('upstash') ||
-      event.request.url.includes('resend')) {
+      event.request.url.includes('resend') ||
+      event.request.url.includes('onesignal')) {
     return;
   }
+
   event.respondWith(
     fetch(event.request)
       .then(function(response) {
         var clone = response.clone();
-        caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put(event.request, clone);
+        });
         return response;
       })
       .catch(function() {
@@ -56,7 +59,6 @@ self.addEventListener('fetch', function(event) {
 self.addEventListener('push', function(event) {
   var data = {};
   try { data = event.data.json(); } catch(e) { data = { title: 'Monitor de Passagens', message: event.data ? event.data.text() : '' }; }
-
   event.waitUntil(
     self.registration.showNotification(data.title || 'Monitor de Passagens', {
       body:    data.message || '',
