@@ -28,6 +28,23 @@ export const AEROPORTOS = [
   { code:'NAT', name:'Sao Goncalo do Amarante', city:'Natal, RN' },
   { code:'MCZ', name:'Zumbi dos Palmares', city:'Maceio, AL' },
   { code:'JPA', name:'Castro Pinto', city:'Joao Pessoa, PB' },
+
+  // ARGENTINA
+  { code:'EZE', name:'Ministro Pistarini (Ezeiza)', city:'Buenos Aires, AR' },
+  { code:'AEP', name:'Jorge Newbery (Aeroparque)', city:'Buenos Aires, AR' },
+  { code:'COR', name:'Ambrosio Taravella', city:'Cordoba, AR' },
+  { code:'MDZ', name:'El Plumerillo', city:'Mendoza, AR' },
+  { code:'BRC', name:'Teniente Candelaria', city:'Bariloche, AR' },
+  { code:'IGR', name:'Cataratas del Iguazu', city:'Puerto Iguazu, AR' },
+  { code:'USH', name:'Malvinas Argentinas', city:'Ushuaia, AR' },
+  { code:'SLA', name:'Martin Miguel de Guemes', city:'Salta, AR' },
+
+  // PORTUGAL
+  { code:'LIS', name:'Humberto Delgado', city:'Lisboa, PT' },
+  { code:'OPO', name:'Francisco Sa Carneiro', city:'Porto, PT' },
+  { code:'FAO', name:'Faro', city:'Faro, PT' },
+  { code:'FNC', name:'Cristiano Ronaldo', city:'Funchal, PT' },
+  { code:'PDL', name:'Joao Paulo II', city:'Ponta Delgada, PT' },
 ];
 
 // SESSÃO
