@@ -5,10 +5,10 @@
 import { getSessao, showToast } from './config.js';
 import { carregarAlertas } from './api.js';
 import { mostrarTelaLogin, ocultarTelaLogin, verificarConviteURL, solicitarOTP, verificarOTP, logout, voltarParaEmail, criarContaConvite, _executarCriarContaConvite, mostrarErroLogin, mostrarErroConvite } from './auth.js';
-import { showTab, updateClock, renderAlertas, renderHistorico, renderConfigAlertas, adicionarAlerta, removerAlerta, solicitarAnalise, doAutocomplete, pickAirport } from './ui.js';
+import { showTab, updateClock, renderAlertas, renderHistorico, renderConfigAlertas, adicionarAlerta, removerAlerta, solicitarAnalise, doAutocomplete, pickAirport, validarCampoAeroporto } from './ui.js';
 import { openCal, calNav, selectDay, confirmCal } from './calendar.js';
 import { mostrarInstallToast, fecharInstallToast, instalarPWA, inicializarPush } from './pwa.js';
-import { carregarUsuarios, adminEnviarConvite, adminCriarUsuario, _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario, editarConfigs, cancelarEditConfigs, salvarConfigs } from './admin.js';
+import { carregarUsuarios, adminEnviarConvite, adminCriarUsuario, _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario, editarConfigs, cancelarEditConfigs, salvarConfigs, adminEditarLimite } from './admin.js';
 
 // ============================================================
 //  Expõe funções no window para uso inline no HTML
@@ -24,6 +24,7 @@ window._removerAlerta       = removerAlerta;
 window._solicitarAnalise    = solicitarAnalise;
 window.doAutocomplete       = doAutocomplete;
 window._pickAirport         = pickAirport;
+window._validarAero         = validarCampoAeroporto;
 window.openCal              = openCal;
 window.calNav               = calNav;
 window._selectDay           = selectDay;
@@ -35,6 +36,7 @@ window.fecharModalSemChatId = fecharModalSemChatId;
 window.editarConfigs        = editarConfigs;
 window.cancelarEditConfigs  = cancelarEditConfigs;
 window.salvarConfigs        = salvarConfigs;
+window.adminEditarLimite    = adminEditarLimite;
 window.adminEnviarConvite   = adminEnviarConvite;
 window.adminCriarUsuario    = adminCriarUsuario;
 window._adminToggleIA       = adminToggleIA;
