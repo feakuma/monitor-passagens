@@ -201,6 +201,9 @@ export function solicitarAnalise(id) {
 }
 
 // AUTOCOMPLETE
+// Conjunto de códigos válidos para validação client-side
+const CODIGOS_VALIDOS = new Set(AEROPORTOS.map(a => a.code));
+
 export function doAutocomplete(input, tipo) {
   const val  = input.value.toUpperCase().trim();
   const drop = document.getElementById('drop-' + tipo);
@@ -210,7 +213,11 @@ export function doAutocomplete(input, tipo) {
     a.code.indexOf(val) === 0 || a.name.toUpperCase().indexOf(val) >= 0 || a.city.toUpperCase().indexOf(val) >= 0
   ).slice(0, 5);
 
-  if (!matches.length) { drop.classList.remove('open'); return; }
+  if (!matches.length) {
+    drop.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:#666;">Aeroporto não encontrado</div>';
+    drop.classList.add('open');
+    return;
+  }
 
   drop.innerHTML = matches.map(a =>
     '<div class="autocomplete-item" onmousedown="window._pickAirport(\'' + a.code + '\',\'' + tipo + '\')" ontouchstart="window._pickAirport(\'' + a.code + '\',\'' + tipo + '\')">' +
@@ -225,4 +232,13 @@ export function pickAirport(code, tipo) {
   const drop = document.getElementById('drop-' + tipo);
   drop.classList.remove('open'); drop.innerHTML = '';
   document.getElementById('input-' + tipo).blur();
+}
+
+// Valida ao sair do campo — limpa se não for da lista
+export function validarCampoAeroporto(input) {
+  const val = input.value.toUpperCase().trim();
+  if (val && !CODIGOS_VALIDOS.has(val)) {
+    input.value = '';
+    showToast('Selecione um aeroporto da lista', 'error');
+  }
 }
