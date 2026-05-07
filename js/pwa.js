@@ -52,28 +52,27 @@ if (_isIOS && !_isInStandalone && !localStorage.getItem('pwa_install_dismissed')
 // PUSH — OneSignal
 export async function inicializarPush() {
   const sessao = getSessao();
-  if (!sessao) return;
+  if (!sessao || !sessao.email) {
+    console.log('Push: sem sessão, abortando');
+    return;
+  }
 
   // Aguarda OneSignal carregar
-  if (!window.OneSignal) {
+  if (typeof OneSignal === 'undefined' || !window.OneSignalDeferred) {
     setTimeout(inicializarPush, 1000);
     return;
   }
 
-  try {
-    // Pede permissão de notificação via OneSignal
-    const permission = await OneSignal.Notifications.requestPermission();
-    if (!permission) return;
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    try {
+      // Associa o usuário pelo e-mail
+      await OneSignal.login(sessao.email);
 
-    // Aguarda subscription ser criada
-    const pushSub = await OneSignal.User.PushSubscription;
-    if (!pushSub || !pushSub.id) return;
-
-    // Associa o usuário pelo e-mail como External ID
-    await OneSignal.login(sessao.email);
-
-    showToast('🔔 Notificações ativadas!', 'success');
-  } catch (err) {
-    console.log('OneSignal error:', err);
-  }
+      // Pede permissão
+      const permission = await OneSignal.Notifications.requestPermission();
+      if (permission) showToast('🔔 Notificações ativadas!', 'success');
+    } catch (err) {
+      console.log('OneSignal error:', err);
+    }
+  });
 }
