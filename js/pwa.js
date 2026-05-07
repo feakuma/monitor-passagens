@@ -1,8 +1,8 @@
 // ============================================================
-//  pwa.js — PWA Install Toast + Push Notifications
+//  pwa.js — PWA Install Toast + Push via OneSignal
 // ============================================================
 
-import { WORKER_URL, getSessao, showToast } from './config.js';
+import { getSessao, showToast } from './config.js';
 
 let _deferredPrompt = null;
 const _isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
@@ -49,56 +49,31 @@ if (_isIOS && !_isInStandalone && !localStorage.getItem('pwa_install_dismissed')
   });
 }
 
-// PUSH NOTIFICATIONS
-let _pushAtivo = false;
-
+// PUSH — OneSignal
 export async function inicializarPush() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  if (localStorage.getItem('push_negado')) return;
   const sessao = getSessao();
   if (!sessao) return;
 
+  // Aguarda OneSignal carregar
+  if (!window.OneSignal) {
+    setTimeout(inicializarPush, 1000);
+    return;
+  }
+
   try {
-    const reg  = await navigator.serviceWorker.ready;
-    const resp = await fetch(WORKER_URL + '/push/vapidkey');
-    const { publicKey } = await resp.json();
+    // Pede permissão de notificação via OneSignal
+    const permission = await OneSignal.Notifications.requestPermission();
+    if (!permission) return;
 
-    const existingSub = await reg.pushManager.getSubscription();
-    if (existingSub) {
-      _pushAtivo = true;
-      await salvarSubscription(existingSub, sessao.token);
-      return;
-    }
+    // Aguarda subscription ser criada
+    const pushSub = await OneSignal.User.PushSubscription;
+    if (!pushSub || !pushSub.id) return;
 
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { localStorage.setItem('push_negado', '1'); return; }
+    // Associa o usuário pelo e-mail como External ID
+    await OneSignal.login(sessao.email);
 
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey)
-    });
-
-    await salvarSubscription(sub, sessao.token);
-    _pushAtivo = true;
     showToast('🔔 Notificações ativadas!', 'success');
   } catch (err) {
-    console.log('Push error:', err);
+    console.log('OneSignal error:', err);
   }
-}
-
-async function salvarSubscription(sub, token) {
-  await fetch(WORKER_URL + '/push/subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify(sub.toJSON())
-  });
-}
-
-function urlBase64ToUint8Array(base64String) {
-  const padding  = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64   = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData  = window.atob(base64);
-  const output   = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i++) output[i] = rawData.charCodeAt(i);
-  return output;
 }
