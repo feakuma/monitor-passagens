@@ -21,6 +21,8 @@ export function renderConfigs() {
     const iaEl  = document.getElementById('cfg-ia');
     if (pctEl) pctEl.textContent = _cfgPctAtual + '%';
     if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa' : '❌ Inativa (solicite ao admin)';
+    const limEl = document.getElementById('cfg-limite');
+    if (limEl) limEl.textContent = u.isAdmin ? 'Ilimitado' : (u.limiteAlertas ?? 10) + ' alertas';
   });
 }
 
@@ -78,6 +80,7 @@ export function carregarUsuarios() {
       '<div class="usuario-meta-item">Chat ID: <strong>' + (u.chatId || '—') + '</strong></div>' +
       '<div class="usuario-meta-item">Alertas: <strong>' + (u.totalAlertas || 0) + '</strong></div>' +
       '<div class="usuario-meta-item">Queda mín: <strong>' + (u.percentualMinimo || 0) + '%</strong></div>' +
+      '<div class="usuario-meta-item">Limite alertas: <strong>' + (u.limiteAlertas ?? 10) + '</strong></div>' +
       '</div><div class="usuario-actions">' +
       (u.analiseIA
         ? '<div class="btn-small" onclick="window._adminToggleIA(\'' + u.email + '\', false)">Desativar IA</div>'
@@ -133,12 +136,13 @@ export function _executarCriarUsuarioManual() {
   const chatId = document.getElementById('admin-chatid').value.trim();
   const ia     = document.getElementById('admin-ia').value === 'true';
   const pct    = parseInt(document.getElementById('admin-pct').value || '0');
+  const limite = parseInt(document.getElementById('admin-limite')?.value || '10');
   const sessao = getSessao();
 
   fetch(WORKER_URL + '/admin/usuarios', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-    body: JSON.stringify({ nome, email, chatId, analiseIA: ia, percentualMinimo: pct })
+    body: JSON.stringify({ nome, email, chatId, analiseIA: ia, percentualMinimo: pct, limiteAlertas: limite })
   })
   .then(r => r.json())
   .then(data => {
@@ -149,6 +153,22 @@ export function _executarCriarUsuarioManual() {
     carregarUsuarios();
   })
   .catch(() => showToast('Erro ao cadastrar', 'error'));
+}
+
+export function adminEditarLimite(email, limiteAtual) {
+  const novoLimite = prompt(`Novo limite de alertas para ${email}:`, limiteAtual);
+  if (novoLimite === null) return;
+  const limite = parseInt(novoLimite);
+  if (isNaN(limite) || limite < 1) { showToast('Limite inválido', 'error'); return; }
+  const sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ limiteAlertas: limite })
+  })
+  .then(r => r.json())
+  .then(data => { if (data.erro) { showToast(data.erro, 'error'); return; } showToast('Limite atualizado!', 'success'); carregarUsuarios(); })
+  .catch(() => showToast('Erro ao atualizar', 'error'));
 }
 
 export function adminToggleIA(email, ativo) {
