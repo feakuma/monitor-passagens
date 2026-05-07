@@ -98,8 +98,11 @@ export function carregarUsuarios() {
 export function adminEnviarConvite() {
   const email  = document.getElementById('convite-email').value.trim().toLowerCase();
   if (!email || !email.includes('@')) { showToast('Informe um e-mail válido', 'error'); return; }
-  const sessao = getSessao();
 
+  const btn = document.getElementById('btn-enviar-convite');
+  if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; btn.textContent = 'Enviando...'; }
+
+  const sessao = getSessao();
   fetch(WORKER_URL + '/admin/convite', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
@@ -107,11 +110,15 @@ export function adminEnviarConvite() {
   })
   .then(r => r.json())
   .then(data => {
+    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = ''; btn.textContent = 'Enviar convite'; }
     if (data.erro) { showToast(data.erro, 'error'); return; }
     showToast('Convite enviado!', 'success');
     document.getElementById('convite-email').value = '';
   })
-  .catch(() => showToast('Erro ao enviar convite', 'error'));
+  .catch(() => {
+    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = ''; btn.textContent = 'Enviar convite'; }
+    showToast('Erro ao enviar convite', 'error');
+  });
 }
 
 export function adminCriarUsuario() {
