@@ -185,6 +185,21 @@
   .ios-modal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 0 auto 20px; }
 
 </style>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "e6a4c322-2d34-436c-9fd9-ac5b324414d0",
+      safari_web_id: "web.onesignal.auto.26339961-08fd-44e5-8197-7ce61bb1927b",
+      notifyButton: { enable: false },
+      welcomeNotification: {
+        title: "Monitor de Passagens",
+        message: "Voce receberá alertas de queda de preco! ✈️",
+      },
+    });
+  });
+</script>
 </head>
 <body>
 
@@ -481,7 +496,7 @@
 
 <script type="module" src="js/app.js"></script>
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.06 · build 47
+  v2026.05.05 · build 24
 </div>
 </body>
 </html>
