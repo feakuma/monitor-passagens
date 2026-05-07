@@ -293,12 +293,12 @@
     <div class="form-row two-col">
       <div class="form-col autocomplete-wrap">
         <div class="field-label">origem</div>
-        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="doAutocomplete(this,'origem')" onkeyup="doAutocomplete(this,'origem')" />
+        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="doAutocomplete(this,'origem')" onkeyup="doAutocomplete(this,'origem')" onblur="window._validarAero(this)" />
         <div class="autocomplete-dropdown" id="drop-origem"></div>
       </div>
       <div class="form-col autocomplete-wrap">
         <div class="field-label" style="text-align:right;">destino</div>
-        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="doAutocomplete(this,'destino')" onkeyup="doAutocomplete(this,'destino')" />
+        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="doAutocomplete(this,'destino')" onkeyup="doAutocomplete(this,'destino')" onblur="window._validarAero(this)" />
         <div class="autocomplete-dropdown" id="drop-destino"></div>
       </div>
     </div>
@@ -319,9 +319,13 @@
         <div style="font-size:13px;color:var(--text2);">Queda mínima para alerta</div>
         <div style="font-size:15px;font-weight:600;" id="cfg-pct">—</div>
       </div>
-      <div class="card-top" style="margin-bottom:0;">
+      <div class="card-top" style="margin-bottom:8px;">
         <div style="font-size:13px;color:var(--text2);">Análise de IA</div>
         <div style="font-size:13px;font-weight:500;" id="cfg-ia">—</div>
+      </div>
+      <div class="card-top" style="margin-bottom:0;">
+        <div style="font-size:13px;color:var(--text2);">Limite de alertas</div>
+        <div style="font-size:13px;font-weight:500;" id="cfg-limite">—</div>
       </div>
     </div>
     <div id="cfg-edit-form" style="display:none;border-top:1px solid var(--border);padding:14px 18px;">
@@ -391,6 +395,12 @@
       <div class="form-col" style="text-align:right;">
         <div class="field-label">queda mínima %</div>
         <input class="autocomplete-input" id="admin-pct" placeholder="0" type="number" min="0" max="100" style="text-align:right;margin-top:4px;" value="0" />
+      </div>
+    </div>
+    <div class="form-row two-col">
+      <div class="form-col">
+        <div class="field-label">limite de alertas</div>
+        <input class="autocomplete-input" id="admin-limite" placeholder="10" type="number" min="1" max="100" style="margin-top:4px;" value="10" />
       </div>
     </div>
   </div>
@@ -496,7 +506,7 @@
 
 <script type="module" src="js/app.js"></script>
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.07 · build 54
+  v2026.05.05 · build 25
 </div>
 </body>
 </html>
