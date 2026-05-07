@@ -50,29 +50,33 @@ if (_isIOS && !_isInStandalone && !localStorage.getItem('pwa_install_dismissed')
 }
 
 // PUSH — OneSignal
-export async function inicializarPush() {
+export function inicializarPush() {
   const sessao = getSessao();
-  if (!sessao || !sessao.email) {
-    console.log('Push: sem sessão, abortando');
-    return;
-  }
+  if (!sessao || !sessao.email) return;
 
-  // Aguarda OneSignal carregar
-  if (typeof OneSignal === 'undefined' || !window.OneSignalDeferred) {
-    setTimeout(inicializarPush, 1000);
-    return;
-  }
-
-  window.OneSignalDeferred.push(async function(OneSignal) {
-    try {
-      // Associa o usuário pelo e-mail
-      await OneSignal.login(sessao.email);
-
-      // Pede permissão
-      const permission = await OneSignal.Notifications.requestPermission();
-      if (permission) showToast('🔔 Notificações ativadas!', 'success');
-    } catch (err) {
-      console.log('OneSignal error:', err);
+  // Aguarda OneSignal estar disponível
+  const tentarInicializar = () => {
+    if (typeof OneSignal === 'undefined') {
+      setTimeout(tentarInicializar, 500);
+      return;
     }
-  });
+
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        // Associa usuário pelo e-mail
+        await OneSignal.login(sessao.email);
+
+        // Pede permissão se ainda não foi concedida
+        const permission = OneSignal.Notifications.permission;
+        if (!permission) {
+          const granted = await OneSignal.Notifications.requestPermission();
+          if (granted) showToast('🔔 Notificações ativadas!', 'success');
+        }
+      } catch (err) {
+        console.log('OneSignal error:', err);
+      }
+    });
+  };
+
+  setTimeout(tentarInicializar, 2000);
 }
