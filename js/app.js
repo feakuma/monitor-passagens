@@ -13,7 +13,10 @@ import { carregarUsuarios, adminEnviarConvite, adminCriarUsuario, _executarCriar
 // ============================================================
 //  Expõe funções no window para uso inline no HTML
 // ============================================================
-window.showTab              = showTab;
+window.showTab = function(tab) {
+showTab(tab);
+if (tab === ‘config’) setTimeout(atualizarStatusPush, 100);
+};
 window.solicitarOTP         = solicitarOTP;
 window.verificarOTP         = verificarOTP;
 window.voltarParaEmail      = voltarParaEmail;
