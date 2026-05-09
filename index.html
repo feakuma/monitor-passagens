@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -178,11 +179,11 @@
   .install-toast-btn:active { opacity: 0.8; }
   .install-toast-close { font-size: 18px; color: var(--text4); cursor: pointer; flex-shrink: 0; padding: 0 4px; }
 
-  /* Toast iOS com instruções */
-  .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; justify-content: center; }
-  .ios-modal.open { display: flex; }
-  .ios-modal-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding: 24px 24px 40px; }
-  .ios-modal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 0 auto 20px; }
+/* Toast iOS com instruções */
+.ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; justify-content: center; }
+.ios-modal.open { display: flex; }
+.ios-modal-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding: 24px 24px 40px; }
+.ios-modal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 0 auto 20px; }
 
 </style>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -312,6 +313,7 @@
   <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
 
   <!-- MINHAS CONFIGURAÇÕES -->
+
   <div class="section-label" style="margin-top:8px;">minhas configurações</div>
   <div class="card" style="margin-bottom:10px;">
     <div class="card-body">
@@ -342,6 +344,21 @@
     </div>
   </div>
 
+  <!-- NOTIFICAÇÕES PUSH -->
+
+  <div class="section-label" style="margin-top:8px;">notificações</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-body">
+      <div class="card-top" style="margin-bottom:0;">
+        <div>
+          <div style="font-size:13px;color:var(--text2);">Alertas de queda de preço</div>
+          <div style="font-size:11px;color:var(--text4);margin-top:3px;" id="push-status">verificando...</div>
+        </div>
+        <div id="push-toggle-btn" onclick="togglePush()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;">Ativar</div>
+      </div>
+    </div>
+  </div>
+
   <div class="section-label" style="margin-top:8px;">conta</div>
   <div class="card" style="margin-bottom:10px;">
     <div class="card-action" onclick="logout()" style="cursor:pointer;">
@@ -355,11 +372,13 @@
 </div>
 
 <!-- ABA ADMIN -->
+
 <div id="tab-admin" class="page">
   <div class="section-label">usuários cadastrados</div>
   <div id="admin-usuarios-list"><div class="empty">Carregando...</div></div>
 
   <!-- CONVIDAR POR E-MAIL -->
+
   <div class="section-label">convidar por e-mail</div>
   <div class="form-card">
     <div class="form-row">
@@ -370,6 +389,7 @@
   <div class="submit-btn" id="btn-enviar-convite" onclick="adminEnviarConvite()" style="margin-bottom:8px;">Enviar convite</div>
 
   <!-- CADASTRO MANUAL -->
+
   <div class="section-label">cadastro manual</div>
   <div class="form-card">
     <div class="form-row">
@@ -407,8 +427,8 @@
   <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
 </div>
 
-
 <!-- MODAL CHAT ID OPCIONAL -->
+
 <div id="modal-sem-chatid" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
   <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px;padding:28px;max-width:320px;width:100%;">
     <div style="text-align:center;margin-bottom:20px;">
@@ -429,7 +449,23 @@
   </div>
 </div>
 
+<!-- MODAL ALERTAS DO USUÁRIO (Admin) -->
+
+<div id="modal-alertas-usuario" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:flex-end;justify-content:center;">
+  <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px 24px 0 0;width:100%;padding:24px;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div>
+        <div style="font-size:16px;font-weight:600;color:#F0F0F0;" id="modal-usuario-nome">—</div>
+        <div style="font-size:12px;color:#444;" id="modal-usuario-email">—</div>
+      </div>
+      <div onclick="fecharModalAlertasUsuario()" style="font-size:24px;color:#444;cursor:pointer;padding:4px 8px;">×</div>
+    </div>
+    <div id="modal-alertas-lista"><div class="empty">Carregando...</div></div>
+  </div>
+</div>
+
 <!-- CALENDÁRIO -->
+
 <div class="calendar-overlay" id="cal-overlay">
   <div class="calendar-sheet">
     <div class="cal-handle"></div>
@@ -451,6 +487,7 @@
 <div class="toast" id="toast"></div>
 
 <!-- TOAST INSTALAÇÃO PWA -->
+
 <div class="install-toast" id="install-toast">
   <div class="install-toast-icon">📱</div>
   <div class="install-toast-text">
@@ -462,6 +499,7 @@
 </div>
 
 <!-- MODAL iOS -->
+
 <div class="ios-modal" id="ios-modal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="ios-modal-sheet">
     <div class="ios-modal-handle"></div>
@@ -497,7 +535,6 @@
   </div>
 </div>
 
-
 <div class="bottom-nav">
   <div class="nav-item" onclick="showTab('alertas')"><div class="nav-icon on" id="nav-alertas">◈</div><div class="nav-label on" id="navl-alertas">alertas</div></div>
   <div class="nav-item" onclick="showTab('historico')"><div class="nav-icon" id="nav-historico">◇</div><div class="nav-label" id="navl-historico">histórico</div></div>
@@ -505,8 +542,9 @@
 </div>
 
 <script type="module" src="js/app.js"></script>
+
 <div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
-  v2026.05.07 · build 60
+  v2026.05.05 · build 26
 </div>
 </body>
 </html>
