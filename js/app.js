@@ -7,16 +7,13 @@ import { carregarAlertas } from ‘./api.js’;
 import { mostrarTelaLogin, ocultarTelaLogin, verificarConviteURL, solicitarOTP, verificarOTP, logout, voltarParaEmail, criarContaConvite, _executarCriarContaConvite, mostrarErroLogin, mostrarErroConvite } from ‘./auth.js’;
 import { showTab, updateClock, renderAlertas, renderHistorico, renderConfigAlertas, adicionarAlerta, removerAlerta, solicitarAnalise, doAutocomplete, pickAirport, validarCampoAeroporto } from ‘./ui.js’;
 import { openCal, calNav, selectDay, confirmCal } from ‘./calendar.js’;
-import { mostrarInstallToast, fecharInstallToast, instalarPWA, inicializarPush, togglePush, atualizarStatusPush } from ‘./pwa.js’;
+import { mostrarInstallToast, fecharInstallToast, instalarPWA, inicializarPush } from ‘./pwa.js’;
 import { carregarUsuarios, adminEnviarConvite, adminCriarUsuario, _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario, editarConfigs, cancelarEditConfigs, salvarConfigs, adminEditarLimite, verAlertasUsuario, fecharModalAlertasUsuario } from ‘./admin.js’;
 
 // ============================================================
 //  Expõe funções no window para uso inline no HTML
 // ============================================================
-window.showTab = function(tab) {
-showTab(tab);
-if (tab === ‘config’) setTimeout(atualizarStatusPush, 100);
-};
+window.showTab              = showTab;
 window.solicitarOTP         = solicitarOTP;
 window.verificarOTP         = verificarOTP;
 window.voltarParaEmail      = voltarParaEmail;
@@ -34,7 +31,6 @@ window._selectDay           = selectDay;
 window.confirmCal           = confirmCal;
 window.instalarPWA          = instalarPWA;
 window.fecharInstallToast   = fecharInstallToast;
-window.togglePush           = togglePush;
 window.confirmarSemChatId   = confirmarSemChatId;
 window.fecharModalSemChatId = fecharModalSemChatId;
 window.editarConfigs        = editarConfigs;
