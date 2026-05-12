@@ -329,8 +329,7 @@ export function adminFecharEdicao() {
 }
 
 export function adminEditarLimite(email, limiteAtual) {
-  var novoLimite = prompt('Novo limite de alertas para ' + email + ':
-(0 = ilimitado para admins, padrão = 10)', limiteAtual);
+  var novoLimite = prompt('Novo limite de alertas para ' + email + ':\n(padrão = 10)', limiteAtual);
   if (novoLimite === null) return;
   var limite = parseInt(novoLimite);
   if (isNaN(limite) || limite < 1) { showToast('Limite inválido — mínimo 1', 'error'); return; }
