@@ -192,13 +192,10 @@ export function carregarUsuarios() {
           '<div class="usuario-meta-item">Limite: <strong>' + (u.limiteAlertas ?? 10) + '</strong></div>' +
         '</div>' +
         '<div class="usuario-actions">' +
-          (u.analiseIA
-            ? '<div class="btn-small" onclick="adminToggleIA(\'' + u.email + '\', false)">Desativar IA</div>'
-            : '<div class="btn-small" onclick="adminToggleIA(\'' + u.email + '\', true)">Ativar IA</div>') +
+          '<div class="btn-small" onclick="adminAbrirEdicao(\'' + u.email + '\')">✏️ Editar</div>' +
           (u.ativo
             ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', false)">Desativar</div>'
             : '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', true)">Ativar</div>') +
-          '<div class="btn-small" onclick="adminEditarLimite(\'' + u.email + '\', ' + (u.limiteAlertas ?? 10) + ')">Limite</div>' +
           (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + u.email + '\', \'' + u.nome + '\')">Remover</div>' : '') +
         '</div>' +
       '</div>';
@@ -272,6 +269,63 @@ export function _executarCriarUsuarioManual() {
     carregarUsuarios();
   })
   .catch(function () { showToast('Erro ao cadastrar', 'error'); });
+}
+
+// Armazena dados do usuário sendo editado
+var _adminEditandoEmail = null;
+var _adminEditandoUsuario = null;
+
+export function adminAbrirEdicao(email) {
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function (r) { return r.json(); })
+  .then(function (usuarios) {
+    var u = usuarios.find(function(x) { return x.email === email; });
+    if (!u) { showToast('Usuário não encontrado', 'error'); return; }
+    _adminEditandoEmail   = email;
+    _adminEditandoUsuario = u;
+
+    // Preenche o modal
+    document.getElementById('modal-edit-nome').textContent    = u.nome;
+    document.getElementById('modal-edit-email').textContent   = u.email;
+    document.getElementById('modal-edit-pct').value           = u.percentualMinimo || 0;
+    document.getElementById('modal-edit-limite').value        = u.limiteAlertas ?? 10;
+    document.getElementById('modal-edit-ia').value            = u.analiseIA ? 'true' : 'false';
+    document.getElementById('modal-edit-chatid').value        = u.chatId || '';
+    document.getElementById('modal-edit-usuario').style.display = 'flex';
+  })
+  .catch(function () { showToast('Erro ao carregar dados', 'error'); });
+}
+
+export function adminSalvarEdicao() {
+  if (!_adminEditandoEmail) return;
+  var sessao = getSessao();
+  var pct    = parseInt(document.getElementById('modal-edit-pct').value || '0');
+  var limite = parseInt(document.getElementById('modal-edit-limite').value || '10');
+  var ia     = document.getElementById('modal-edit-ia').value === 'true';
+  var chatId = document.getElementById('modal-edit-chatid').value.trim();
+
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(_adminEditandoEmail) + '/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ percentualMinimo: pct, limiteAlertas: limite, analiseIA: ia, chatId: chatId })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Usuário atualizado!', 'success');
+    document.getElementById('modal-edit-usuario').style.display = 'none';
+    _adminEditandoEmail   = null;
+    _adminEditandoUsuario = null;
+    carregarUsuarios();
+  })
+  .catch(function () { showToast('Erro ao salvar', 'error'); });
+}
+
+export function adminFecharEdicao() {
+  document.getElementById('modal-edit-usuario').style.display = 'none';
+  _adminEditandoEmail   = null;
+  _adminEditandoUsuario = null;
 }
 
 export function adminEditarLimite(email, limiteAtual) {
