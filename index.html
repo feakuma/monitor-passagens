@@ -387,6 +387,69 @@
     </div>
   </div>
 
+
+  <div class="section-label" style="margin-top:8px;">inteligência artificial</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div class="card-body">
+      <div class="card-top" style="margin-bottom:8px;">
+        <div style="font-size:13px;color:var(--text2);">Provedor</div>
+        <div style="font-size:13px;font-weight:500;" id="cfg-provider-status">—</div>
+      </div>
+      <div class="card-top" style="margin-bottom:0;">
+        <div style="font-size:13px;color:var(--text2);">Token API</div>
+        <div style="font-size:13px;font-weight:500;" id="cfg-token-status">—</div>
+      </div>
+    </div>
+
+    <!-- Formulário de edição de IA -->
+    <div id="cfg-ia-edit-form" style="display:none;border-top:1px solid var(--border);padding:16px 18px;">
+
+      <!-- Provedor -->
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">provedor de ia</div>
+      <select id="cfg-provider-input"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;margin-bottom:14px;">
+        <option value="anthropic">Claude (Anthropic)</option>
+        <option value="openai">GPT (OpenAI)</option>
+        <option value="google">Gemini (Google)</option>
+      </select>
+
+      <!-- Token -->
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">token da api</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px;">
+        <input id="cfg-token-input" type="password" placeholder="sk-ant-... / sk-... / AIzaSy..."
+          style="flex:1;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:monospace;" />
+        <div onclick="toggleTokenVisibility()"
+          style="border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;color:var(--text3);">👁</div>
+      </div>
+      <div style="font-size:11px;color:var(--text4);margin-bottom:14px;">Deixe em branco para manter o token atual. O token é armazenado com segurança.</div>
+
+      <!-- Prompt -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;">prompt de análise</div>
+        <div onclick="resetPrompt()" style="font-size:11px;color:var(--text4);cursor:pointer;text-decoration:underline;">restaurar padrão</div>
+      </div>
+      <textarea id="cfg-prompt-input" rows="10"
+        style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text2);font-size:12px;outline:none;resize:vertical;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin-bottom:6px;"></textarea>
+      <div style="font-size:11px;color:var(--text4);margin-bottom:14px;">
+        Use as variáveis: <code style="color:var(--green);">{origem}</code> <code style="color:var(--green);">{destino}</code>
+        <code style="color:var(--green);">{dataIda}</code> <code style="color:var(--green);">{dataVoltaStr}</code>
+        <code style="color:var(--green);">{precoAtual}</code> <code style="color:var(--green);">{variacao}</code>
+        <code style="color:var(--green);">{historicoPontos}</code>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <div onclick="salvarConfigIA()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
+        <div onclick="cancelarEditConfigIA()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
+      </div>
+      <div onclick="removerTokenIA()" style="text-align:center;font-size:12px;color:var(--red);cursor:pointer;padding:12px 0 4px;">Remover meu token</div>
+    </div>
+
+    <div class="card-action" onclick="editarConfigIA()" style="cursor:pointer;">
+      <div class="action-left"><div class="action-title">Configurar minha IA</div><div class="action-sub">Token próprio tem prioridade sobre o do sistema</div></div>
+      <div class="action-arrow">→</div>
+    </div>
+  </div>
+
   <div class="section-label" style="margin-top:8px;">notificações</div>
   <div class="card" style="margin-bottom:10px;">
     <div class="card-body">
@@ -458,6 +521,8 @@
     </div>
   </div>
   <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
+
+  <div style="text-align:center;padding:20px 0 8px;font-size:10px;color:var(--text4);letter-spacing:0.5px;">v2026.05.09 · build 71</div>
 </div>
 
 <!-- ── MODAIS ─────────────────────────────────────────────── -->
@@ -572,9 +637,6 @@
   </div>
 </div>
 
-<div style="text-align:center;padding:16px 0 8px;font-size:10px;color:#888;letter-spacing:0.5px;">
-  v2026.05.12 · build 84
-</div>
 
 <!-- ── ENTRY POINT ─────────────────────────────────────────── -->
 <script type="module" src="js/app.js"></script>
