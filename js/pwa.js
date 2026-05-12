@@ -4,18 +4,23 @@
 
 import { WORKER_URL, getSessao, showToast } from './config.js';
 
-var _pushAtivo       = false;
-var _deferredPrompt  = null;
-var _isIOS           = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-var _isInStandalone  = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+var _pushAtivo      = false;
+var _deferredPrompt = null;
+var _isIOS          = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+var _isInStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+// Chaves de localStorage escopadas por usuário — evita que flags de um
+// usuário afetem outro na mesma máquina/browser
+function _keyPush()    { var s = getSessao(); return 'push_negado_'    + (s ? s.usuario.email : 'anon'); }
+function _keyInstall() { var s = getSessao(); return 'pwa_dismissed_'  + (s ? s.usuario.email : 'anon'); }
 
 // ── PUSH ──────────────────────────────────────────────────────
 
 export async function inicializarPush() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  if (localStorage.getItem('push_negado')) return;
   var sessao = getSessao();
   if (!sessao) return;
+  if (localStorage.getItem(_keyPush())) return;
 
   try {
     var reg = await navigator.serviceWorker.ready;
@@ -33,7 +38,7 @@ export async function inicializarPush() {
 
     var perm = await Notification.requestPermission();
     if (perm !== 'granted') {
-      localStorage.setItem('push_negado', '1');
+      localStorage.setItem(_keyPush(), '1');
       atualizarStatusPush();
       return;
     }
@@ -65,27 +70,24 @@ export async function togglePush() {
   if (!sessao) return;
 
   if (_pushAtivo) {
-    // Desativar
     try {
       var reg = await navigator.serviceWorker.ready;
       var sub = await reg.pushManager.getSubscription();
       if (sub) {
         await sub.unsubscribe();
-        await fetch(WORKER_URL + '/push/unsubscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-          body: JSON.stringify({ endpoint: sub.endpoint })
+        await fetch(WORKER_URL + '/push/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }
         });
       }
       _pushAtivo = false;
-      localStorage.setItem('push_negado', '1');
+      localStorage.setItem(_keyPush(), '1');
       showToast('Notificações desativadas', 'success');
     } catch (err) {
       showToast('Erro ao desativar', 'error');
     }
   } else {
-    // Ativar
-    localStorage.removeItem('push_negado');
+    localStorage.removeItem(_keyPush());
     await inicializarPush();
   }
   atualizarStatusPush();
@@ -107,13 +109,11 @@ export async function atualizarStatusPush() {
     var sub = await reg.pushManager.getSubscription();
     _pushAtivo = !!sub;
     if (_pushAtivo) {
-      statusEl.textContent = 'Ativo — você receberá alertas de queda';
-      btnEl.textContent    = 'Desativar';
-      btnEl.style.background = 'var(--bg3)';
+      statusEl.textContent   = 'Ativo — você receberá alertas de queda';
+      btnEl.textContent      = 'Desativar';
     } else {
-      statusEl.textContent = 'Inativo';
-      btnEl.textContent    = 'Ativar';
-      btnEl.style.background = 'var(--bg3)';
+      statusEl.textContent   = 'Inativo';
+      btnEl.textContent      = 'Ativar';
     }
   } catch (err) {
     statusEl.textContent = 'Erro ao verificar status';
@@ -121,9 +121,9 @@ export async function atualizarStatusPush() {
 }
 
 function _urlBase64ToUint8Array(base64String) {
-  var padding   = '='.repeat((4 - base64String.length % 4) % 4);
-  var base64    = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  var rawData   = window.atob(base64);
+  var padding    = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64     = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData    = window.atob(base64);
   var outputArray = new Uint8Array(rawData.length);
   for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
   return outputArray;
@@ -134,21 +134,21 @@ function _urlBase64ToUint8Array(base64String) {
 window.addEventListener('beforeinstallprompt', function (e) {
   e.preventDefault();
   _deferredPrompt = e;
-  if (!_isInStandalone && !localStorage.getItem('pwa_install_dismissed')) {
+  if (!_isInStandalone && !localStorage.getItem(_keyInstall())) {
     setTimeout(mostrarInstallToast, 3000);
   }
 });
 
 export function mostrarInstallToast() {
   if (_isInStandalone) return;
-  if (localStorage.getItem('pwa_install_dismissed')) return;
+  if (localStorage.getItem(_keyInstall())) return;
   if (!getSessao()) return;
   document.getElementById('install-toast').classList.add('show');
 }
 
 export function fecharInstallToast() {
   document.getElementById('install-toast').classList.remove('show');
-  localStorage.setItem('pwa_install_dismissed', '1');
+  localStorage.setItem(_keyInstall(), '1');
 }
 
 export function instalarPWA() {
@@ -165,9 +165,11 @@ export function instalarPWA() {
   }
 }
 
-// iOS — mostra toast manual se ainda não instalou e não dispensou
-if (_isIOS && !_isInStandalone && !localStorage.getItem('pwa_install_dismissed')) {
+// iOS — mostra toast se não instalou e não dispensou
+if (_isIOS && !_isInStandalone) {
   window.addEventListener('load', function () {
-    if (getSessao()) setTimeout(mostrarInstallToast, 3000);
+    if (getSessao() && !localStorage.getItem(_keyInstall())) {
+      setTimeout(mostrarInstallToast, 3000);
+    }
   });
 }
