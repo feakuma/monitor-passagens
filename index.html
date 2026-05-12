@@ -535,10 +535,57 @@
   </div>
   <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
 
-  <div style="text-align:center;padding:20px 0 8px;font-size:10px;color:var(--text4);letter-spacing:0.5px;">v2026.05.12 · build 97</div>
+  <div style="text-align:center;padding:20px 0 8px;font-size:10px;color:var(--text4);letter-spacing:0.5px;">v2026.05.09 · build 71</div>
 </div>
 
 <!-- ── MODAIS ─────────────────────────────────────────────── -->
+
+
+<!-- Modal Editar Usuário (Admin) -->
+<div id="modal-edit-usuario" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px;padding:28px;max-width:360px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div style="margin-bottom:20px;">
+      <div id="modal-edit-nome" style="font-size:17px;font-weight:600;color:#F0F0F0;margin-bottom:4px;"></div>
+      <div id="modal-edit-email" style="font-size:12px;color:#666;"></div>
+    </div>
+
+    <!-- Percentual mínimo -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">queda mínima para alerta (%)</div>
+      <input id="modal-edit-pct" type="number" min="0" max="100"
+        style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;" />
+    </div>
+
+    <!-- Limite de alertas -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">limite de alertas</div>
+      <input id="modal-edit-limite" type="number" min="1" max="100"
+        style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;" />
+    </div>
+
+    <!-- Análise de IA -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">análise de ia</div>
+      <select id="modal-edit-ia"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;">
+        <option value="false">Inativa</option>
+        <option value="true">Ativa</option>
+      </select>
+    </div>
+
+    <!-- Chat ID -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">telegram chat id</div>
+      <input id="modal-edit-chatid" type="number" placeholder="ex: 6315959431"
+        style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;" />
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <div onclick="adminSalvarEdicao()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;">Salvar</div>
+      <div onclick="adminFecharEdicao()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer;">Cancelar</div>
+    </div>
+  </div>
+</div>
 
 <!-- Modal sem Chat ID -->
 <div id="modal-sem-chatid" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
