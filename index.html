@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -13,19 +12,43 @@
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="apple-mobile-web-app-title" content="Passagens">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "e6a4c322-2d34-436c-9fd9-ac5b324414d0",
+      safari_web_id: "web.onesignal.auto.26339961-08fd-44e5-8197-7ce61bb1927b",
+      notifyButton: { enable: false },
+    });
+  });
+</script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  :root { --bg: #0D0D0D; --bg2: #141414; --bg3: #1A1A1A; --border: #1C1C1C; --border2: #2A2A2A; --text: #F0F0F0; --text2: #888; --text3: #444; --text4: #333; --green: #5A9E6F; --red: #9E5A5A; }
+  :root {
+    --bg: #0D0D0D; --bg2: #141414; --bg3: #1A1A1A;
+    --border: #1C1C1C; --border2: #2A2A2A;
+    --text: #F0F0F0; --text2: #888; --text3: #444; --text4: #333;
+    --green: #5A9E6F; --red: #9E5A5A;
+  }
   body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; max-width: 430px; margin: 0 auto; padding-bottom: 80px; }
+
+  /* STATUS BAR & HEADER */
   .status-bar { padding: 16px 24px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
   .header { padding: 16px 24px 20px; }
   .header-eyebrow { font-size: 11px; color: var(--text3); font-weight: 300; margin-bottom: 4px; }
   .header-title { font-size: 26px; font-weight: 600; letter-spacing: -0.8px; }
+
+  /* TABS */
   .tabs { display: flex; padding: 0 24px; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
   .tab { font-size: 13px; color: var(--text3); padding-bottom: 12px; cursor: pointer; border-bottom: 1.5px solid transparent; margin-bottom: -1px; transition: color 0.2s; }
   .tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+  /* PAGES */
   .page { display: none; padding: 0 16px; }
   .page.active { display: block; }
+
+  /* CARDS */
   .card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
   .card-body { padding: 16px 18px; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
@@ -46,16 +69,24 @@
   .action-sub { font-size: 10px; color: var(--text3); font-weight: 300; }
   .action-arrow { font-size: 14px; color: var(--text4); }
   .action-arrow.active { color: var(--green); }
+
+  /* IA */
   .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: 14px; border: 1px solid #1A2E20; background: #0F1A12; }
   .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.5px; margin-bottom: 6px; }
   .ai-verdict { font-size: 14px; color: var(--green); font-weight: 600; margin-bottom: 5px; }
   .ai-text { font-size: 12px; color: #3A7A4A; line-height: 1.7; }
   .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid #1A2E20; border-radius: 12px; background: #0F1A12; cursor: pointer; font-size: 12px; color: #3A7A4A; margin-top: 8px; }
+
+  /* MONITOR DOT */
   .monitor-row { display: flex; align-items: center; gap: 7px; padding: 4px 2px 16px; }
   .monitor-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text4); animation: blink 2.5s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
   .monitor-text { font-size: 11px; color: var(--text4); }
+
+  /* EMPTY */
   .empty { text-align: center; padding: 48px 24px; color: var(--text3); font-size: 13px; line-height: 1.7; }
+
+  /* HISTÓRICO */
   .hist-item { background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); padding: 13px 16px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
   .hist-left { display: flex; flex-direction: column; gap: 3px; }
   .hist-route { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; }
@@ -66,6 +97,8 @@
   .hist-var.down { color: var(--green); }
   .hist-var.up { color: var(--red); }
   .hist-sep { font-size: 10px; color: var(--text4); padding: 12px 2px 6px; }
+
+  /* CONFIG — lista de alertas */
   .alerta-item { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
   .alerta-header { padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
   .alerta-route { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
@@ -76,7 +109,11 @@
   .alerta-date { font-size: 11px; color: var(--text3); }
   .alerta-date strong { color: var(--text2); font-weight: 500; }
   .alerta-cia { font-size: 11px; color: var(--text4); }
+
+  /* SEÇÕES */
   .section-label { font-size: 11px; color: var(--text3); padding: 16px 2px 10px; letter-spacing: 0.3px; }
+
+  /* FORMULÁRIO */
   .form-card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: visible; margin-bottom: 10px; }
   .form-row { padding: 14px 16px; border-bottom: 1px solid var(--border); position: relative; }
   .form-row:last-child { border-bottom: none; }
@@ -86,6 +123,8 @@
   .field-label { font-size: 10px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
   .field-value { font-size: 15px; color: var(--text); font-weight: 500; letter-spacing: -0.3px; }
   .field-placeholder { font-size: 15px; color: var(--text4); cursor: pointer; }
+
+  /* AUTOCOMPLETE */
   .autocomplete-wrap { position: relative; overflow: visible; }
   .autocomplete-input { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; letter-spacing: -0.3px; padding: 0; -webkit-appearance: none; }
   .autocomplete-input::placeholder { color: var(--text4); font-weight: 400; }
@@ -98,6 +137,8 @@
   .ac-info { display: flex; flex-direction: column; gap: 2px; }
   .ac-name { font-size: 13px; color: #AAA; }
   .ac-city { font-size: 11px; color: #666; }
+
+  /* CALENDÁRIO */
   .calendar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; justify-content: center; }
   .calendar-overlay.open { display: flex; }
   .calendar-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding-bottom: 20px; }
@@ -117,21 +158,30 @@
   .cal-day.in-range { background: #2A2A2A; color: #D0D0D0; border-radius: 0; }
   .cal-confirm { margin: 8px 16px 0; background: #F5F5F5; color: #0D0D0D; border-radius: 14px; padding: 16px; text-align: center; font-size: 16px; font-weight: 700; cursor: pointer; }
   .cal-confirm:active { opacity: 0.8; }
+
+  /* BOTÕES */
   .submit-btn { background: var(--text); color: var(--bg); border-radius: 16px; padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; }
   .submit-btn:active { opacity: 0.8; }
   .submit-btn.loading { opacity: 0.5; pointer-events: none; }
+
+  /* TOAST */
   .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #202020; border: 1px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; color: var(--text2); opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { color: var(--green); border-color: #1A3A22; }
   .toast.error { color: var(--red); border-color: #3A1A1A; }
+
+  /* BOTTOM NAV */
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(13,13,13,0.97); border-top: 1px solid var(--border); padding: 12px 0 20px; display: flex; justify-content: space-around; }
   .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 20px; }
   .nav-icon { font-size: 16px; color: var(--text4); }
   .nav-icon.on { color: var(--text); }
   .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.3px; }
   .nav-label.on { color: var(--text2); }
+
+  /* SPINNER */
   .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
   /* ADMIN */
   .usuario-card { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
   .usuario-header { padding: 14px 16px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -139,9 +189,9 @@
   .usuario-email { font-size: 11px; color: var(--text3); margin-top: 2px; }
   .usuario-badges { display: flex; gap: 6px; flex-wrap: wrap; }
   .badge { font-size: 9px; padding: 3px 8px; border-radius: 10px; font-weight: 500; }
-  .badge-green { background: #0D2A1A; color: #5A9E6F; border: 1px solid #1A4A2E; }
-  .badge-red { background: #2A0D0D; color: #9E5A5A; border: 1px solid #4A1A1A; }
-  .badge-gray { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
+  .badge-green  { background: #0D2A1A; color: #5A9E6F; border: 1px solid #1A4A2E; }
+  .badge-red    { background: #2A0D0D; color: #9E5A5A; border: 1px solid #4A1A1A; }
+  .badge-gray   { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
   .badge-purple { background: #1A1030; color: #9B8FE8; border: 1px solid #3a3560; }
   .usuario-meta { padding: 0 16px 10px; display: flex; gap: 16px; flex-wrap: wrap; }
   .usuario-meta-item { font-size: 11px; color: var(--text3); }
@@ -150,26 +200,9 @@
   .btn-small { font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); }
   .btn-small:active { opacity: 0.7; }
   .btn-small.danger { color: var(--red); border-color: #4A1A1A; }
-  /* TOAST INSTALAÇÃO PWA */
-  .install-toast {
-    position: fixed;
-    bottom: 90px;
-    left: 16px;
-    right: 16px;
-    max-width: 398px;
-    margin: 0 auto;
-    background: #1A1A1A;
-    border: 1px solid #2A2A2A;
-    border-radius: 16px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 400;
-    transform: translateY(200px);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
+
+  /* PWA INSTALL TOAST */
+  .install-toast { position: fixed; bottom: 90px; left: 16px; right: 16px; max-width: 398px; margin: 0 auto; background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; z-index: 400; transform: translateY(200px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
   .install-toast.show { transform: translateY(0); opacity: 1; }
   .install-toast-icon { font-size: 24px; flex-shrink: 0; }
   .install-toast-text { flex: 1; }
@@ -179,26 +212,16 @@
   .install-toast-btn:active { opacity: 0.8; }
   .install-toast-close { font-size: 18px; color: var(--text4); cursor: pointer; flex-shrink: 0; padding: 0 4px; }
 
-/* Toast iOS com instruções */
-.ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; justify-content: center; }
-.ios-modal.open { display: flex; }
-.ios-modal-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding: 24px 24px 40px; }
-.ios-modal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 0 auto 20px; }
-
+  /* iOS MODAL */
+  .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; justify-content: center; }
+  .ios-modal.open { display: flex; }
+  .ios-modal-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding: 24px 24px 40px; }
+  .ios-modal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 0 auto 20px; }
 </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "e6a4c322-2d34-436c-9fd9-ac5b324414d0",
-      safari_web_id: "web.onesignal.auto.26339961-08fd-44e5-8197-7ce61bb1927b",
-      notifyButton: { enable: false },
-    });
-  });
-</script>
 </head>
 <body>
+
+<!-- ── TELA DE LOGIN ──────────────────────────────────────── -->
 
 <div id="tela-login" style="display:none;">
   <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#0D0D0D;">
@@ -207,17 +230,24 @@
       <div style="font-size:24px;font-weight:600;color:#F0F0F0;letter-spacing:-0.8px;">Monitor de Passagens</div>
       <div style="font-size:13px;color:#444;margin-top:6px;">Faça login para continuar</div>
     </div>
+
     <!-- ETAPA 1: E-MAIL -->
     <div id="login-step-email" style="width:100%;max-width:320px;">
       <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
           <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">e-mail</div>
-          <input id="login-email" type="email" placeholder="seu@email.com" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" onkeyup="if(event.key==='Enter') solicitarOTP()" />
+          <input id="login-email" type="email" placeholder="seu@email.com"
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;"
+            onkeyup="if(event.key==='Enter') solicitarOTP()" />
         </div>
       </div>
       <div id="login-email-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
-      <div id="btn-solicitar-otp" onclick="solicitarOTP()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">Enviar código</div>
+      <div id="btn-solicitar-otp" onclick="solicitarOTP()"
+        style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">
+        Enviar código
+      </div>
     </div>
+
     <!-- ETAPA 2: OTP -->
     <div id="login-step-otp" style="width:100%;max-width:320px;display:none;">
       <div style="text-align:center;margin-bottom:24px;">
@@ -227,14 +257,20 @@
       <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
           <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">código de 6 dígitos</div>
-          <input id="login-otp" type="number" placeholder="000000" maxlength="6" style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;letter-spacing:6px;padding:0;" onkeyup="if(event.key==='Enter') verificarOTP()" />
+          <input id="login-otp" type="number" placeholder="000000" maxlength="6"
+            style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;letter-spacing:6px;padding:0;"
+            onkeyup="if(event.key==='Enter') verificarOTP()" />
         </div>
       </div>
       <div id="login-otp-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
-      <div id="btn-verificar-otp" onclick="verificarOTP()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;">Entrar</div>
+      <div id="btn-verificar-otp" onclick="verificarOTP()"
+        style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;">
+        Entrar
+      </div>
       <div onclick="voltarParaEmail()" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;">← Usar outro e-mail</div>
       <div id="btn-reenviar-otp" onclick="solicitarOTP(true)" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;display:none;">Reenviar código</div>
     </div>
+
     <!-- ETAPA 3: CADASTRO VIA CONVITE -->
     <div id="login-step-convite" style="width:100%;max-width:320px;display:none;">
       <div style="text-align:center;margin-bottom:24px;">
@@ -245,21 +281,28 @@
       <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;border-bottom:1px solid #1C1C1C;">
           <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">seu nome</div>
-          <input id="convite-nome" type="text" placeholder="Como quer ser chamado?" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+          <input id="convite-nome" type="text" placeholder="Como quer ser chamado?"
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
         </div>
         <div style="padding:16px 18px;">
           <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">telegram chat id</div>
-          <input id="convite-chatid" type="number" placeholder="ex: 123456789 (opcional)" style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+          <input id="convite-chatid" type="number" placeholder="ex: 123456789 (opcional)"
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
         </div>
       </div>
       <div style="background:#141414;border:1px solid #1C1C1C;border-radius:12px;padding:14px 16px;margin-bottom:16px;">
         <div style="font-size:12px;color:#666;line-height:1.6;">💡 Para obter seu Chat ID:<br>1. Abra o Telegram<br>2. Busque <strong style="color:#888;">@userinfobot</strong><br>3. Envie /start e copie o ID</div>
       </div>
       <div id="convite-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
-      <div id="btn-criar-conta" onclick="criarContaConvite()" style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">Criar minha conta</div>
+      <div id="btn-criar-conta" onclick="criarContaConvite()"
+        style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">
+        Criar minha conta
+      </div>
     </div>
   </div>
 </div>
+
+<!-- ── APP ────────────────────────────────────────────────── -->
 
 <div class="status-bar"><span id="clock">--:--</span><span>●●●</span></div>
 <div class="header">
@@ -274,28 +317,37 @@
   <div class="tab" id="tab-admin-btn" style="display:none;" onclick="showTab('admin')">Admin</div>
 </div>
 
+<!-- ABA ALERTAS -->
 <div id="tab-alertas" class="page active">
   <div id="alertas-list"><div class="empty">Carregando...</div></div>
 </div>
 
+<!-- ABA HISTÓRICO -->
 <div id="tab-historico" class="page">
   <div id="historico-list"><div class="empty">Carregando...</div></div>
 </div>
 
+<!-- ABA CONFIG -->
 <div id="tab-config" class="page">
   <div class="section-label">meus alertas</div>
   <div id="config-alertas-list"></div>
+
   <div class="section-label">novo alerta</div>
   <div class="form-card">
     <div class="form-row two-col">
       <div class="form-col autocomplete-wrap">
         <div class="field-label">origem</div>
-        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="doAutocomplete(this,'origem')" onkeyup="doAutocomplete(this,'origem')" />
+        <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+          oninput="doAutocomplete(this,'origem')" onkeyup="doAutocomplete(this,'origem')" />
         <div class="autocomplete-dropdown" id="drop-origem"></div>
       </div>
       <div class="form-col autocomplete-wrap">
         <div class="field-label" style="text-align:right;">destino</div>
-        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" style="text-align:right;" oninput="doAutocomplete(this,'destino')" onkeyup="doAutocomplete(this,'destino')" />
+        <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+          style="text-align:right;"
+          oninput="doAutocomplete(this,'destino')" onkeyup="doAutocomplete(this,'destino')" />
         <div class="autocomplete-dropdown" id="drop-destino"></div>
       </div>
     </div>
@@ -307,8 +359,6 @@
     </div>
   </div>
   <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
-
-  <!-- MINHAS CONFIGURAÇÕES -->
 
   <div class="section-label" style="margin-top:8px;">minhas configurações</div>
   <div class="card" style="margin-bottom:10px;">
@@ -324,7 +374,8 @@
     </div>
     <div id="cfg-edit-form" style="display:none;border-top:1px solid var(--border);padding:14px 18px;">
       <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">queda mínima %</div>
-      <input id="cfg-pct-input" type="number" min="0" max="100" placeholder="0" style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;" />
+      <input id="cfg-pct-input" type="number" min="0" max="100" placeholder="0"
+        style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;" />
       <div style="display:flex;gap:8px;">
         <div onclick="salvarConfigs()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
         <div onclick="cancelarEditConfigs()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
@@ -344,7 +395,10 @@
           <div style="font-size:13px;color:var(--text2);">Alertas de queda de preço</div>
           <div style="font-size:11px;color:var(--text4);margin-top:3px;" id="push-status">verificando...</div>
         </div>
-        <div id="push-toggle-btn" onclick="togglePush()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;">Ativar</div>
+        <div id="push-toggle-btn" onclick="togglePush()"
+          style="background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;">
+          Ativar
+        </div>
       </div>
     </div>
   </div>
@@ -362,12 +416,9 @@
 </div>
 
 <!-- ABA ADMIN -->
-
 <div id="tab-admin" class="page">
   <div class="section-label">usuários cadastrados</div>
   <div id="admin-usuarios-list"><div class="empty">Carregando...</div></div>
-
-  <!-- CONVIDAR POR E-MAIL -->
 
   <div class="section-label">convidar por e-mail</div>
   <div class="form-card">
@@ -376,9 +427,7 @@
       <input class="autocomplete-input" id="convite-email" placeholder="email@exemplo.com" type="email" autocomplete="off" style="margin-top:4px;" />
     </div>
   </div>
-  <div class="submit-btn" onclick="adminEnviarConvite()" style="margin-bottom:8px;">Enviar convite</div>
-
-  <!-- CADASTRO MANUAL -->
+  <div id="btn-enviar-convite" class="submit-btn" onclick="adminEnviarConvite()" style="margin-bottom:8px;">Enviar convite</div>
 
   <div class="section-label">cadastro manual</div>
   <div class="form-card">
@@ -411,8 +460,9 @@
   <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
 </div>
 
-<!-- MODAL CHAT ID OPCIONAL -->
+<!-- ── MODAIS ─────────────────────────────────────────────── -->
 
+<!-- Modal sem Chat ID -->
 <div id="modal-sem-chatid" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
   <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px;padding:28px;max-width:320px;width:100%;">
     <div style="text-align:center;margin-bottom:20px;">
@@ -433,8 +483,7 @@
   </div>
 </div>
 
-<!-- CALENDÁRIO -->
-
+<!-- Calendário -->
 <div class="calendar-overlay" id="cal-overlay">
   <div class="calendar-sheet">
     <div class="cal-handle"></div>
@@ -453,10 +502,10 @@
   </div>
 </div>
 
+<!-- Toast global -->
 <div class="toast" id="toast"></div>
 
-<!-- TOAST INSTALAÇÃO PWA -->
-
+<!-- Toast instalação PWA -->
 <div class="install-toast" id="install-toast">
   <div class="install-toast-icon">📱</div>
   <div class="install-toast-text">
@@ -467,8 +516,7 @@
   <div class="install-toast-close" onclick="fecharInstallToast()">×</div>
 </div>
 
-<!-- MODAL iOS -->
-
+<!-- Modal iOS -->
 <div class="ios-modal" id="ios-modal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="ios-modal-sheet">
     <div class="ios-modal-handle"></div>
@@ -500,866 +548,36 @@
         </div>
       </div>
     </div>
-    <div onclick="document.getElementById('ios-modal').classList.remove('open');fecharInstallToast();" style="background:#F0F0F0;color:#0D0D0D;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;">Entendido!</div>
+    <div onclick="document.getElementById('ios-modal').classList.remove('open');fecharInstallToast();"
+      style="background:#F0F0F0;color:#0D0D0D;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;">
+      Entendido!
+    </div>
   </div>
 </div>
 
+<!-- ── BOTTOM NAV ──────────────────────────────────────────── -->
+
 <div class="bottom-nav">
-  <div class="nav-item" onclick="showTab('alertas')"><div class="nav-icon on" id="nav-alertas">◈</div><div class="nav-label on" id="navl-alertas">alertas</div></div>
-  <div class="nav-item" onclick="showTab('historico')"><div class="nav-icon" id="nav-historico">◇</div><div class="nav-label" id="navl-historico">histórico</div></div>
-  <div class="nav-item" onclick="showTab('config')"><div class="nav-icon" id="nav-config">○</div><div class="nav-label" id="navl-config">config</div></div>
+  <div class="nav-item" onclick="showTab('alertas')">
+    <div class="nav-icon on" id="nav-alertas">◈</div>
+    <div class="nav-label on" id="navl-alertas">alertas</div>
+  </div>
+  <div class="nav-item" onclick="showTab('historico')">
+    <div class="nav-icon" id="nav-historico">◇</div>
+    <div class="nav-label" id="navl-historico">histórico</div>
+  </div>
+  <div class="nav-item" onclick="showTab('config')">
+    <div class="nav-icon" id="nav-config">○</div>
+    <div class="nav-label" id="navl-config">config</div>
+  </div>
 </div>
 
-<script>
-const WORKER_URL = 'https://passagens-proxy.felipe-akuma.workers.dev';
-const IS_GAS = typeof google !== 'undefined' && google.script;
-
-// SESSÃO
-function salvarSessao(token, usuario) { localStorage.setItem('pm_token', token); localStorage.setItem('pm_usuario', JSON.stringify(usuario)); }
-function getSessao() { var t = localStorage.getItem('pm_token'); var u = localStorage.getItem('pm_usuario'); if (!t || !u) return null; return { token: t, usuario: JSON.parse(u) }; }
-function limparSessao() { localStorage.removeItem('pm_token'); localStorage.removeItem('pm_usuario'); }
-
-// API
-function api(action, data) {
-  data = data || {};
-  var sessao = getSessao();
-  var headers = { 'Content-Type': 'text/plain' };
-  if (sessao) headers['Authorization'] = 'Bearer ' + sessao.token;
-  if (IS_GAS) {
-    return new Promise(function(resolve, reject) {
-      google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).handleAction(JSON.stringify(Object.assign({ action: action }, data)));
-    });
-  }
-  return fetch(WORKER_URL, { method: 'POST', redirect: 'follow', headers: headers, body: JSON.stringify(Object.assign({ action: action }, data)) })
-  .then(function(r) {
-    if (r.status === 401) { limparSessao(); mostrarTelaLogin(); return Promise.reject('Sessão expirada'); }
-    return r.json();
-  });
-}
-
-// INICIALIZAR
-function inicializarApp() {
-  var sessao = getSessao();
-  if (sessao) {
-    document.getElementById('tela-login').style.display = 'none';
-    document.querySelector('.status-bar').style.display = '';
-    document.querySelector('.header').style.display = '';
-    document.querySelector('.tabs').style.display = '';
-    document.querySelectorAll('.page').forEach(function(p) { p.style.display = ''; });
-    document.querySelector('.bottom-nav').style.display = '';
-    if (sessao.usuario && sessao.usuario.isAdmin) document.getElementById('tab-admin-btn').style.display = '';
-    var emailEl = document.getElementById('sessao-email');
-    if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;
-    carregarAlertas();
-    setTimeout(inicializarPush, 3000);
-  } else {
-    mostrarTelaLogin();
-  }
-}
-
-function mostrarTelaLogin() {
-  document.getElementById('tela-login').style.display = 'block';
-  document.querySelector('.status-bar').style.display = 'none';
-  document.querySelector('.header').style.display = 'none';
-  document.querySelector('.tabs').style.display = 'none';
-  document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
-  document.querySelector('.bottom-nav').style.display = 'none';
-}
-
-// LOGIN
-function solicitarOTP(reenvio) {
-  var email = document.getElementById('login-email').value.trim().toLowerCase();
-  if (!email || !email.includes('@')) { mostrarErroLogin('email', 'Informe um e-mail válido'); return; }
-  var btn = document.getElementById('btn-solicitar-otp');
-  btn.textContent = 'Enviando...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
-  document.getElementById('login-email-erro').style.display = 'none';
-  fetch(WORKER_URL + '/auth/request-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    btn.textContent = 'Enviar código'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
-    if (data.erro) { mostrarErroLogin('email', data.erro); return; }
-    document.getElementById('login-step-email').style.display = 'none';
-    document.getElementById('login-step-otp').style.display = 'block';
-    document.getElementById('login-email-display').textContent = email;
-    document.getElementById('login-otp').focus();
-    setTimeout(function() { document.getElementById('btn-reenviar-otp').style.display = 'block'; }, 30000);
-  })
-  .catch(function() { btn.textContent = 'Enviar código'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroLogin('email', 'Erro ao enviar. Tente novamente.'); });
-}
-
-function verificarOTP() {
-  var email = document.getElementById('login-email').value.trim().toLowerCase();
-  var codigo = document.getElementById('login-otp').value.trim();
-  if (!codigo || codigo.length !== 6) { mostrarErroLogin('otp', 'Digite o código de 6 dígitos'); return; }
-  var btn = document.getElementById('btn-verificar-otp');
-  btn.textContent = 'Verificando...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
-  document.getElementById('login-otp-erro').style.display = 'none';
-  fetch(WORKER_URL + '/auth/verify-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, codigo: codigo }) })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
-    if (data.erro) { mostrarErroLogin('otp', data.erro); return; }
-    salvarSessao(data.token, data.usuario);
-    inicializarApp();
-    if (!localStorage.getItem('pwa_install_dismissed') && !_isInStandalone) setTimeout(mostrarInstallToast, 2000);
-    setTimeout(inicializarPush, 4000);
-  })
-  .catch(function() { btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroLogin('otp', 'Erro ao verificar. Tente novamente.'); });
-}
-
-function logout() {
-  var sessao = getSessao();
-  if (sessao) fetch(WORKER_URL + '/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao.token } });
-  limparSessao(); mostrarTelaLogin();
-}
-
-function voltarParaEmail() {
-  document.getElementById('login-step-otp').style.display = 'none';
-  document.getElementById('login-step-email').style.display = 'block';
-  document.getElementById('login-otp').value = '';
-  document.getElementById('login-otp-erro').style.display = 'none';
-  document.getElementById('btn-reenviar-otp').style.display = 'none';
-}
-
-function mostrarErroLogin(tipo, msg) { var el = document.getElementById('login-' + tipo + '-erro'); el.textContent = msg; el.style.display = 'block'; }
-
-// CONVITE
-var _conviteToken = null;
-var _conviteEmail = null;
-
-function verificarConviteURL() {
-  var params = new URLSearchParams(window.location.search);
-  var token = params.get('convite');
-  if (!token) return false;
-  fetch(WORKER_URL + '/convite/' + token)
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.erro) { mostrarTelaLogin(); showToast('Convite inválido ou expirado.', 'error'); return; }
-    document.getElementById('tela-login').style.display = 'block';
-    document.querySelector('.status-bar').style.display = 'none';
-    document.querySelector('.header').style.display = 'none';
-    document.querySelector('.tabs').style.display = 'none';
-    document.querySelectorAll('.page').forEach(function(p) { p.style.display = 'none'; });
-    document.querySelector('.bottom-nav').style.display = 'none';
-    document.getElementById('login-step-email').style.display = 'none';
-    document.getElementById('login-step-otp').style.display = 'none';
-    document.getElementById('login-step-convite').style.display = 'block';
-    document.getElementById('convite-email-display').textContent = data.email;
-    _conviteToken = token;
-    _conviteEmail = data.email;
-  })
-  .catch(function() { mostrarTelaLogin(); });
-  return true;
-}
-
-var _pendingNome = null;
-var _pendingChatId = null;
-var _pendingTipo = null; // 'convite' ou 'manual'
-
-function criarContaConvite() {
-  var nome = document.getElementById('convite-nome').value.trim();
-  var chatId = document.getElementById('convite-chatid').value.trim();
-  if (!nome) { mostrarErroConvite('Informe seu nome'); return; }
-  if (!chatId) {
-    _pendingNome = nome;
-    _pendingChatId = '';
-    _pendingTipo = 'convite';
-    document.getElementById('modal-sem-chatid').style.display = 'flex';
-    return;
-  }
-  _executarCriarContaConvite(nome, chatId);
-}
-
-function confirmarSemChatId() {
-  document.getElementById('modal-sem-chatid').style.display = 'none';
-  if (_pendingTipo === 'convite') {
-    _executarCriarContaConvite(_pendingNome, '');
-  } else if (_pendingTipo === 'manual') {
-    _executarCriarUsuarioManual();
-  }
-}
-
-function fecharModalSemChatId() {
-  document.getElementById('modal-sem-chatid').style.display = 'none';
-  _pendingNome = null; _pendingChatId = null; _pendingTipo = null;
-}
-
-function _executarCriarContaConvite(nome, chatId) {
-  var btn = document.getElementById('btn-criar-conta');
-  btn.textContent = 'Criando conta...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
-  fetch(WORKER_URL + '/convite/' + _conviteToken, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome: nome, chatId: chatId })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    btn.textContent = 'Criar minha conta'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
-    if (data.erro) { mostrarErroConvite(data.erro); return; }
-    document.getElementById('login-step-convite').style.display = 'none';
-    document.getElementById('login-step-email').style.display = 'block';
-    document.getElementById('login-email').value = _conviteEmail;
-    showToast('Conta criada! Faça login para continuar.', 'success');
-    window.history.replaceState({}, document.title, window.location.pathname);
-  })
-  .catch(function() { btn.textContent = 'Criar minha conta'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; mostrarErroConvite('Erro ao criar conta. Tente novamente.'); });
-}
-
-function mostrarErroConvite(msg) { var el = document.getElementById('convite-erro'); el.textContent = msg; el.style.display = 'block'; }
-
-// CONFIGS DO USUÁRIO
-var _cfgPctAtual = 0;
-
-function renderConfigs() {
-  var sessao = getSessao();
-  if (!sessao || !sessao.usuario) return;
-  fetch(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
-  .then(function(r) { return r.json(); })
-  .then(function(u) {
-    _cfgPctAtual = u.percentualMinimo || 0;
-    var pctEl = document.getElementById('cfg-pct');
-    var iaEl  = document.getElementById('cfg-ia');
-    if (pctEl) pctEl.textContent = _cfgPctAtual + '%';
-    if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa' : '❌ Inativa (solicite ao admin)';
-  });
-}
-
-function editarConfigs() {
-  var form = document.getElementById('cfg-edit-form');
-  var input = document.getElementById('cfg-pct-input');
-  if (!form || !input) return;
-  input.value = _cfgPctAtual;
-  form.style.display = 'block';
-}
-
-function cancelarEditConfigs() { document.getElementById('cfg-edit-form').style.display = 'none'; }
-
-function salvarConfigs() {
-  var pct = parseInt(document.getElementById('cfg-pct-input').value || '0');
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/auth/config', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-    body: JSON.stringify({ percentualMinimo: pct })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.erro) { showToast(data.erro, 'error'); return; }
-    _cfgPctAtual = pct;
-    document.getElementById('cfg-pct').textContent = pct + '%';
-    document.getElementById('cfg-edit-form').style.display = 'none';
-    showToast('Configuração salva!', 'success');
-  })
-  .catch(function() { showToast('Erro ao salvar', 'error'); });
-}
-
-// AEROPORTOS
-var AEROPORTOS = [
-  { code:'CGH', name:'Congonhas', city:'Sao Paulo, SP' },
-  { code:'GRU', name:'Guarulhos', city:'Sao Paulo, SP' },
-  { code:'VCP', name:'Viracopos', city:'Campinas, SP' },
-  { code:'FLN', name:'Hercilio Luz', city:'Florianopolis, SC' },
-  { code:'GIG', name:'Galeao', city:'Rio de Janeiro, RJ' },
-  { code:'SDU', name:'Santos Dumont', city:'Rio de Janeiro, RJ' },
-  { code:'BSB', name:'Juscelino Kubitschek', city:'Brasilia, DF' },
-  { code:'SSA', name:'Luis Eduardo Magalhaes', city:'Salvador, BA' },
-  { code:'REC', name:'Guararapes', city:'Recife, PE' },
-  { code:'FOR', name:'Pinto Martins', city:'Fortaleza, CE' },
-  { code:'BEL', name:'Val de Cans', city:'Belem, PA' },
-  { code:'MAO', name:'Eduardo Gomes', city:'Manaus, AM' },
-  { code:'CWB', name:'Afonso Pena', city:'Curitiba, PR' },
-  { code:'POA', name:'Salgado Filho', city:'Porto Alegre, RS' },
-  { code:'GYN', name:'Santa Genoveva', city:'Goiania, GO' },
-  { code:'VIX', name:'Eurico Salles', city:'Vitoria, ES' },
-  { code:'CNF', name:'Tancredo Neves', city:'Belo Horizonte, MG' },
-  { code:'IGU', name:'Cataratas', city:'Foz do Iguacu, PR' },
-  { code:'NVT', name:'Victor Konder', city:'Navegantes, SC' },
-  { code:'NAT', name:'Sao Goncalo do Amarante', city:'Natal, RN' },
-  { code:'MCZ', name:'Zumbi dos Palmares', city:'Maceio, AL' },
-  { code:'JPA', name:'Castro Pinto', city:'Joao Pessoa, PB' },
-  // ARGENTINA
-  { code:'EZE', name:'Ministro Pistarini (Ezeiza)', city:'Buenos Aires, AR' },
-  { code:'AEP', name:'Jorge Newbery (Aeroparque)', city:'Buenos Aires, AR' },
-  { code:'COR', name:'Ambrosio Taravella', city:'Cordoba, AR' },
-  { code:'MDZ', name:'El Plumerillo', city:'Mendoza, AR' },
-  { code:'BRC', name:'Teniente Candelaria', city:'Bariloche, AR' },
-  { code:'IGR', name:'Cataratas del Iguazu', city:'Puerto Iguazu, AR' },
-  { code:'USH', name:'Malvinas Argentinas', city:'Ushuaia, AR' },
-  { code:'SLA', name:'Martin Miguel de Guemes', city:'Salta, AR' },
-  // PORTUGAL
-  { code:'LIS', name:'Humberto Delgado', city:'Lisboa, PT' },
-  { code:'OPO', name:'Francisco Sa Carneiro', city:'Porto, PT' },
-  { code:'FAO', name:'Faro', city:'Faro, PT' },
-  { code:'FNC', name:'Cristiano Ronaldo', city:'Funchal, PT' },
-  { code:'PDL', name:'Joao Paulo II', city:'Ponta Delgada, PT' },
-];
-
-var alertasData = [];
-var calTarget = null;
-var calDate = new Date();
-var calSelected = null;
-
-function updateClock() { var now = new Date(); document.getElementById('clock').textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0'); }
-updateClock();
-setInterval(updateClock, 10000);
-
-// TABS
-function showTab(tab) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  var el = document.getElementById('tab-' + tab);
-  if (el) el.classList.add('active');
-  var tabs = ['alertas','historico','config','admin'];
-  var tabBtn = document.querySelectorAll('.tab')[tabs.indexOf(tab)];
-  if (tabBtn) tabBtn.classList.add('active');
-  ['alertas','historico','config'].forEach(function(t) {
-    var ni = document.getElementById('nav-' + t);
-    var nl = document.getElementById('navl-' + t);
-    if (ni) ni.classList.toggle('on', t === tab);
-    if (nl) nl.classList.toggle('on', t === tab);
-  });
-  var titles = { alertas: 'Passagens', historico: 'Historico', config: 'Config', admin: 'Admin' };
-  document.getElementById('page-title').textContent = titles[tab] || 'Passagens';
-  if (tab === 'alertas' || tab === 'historico') carregarAlertas();
-  if (tab === 'config') { renderConfigAlertas(); renderConfigs(); setTimeout(atualizarStatusPush, 200); }
-  if (tab === 'admin') carregarUsuarios();
-}
-
-// CARREGAR — lê alertas do Redis via Worker
-function carregarAlertas() {
-  var sessao = getSessao();
-  if (!sessao) return;
-  fetch(WORKER_URL + '/alertas', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
-  .then(function(r) {
-    if (r.status === 401) { limparSessao(); mostrarTelaLogin(); return Promise.reject('Sessão expirada'); }
-    return r.json();
-  })
-  .then(function(data) {
-    alertasData = data || [];
-    var n = alertasData.length;
-    document.getElementById('eyebrow').textContent = n + ' alerta' + (n !== 1 ? 's' : '') + ' ativo' + (n !== 1 ? 's' : '');
-    renderAlertas(); renderHistorico(); renderConfigAlertas();
-  }).catch(function(e) { console.error(e); document.getElementById('eyebrow').textContent = 'erro ao carregar'; });
-}
-
-// RENDER ALERTAS
-function renderAlertas() {
-  var el = document.getElementById('alertas-list');
-  if (!alertasData.length) { el.innerHTML = '<div class="empty">Nenhum alerta cadastrado.<br>Va em Config para criar um.</div>'; return; }
-  var temIA = getSessao() && getSessao().usuario && getSessao().usuario.analiseIA;
-  el.innerHTML = alertasData.map(function(a) {
-    var temQueda = a.variacao < -0.5;
-    var temAlta = a.variacao > 0.5;
-    var varStr = temQueda ? ('↓ ' + Math.abs(a.variacao) + '%') : temAlta ? ('↑ ' + a.variacao + '%') : '— sem variacao';
-    var varClass = temQueda ? 'price-drop' : temAlta ? 'price-up' : 'price-neutral';
-    var precoStr = a.precoAtual > 0 ? 'R$ ' + a.precoAtual.toFixed(2).replace('.',',') : '—';
-    var url = 'https://www.google.com/travel/flights?q=Voos+' + a.origem + '+' + a.destino + '+' + (a.dataIda||'').replace(/-/g,'') + (a.dataVolta ? '+' + a.dataVolta.replace(/-/g,'') : '');
-    var temHist = a.historico && a.historico.length > 1;
-    return '<div class="card"><div class="card-body"><div class="card-top"><div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div><div class="price-block"><div class="price">' + precoStr + '</div><div class="' + varClass + '">' + varStr + '</div></div></div><div class="card-meta"><div class="dates"><div class="date-row">ida <strong>' + formatData(a.dataIda) + '</strong></div>' + (a.dataVolta ? '<div class="date-row">volta <strong>' + formatData(a.dataVolta) + '</strong></div>' : '') + '</div></div></div>' +
-      (temHist ? '<div style="padding:0 16px 16px;"><canvas id="chart-' + a.id + '" height="80"></canvas></div>' : '') +
-      '<div class="card-action" onclick="window.open(\'' + url + '\',\'_blank\')"><div class="action-left"><div class="action-title">Buscar no Google Flights</div><div class="action-sub">' + a.origem + ' → ' + a.destino + ' · ' + formatDataCurta(a.dataIda) + '</div></div><div class="action-arrow ' + (temQueda ? 'active' : '') + '">↗</div></div></div>' +
-      (temIA ? '<div class="ai-btn" id="btn-ai-' + a.id + '" onclick="solicitarAnalise(' + a.id + ')"><span>Analisar com IA</span></div>' : '') +
-      '<div id="ai-' + a.id + '" style="display:none;" class="ai-block"><div class="ai-label">analise · ia</div><div class="ai-verdict" id="ai-verdict-' + a.id + '"></div><div class="ai-text" id="ai-text-' + a.id + '"></div></div><div style="height:8px;"></div>';
-  }).join('');
-  var m = document.createElement('div');
-  m.className = 'monitor-row';
-  m.innerHTML = '<div class="monitor-dot"></div><div class="monitor-text">verificando 4x por dia</div>';
-  el.appendChild(m);
-
-  // Renderiza gráficos após DOM atualizado
-  setTimeout(function() {
-    alertasData.forEach(function(a) {
-      if (!a.historico || a.historico.length <= 1) return;
-      var canvas = document.getElementById('chart-' + a.id);
-      if (!canvas) return;
-
-      // Filtra últimos 15 dias
-      var quinzeDiasAtras = new Date();
-      quinzeDiasAtras.setDate(quinzeDiasAtras.getDate() - 15);
-      var hist = a.historico.filter(function(h) { return new Date(h.data) >= quinzeDiasAtras; });
-      if (hist.length <= 1) hist = a.historico;
-
-      var labels = hist.map(function(h) {
-        var d = new Date(h.data);
-        return d.getDate() + '/' + (d.getMonth()+1) + ' ' + d.getHours().toString().padStart(2,'0') + 'h';
-      });
-      var precos = hist.map(function(h) { return h.preco; });
-      var minPreco = Math.min.apply(null, precos);
-      var maxPreco = Math.max.apply(null, precos);
-      var temQueda = precos[precos.length-1] < precos[0];
-
-      // Destrói chart anterior se existir
-      if (canvas._chartInstance) canvas._chartInstance.destroy();
-
-      canvas._chartInstance = new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: precos,
-            borderColor: temQueda ? '#5A9E6F' : '#9E5A5A',
-            backgroundColor: temQueda ? 'rgba(90,158,111,0.08)' : 'rgba(158,90,90,0.08)',
-            borderWidth: 1.5,
-            pointRadius: hist.length <= 6 ? 3 : 0,
-            pointHoverRadius: 4,
-            tension: 0.3,
-            fill: true,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(ctx) { return 'R$ ' + ctx.parsed.y.toFixed(2); }
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: '#444', font: { size: 9 }, maxTicksLimit: 5 },
-              grid: { color: '#1C1C1C' }
-            },
-            y: {
-              ticks: {
-                color: '#444',
-                font: { size: 9 },
-                callback: function(v) { return 'R$' + v.toFixed(0); }
-              },
-              grid: { color: '#1C1C1C' },
-              suggestedMin: minPreco * 0.98,
-              suggestedMax: maxPreco * 1.02,
-            }
-          }
-        }
-      });
-    });
-  }, 100);
-}
-
-// RENDER HISTÓRICO
-function renderHistorico() {
-  var el = document.getElementById('historico-list');
-  var items = [];
-  alertasData.forEach(function(a) { (a.historico || []).forEach(function(h) { items.push({ preco: h.preco, data: h.data, rota: a.origem + ' → ' + a.destino, dataIda: a.dataIda }); }); });
-  items.sort(function(x,y) { return new Date(y.data) - new Date(x.data); });
-  if (!items.length) { el.innerHTML = '<div class="empty">Historico disponivel apos a primeira verificacao.</div>'; return; }
-  var html = ''; var lastDate = '';
-  items.forEach(function(item, i) {
-    var d = new Date(item.data);
-    var dateStr = d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
-    var timeStr = d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-    if (dateStr !== lastDate) { html += '<div class="hist-sep">' + dateStr + '</div>'; lastDate = dateStr; }
-    var prev = items[i+1]; var varStr = '— sem variacao'; var varClass = 'hist-var';
-    if (prev) { var diff = item.preco - prev.preco; if (diff < -1) { varStr = '↓ R$ ' + Math.abs(diff).toFixed(0); varClass = 'hist-var down'; } else if (diff > 1) { varStr = '↑ R$ ' + diff.toFixed(0); varClass = 'hist-var up'; } }
-    html += '<div class="hist-item"><div class="hist-left"><div class="hist-route">' + item.rota + '</div><div class="hist-meta">' + timeStr + ' · ida ' + formatData(item.dataIda) + '</div></div><div class="hist-right"><div class="hist-price">R$ ' + item.preco.toFixed(2).replace('.',',') + '</div><div class="' + varClass + '">' + varStr + '</div></div></div>';
-  });
-  el.innerHTML = html;
-}
-
-// RENDER CONFIG
-function renderConfigAlertas() {
-  var el = document.getElementById('config-alertas-list');
-  if (!alertasData.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 2px 12px;">Nenhum alerta cadastrado ainda.</div>'; return; }
-  el.innerHTML = alertasData.map(function(a) {
-    return '<div class="alerta-item"><div class="alerta-header"><div class="alerta-route">' + a.origem + ' <span>→</span> ' + a.destino + '</div><div class="remove-btn" onclick="removerAlerta(' + a.indice + ')">×</div></div><div class="alerta-dates"><div class="alerta-date">ida <strong>' + formatData(a.dataIda) + '</strong>' + (a.dataVolta ? ' · volta <strong>' + formatData(a.dataVolta) + '</strong>' : '') + '</div><div class="alerta-cia">R$ ' + (a.precoAtual > 0 ? a.precoAtual.toFixed(2).replace('.',',') : '—') + '</div></div></div>';
-  }).join('');
-}
-
-// ANÁLISE IA
-function solicitarAnalise(id) {
-  var btn = document.getElementById('btn-ai-' + id);
-  btn.innerHTML = '<div class="spinner"></div><span>Analisando...</span>';
-  btn.style.pointerEvents = 'none';
-  api('analisar', { id: id }).then(function(res) {
-    if (!res || res.erro) { showToast(res ? res.erro : 'Erro ao analisar', 'error'); btn.innerHTML = '<span>Analisar com IA</span>'; btn.style.pointerEvents = ''; return; }
-    var linhas = res.analise.split('\n');
-    document.getElementById('ai-verdict-' + id).textContent = linhas[0];
-    document.getElementById('ai-text-' + id).textContent = linhas.slice(1).join('\n').trim();
-    document.getElementById('ai-' + id).style.display = 'block';
-    btn.style.display = 'none';
-  }).catch(function() { showToast('Erro ao analisar', 'error'); btn.innerHTML = '<span>Analisar com IA</span>'; btn.style.pointerEvents = ''; });
-}
-
-// ADICIONAR — salva alerta no Redis via Worker
-function adicionarAlerta() {
-  var origem = document.getElementById('input-origem').value.trim().toUpperCase();
-  var destino = document.getElementById('input-destino').value.trim().toUpperCase();
-  var dataIda = document.getElementById('input-ida').value;
-  var dataVolta = document.getElementById('input-volta').value;
-  if (!origem || origem.length !== 3) { showToast('Informe a origem', 'error'); return; }
-  if (!destino || destino.length !== 3) { showToast('Informe o destino', 'error'); return; }
-  if (!dataIda) { showToast('Informe a data de ida', 'error'); return; }
-  var btn = document.getElementById('btn-adicionar');
-  btn.classList.add('loading'); btn.textContent = 'Criando...';
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/alertas', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-    body: JSON.stringify({ origem: origem, destino: destino, dataIda: dataIda, dataVolta: dataVolta || null })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(res) {
-    if (!res || res.erro) { showToast(res ? res.erro : 'Erro ao criar', 'error'); } else {
-      showToast('Alerta criado!', 'success');
-      document.getElementById('input-origem').value = '';
-      document.getElementById('input-destino').value = '';
-      document.getElementById('input-ida').value = '';
-      document.getElementById('input-volta').value = '';
-      document.getElementById('display-range').textContent = 'selecionar datas';
-      document.getElementById('display-range').className = 'field-placeholder';
-      carregarAlertas();
-    }
-    btn.classList.remove('loading'); btn.textContent = 'Criar alerta';
-  }).catch(function() { showToast('Erro ao criar', 'error'); btn.classList.remove('loading'); btn.textContent = 'Criar alerta'; });
-}
-
-// REMOVER — remove alerta do Redis via Worker
-function removerAlerta(indice) {
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/alertas/' + indice, {
-    method: 'DELETE',
-    headers: { 'Authorization': 'Bearer ' + sessao.token }
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(res) {
-    if (!res || res.erro) { showToast(res ? res.erro : 'Erro', 'error'); return; }
-    showToast('Alerta removido', 'success'); carregarAlertas();
-  }).catch(function() { showToast('Erro ao remover', 'error'); });
-}
-
-// AUTOCOMPLETE
-function doAutocomplete(input, tipo) {
-  var val = input.value.toUpperCase().trim();
-  var drop = document.getElementById('drop-' + tipo);
-  if (val.length === 0) { drop.classList.remove('open'); drop.innerHTML = ''; return; }
-  var matches = AEROPORTOS.filter(function(a) { return a.code.indexOf(val) === 0 || a.name.toUpperCase().indexOf(val) >= 0 || a.city.toUpperCase().indexOf(val) >= 0; }).slice(0, 5);
-  if (!matches.length) { drop.classList.remove('open'); return; }
-  drop.innerHTML = matches.map(function(a) { return '<div class="autocomplete-item" onmousedown="pickAirport(\'' + a.code + '\',\'' + tipo + '\')" ontouchstart="pickAirport(\'' + a.code + '\',\'' + tipo + '\')"><div class="ac-code">' + a.code + '</div><div class="ac-info"><div class="ac-name">' + a.name + '</div><div class="ac-city">' + a.city + '</div></div></div>'; }).join('');
-  drop.classList.add('open');
-}
-function pickAirport(code, tipo) { document.getElementById('input-' + tipo).value = code; var drop = document.getElementById('drop-' + tipo); drop.classList.remove('open'); drop.innerHTML = ''; document.getElementById('input-' + tipo).blur(); }
-document.addEventListener('click', function(e) { if (!e.target.closest('.autocomplete-wrap')) { document.querySelectorAll('.autocomplete-dropdown').forEach(function(d) { d.classList.remove('open'); d.innerHTML = ''; }); } });
-
-// CALENDÁRIO
-var MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-var calRangeStep = 'ida';
-var calSelectedIda = null;
-var calSelectedVolta = null;
-
-function openCal(target) {
-  calTarget = target; calDate = new Date(); calSelected = null; calRangeStep = 'ida'; calSelectedIda = null; calSelectedVolta = null;
-  document.getElementById('cal-step').textContent = 'Selecione a data de ida';
-  document.getElementById('cal-range-preview').style.display = 'none';
-  document.getElementById('cal-range-preview').textContent = '';
-  renderCal(); document.getElementById('cal-overlay').classList.add('open');
-}
-document.getElementById('cal-overlay').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
-function calNav(dir) { calDate = new Date(calDate.getFullYear(), calDate.getMonth() + dir, 1); renderCal(); }
-function renderCal() {
-  document.getElementById('cal-title').textContent = MESES[calDate.getMonth()] + ' ' + calDate.getFullYear();
-  var year = calDate.getFullYear(), month = calDate.getMonth();
-  var first = new Date(year, month, 1).getDay();
-  var days = new Date(year, month + 1, 0).getDate();
-  var today = new Date(); today.setHours(0,0,0,0);
-  var html = ''; var day = 1; var row = 0;
-  while (day <= days) {
-    html += '<tr>';
-    for (var col = 0; col < 7; col++) {
-      if (row === 0 && col < first) { html += '<td></td>'; }
-      else if (day > days) { html += '<td></td>'; }
-      else {
-        var dt = new Date(year, month, day); dt.setHours(0,0,0,0);
-        var isPast = dt < today;
-        var isIda = calSelectedIda && dt.getTime() === calSelectedIda.getTime();
-        var isVolta = calSelectedVolta && dt.getTime() === calSelectedVolta.getTime();
-        var isRange = calSelectedIda && calSelectedVolta && dt > calSelectedIda && dt < calSelectedVolta;
-        var isToday = dt.getTime() === today.getTime();
-        var cls = 'cal-day' + (isPast ? ' past' : '') + (isToday && !isPast ? ' today' : '') + ((isIda || isVolta) ? ' selected' : '') + (isRange ? ' in-range' : '');
-        var onclick = isPast ? '' : ' onclick="selectDay(' + day + ')"';
-        html += '<td><div class="' + cls + '"' + onclick + '>' + day + '</div></td>';
-        day++;
-      }
-    }
-    html += '</tr>'; row++;
-  }
-  document.getElementById('cal-body').innerHTML = html;
-}
-function selectDay(d) {
-  var dt = new Date(calDate.getFullYear(), calDate.getMonth(), d); dt.setHours(0,0,0,0);
-  if (calRangeStep === 'ida') {
-    calSelectedIda = dt; calSelectedVolta = null; calRangeStep = 'volta';
-    document.getElementById('cal-step').textContent = 'Agora selecione a data de volta (opcional)';
-    var preview = document.getElementById('cal-range-preview');
-    preview.textContent = 'Ida: ' + formatDataCurta2(dt); preview.style.display = 'block';
-  } else {
-    if (dt <= calSelectedIda) { showToast('A volta deve ser depois da ida', 'error'); return; }
-    calSelectedVolta = dt;
-    document.getElementById('cal-range-preview').textContent = 'Ida: ' + formatDataCurta2(calSelectedIda) + '  →  Volta: ' + formatDataCurta2(dt);
-  }
-  renderCal();
-}
-function confirmCal() {
-  if (!calSelectedIda) { showToast('Selecione a data de ida', 'error'); return; }
-  var toISO = function(dt) { return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0'); };
-  document.getElementById('input-ida').value = toISO(calSelectedIda);
-  document.getElementById('input-volta').value = calSelectedVolta ? toISO(calSelectedVolta) : '';
-  var el = document.getElementById('display-range');
-  el.textContent = calSelectedVolta ? (formatDataCurta2(calSelectedIda) + ' → ' + formatDataCurta2(calSelectedVolta)) : (formatDataCurta2(calSelectedIda) + ' (só ida)');
-  el.className = 'field-value';
-  document.getElementById('cal-overlay').classList.remove('open');
-}
-function formatDataCurta2(dt) { var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return dt.getDate() + ' ' + m[dt.getMonth()]; }
-
-// ADMIN
-function carregarUsuarios() {
-  var el = document.getElementById('admin-usuarios-list');
-  el.innerHTML = '<div class="empty">Carregando...</div>';
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
-  .then(function(r) { return r.json(); })
-  .then(function(usuarios) {
-    if (!usuarios || usuarios.erro) { el.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>'; return; }
-    if (!usuarios.length) { el.innerHTML = '<div class="empty">Nenhum usuário cadastrado.</div>'; return; }
-    el.innerHTML = usuarios.map(function(u) {
-      return '<div class="usuario-card"><div class="usuario-header"><div><div class="usuario-nome">' + u.nome + '</div><div class="usuario-email">' + u.email + '</div></div><div class="usuario-badges">' +
-        (u.isAdmin ? '<span class="badge badge-purple">admin</span>' : '') +
-        (u.ativo ? '<span class="badge badge-green">ativo</span>' : '<span class="badge badge-red">inativo</span>') +
-        (u.analiseIA ? '<span class="badge badge-green">IA ✓</span>' : '<span class="badge badge-gray">sem IA</span>') +
-        '</div></div><div class="usuario-meta"><div class="usuario-meta-item">Chat ID: <strong>' + u.chatId + '</strong></div><div class="usuario-meta-item">Alertas: <strong>' + (u.totalAlertas || 0) + '</strong></div><div class="usuario-meta-item">Queda mín: <strong>' + (u.percentualMinimo || 0) + '%</strong></div></div>' +
-        '<div class="usuario-actions">' +
-        (u.analiseIA ? '<div class="btn-small" onclick="adminToggleIA(\'' + u.email + '\', false)">Desativar IA</div>' : '<div class="btn-small" onclick="adminToggleIA(\'' + u.email + '\', true)">Ativar IA</div>') +
-        (u.ativo ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', false)">Desativar</div>' : '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', true)">Ativar</div>') +
-        (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + u.email + '\', \'' + u.nome + '\')">Remover</div>' : '') +
-        '</div></div>';
-    }).join('');
-  })
-  .catch(function() { el.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>'; });
-}
-
-function adminEnviarConvite() {
-  var email = document.getElementById('convite-email').value.trim().toLowerCase();
-  if (!email || !email.includes('@')) { showToast('Informe um e-mail válido', 'error'); return; }
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/convite', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-    body: JSON.stringify({ email: email })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.erro) { showToast(data.erro, 'error'); return; }
-    showToast('Convite enviado!', 'success');
-    document.getElementById('convite-email').value = '';
-  })
-  .catch(function() { showToast('Erro ao enviar convite', 'error'); });
-}
-
-function adminCriarUsuario() {
-  var nome = document.getElementById('admin-nome').value.trim();
-  var email = document.getElementById('admin-email').value.trim().toLowerCase();
-  var chatId = document.getElementById('admin-chatid').value.trim();
-  var ia = document.getElementById('admin-ia').value === 'true';
-  var pct = parseInt(document.getElementById('admin-pct').value || '0');
-  if (!nome || !email) { showToast('Preencha nome e e-mail', 'error'); return; }
-  if (!chatId) {
-    _pendingNome = nome;
-    _pendingChatId = '';
-    _pendingTipo = 'manual';
-    document.getElementById('modal-sem-chatid').style.display = 'flex';
-    return;
-  }
-  _executarCriarUsuarioManual();
-}
-
-function _executarCriarUsuarioManual() {
-  var nome = document.getElementById('admin-nome').value.trim();
-  var email = document.getElementById('admin-email').value.trim().toLowerCase();
-  var chatId = document.getElementById('admin-chatid').value.trim();
-  var ia = document.getElementById('admin-ia').value === 'true';
-  var pct = parseInt(document.getElementById('admin-pct').value || '0');
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ nome: nome, email: email, chatId: chatId, analiseIA: ia, percentualMinimo: pct }) })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.erro) { showToast(data.erro, 'error'); return; }
-    showToast('Usuário cadastrado!', 'success');
-    document.getElementById('admin-nome').value = '';
-    document.getElementById('admin-email').value = '';
-    document.getElementById('admin-chatid').value = '';
-    document.getElementById('admin-pct').value = '0';
-    _pendingNome = null; _pendingChatId = null; _pendingTipo = null;
-    carregarUsuarios();
-  })
-  .catch(function() { showToast('Erro ao cadastrar', 'error'); });
-}
-
-function adminToggleIA(email, ativo) {
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ analiseIA: ativo }) })
-  .then(function(r) { return r.json(); })
-  .then(function(data) { if (data.erro) { showToast(data.erro, 'error'); return; } showToast('Atualizado!', 'success'); carregarUsuarios(); })
-  .catch(function() { showToast('Erro ao atualizar', 'error'); });
-}
-
-function adminToggleAtivo(email, ativo) {
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }, body: JSON.stringify({ ativo: ativo }) })
-  .then(function(r) { return r.json(); })
-  .then(function(data) { if (data.erro) { showToast(data.erro, 'error'); return; } showToast(ativo ? 'Usuário ativado!' : 'Usuário desativado!', 'success'); carregarUsuarios(); })
-  .catch(function() { showToast('Erro ao atualizar', 'error'); });
-}
-
-function adminRemoverUsuario(email, nome) {
-  if (!confirm('Remover ' + nome + '? Todos os alertas serão apagados.')) return;
-  var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email), { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + sessao.token } })
-  .then(function(r) { return r.json(); })
-  .then(function(data) { if (data.erro) { showToast(data.erro, 'error'); return; } showToast('Usuário removido!', 'success'); carregarUsuarios(); })
-  .catch(function() { showToast('Erro ao remover', 'error'); });
-}
-
-// TOAST
-function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show' + (type ? ' ' + type : ''); setTimeout(function() { t.className = 'toast'; }, 3000); }
-
-// HELPERS
-function formatData(str) { if (!str) return '—'; var p = str.split('-'); var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return p[2] + ' ' + m[parseInt(p[1])-1] + ' ' + p[0]; }
-function formatDataCurta(str) { if (!str) return '—'; var p = str.split('-'); return p[2] + '/' + p[1]; }
-
-// INIT — verifica convite antes de inicializar
-if (!verificarConviteURL()) {
-  inicializarApp();
-}
-setInterval(carregarAlertas, 5 * 60 * 1000);
-
-
-
-// PUSH NOTIFICATIONS
-var _pushAtivo = false;
-
-async function inicializarPush() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  if (localStorage.getItem('push_negado')) return;
-  var sessao = getSessao();
-  if (!sessao) return;
-
-  try {
-    var reg = await navigator.serviceWorker.ready;
-
-    // Busca chave pública VAPID
-    var resp = await fetch(WORKER_URL + '/push/vapidkey');
-    var { publicKey } = await resp.json();
-
-    // Verifica se já tem subscription
-    var existingSub = await reg.pushManager.getSubscription();
-    if (existingSub) {
-      _pushAtivo = true;
-      await salvarSubscription(existingSub, sessao.token);
-      return;
-    }
-
-    // Pede permissão
-    var perm = await Notification.requestPermission();
-    if (perm !== 'granted') {
-      localStorage.setItem('push_negado', '1');
-      return;
-    }
-
-    // Cria subscription
-    var sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey)
-    });
-
-    await salvarSubscription(sub, sessao.token);
-    _pushAtivo = true;
-    showToast('🔔 Notificações ativadas!', 'success');
-  } catch (err) {
-    console.log('Push error:', err);
-  }
-}
-
-async function salvarSubscription(sub, token) {
-  await fetch(WORKER_URL + '/push/subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify(sub.toJSON())
-  });
-}
-
-function urlBase64ToUint8Array(base64String) {
-  var padding = '='.repeat((4 - base64String.length % 4) % 4);
-  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  var rawData = window.atob(base64);
-  var outputArray = new Uint8Array(rawData.length);
-  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
-  return outputArray;
-}
-
-// PWA INSTALL
-var _deferredPrompt = null;
-var _isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-var _isInStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  _deferredPrompt = e;
-  if (!_isInStandalone && !localStorage.getItem('pwa_install_dismissed')) {
-    setTimeout(mostrarInstallToast, 3000);
-  }
-});
-
-function mostrarInstallToast() {
-  if (_isInStandalone) return;
-  if (localStorage.getItem('pwa_install_dismissed')) return;
-  var sessao = getSessao();
-  if (!sessao) return;
-  document.getElementById('install-toast').classList.add('show');
-}
-
-function fecharInstallToast() {
-  document.getElementById('install-toast').classList.remove('show');
-  localStorage.setItem('pwa_install_dismissed', '1');
-}
-
-function instalarPWA() {
-  if (_isIOS) {
-    document.getElementById('ios-modal').classList.add('open');
-    return;
-  }
-  if (_deferredPrompt) {
-    _deferredPrompt.prompt();
-    _deferredPrompt.userChoice.then(function(result) {
-      if (result.outcome === 'accepted') {
-        fecharInstallToast();
-      }
-      _deferredPrompt = null;
-    });
-  }
-}
-
-// iOS — mostra toast manual se ainda não instalou e não dispensou
-if (_isIOS && !_isInStandalone && !localStorage.getItem('pwa_install_dismissed')) {
-  window.addEventListener('load', function() {
-    var sessao = getSessao();
-    if (sessao) setTimeout(mostrarInstallToast, 3000);
-  });
-}
-
-// SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(reg) { console.log('SW registrado:', reg.scope); })
-      .catch(function(err) { console.log('SW erro:', err); });
-  });
-}
-</script>
-
-<div style="text-align:center; padding: 16px 0 8px; font-size:10px; color:#888; letter-spacing:0.5px;">
+<div style="text-align:center;padding:16px 0 8px;font-size:10px;color:#888;letter-spacing:0.5px;">
   v2026.05.09 · build 71
 </div>
+
+<!-- ── ENTRY POINT ─────────────────────────────────────────── -->
+<script type="module" src="js/app.js"></script>
+
 </body>
 </html>
