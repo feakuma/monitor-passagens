@@ -21,6 +21,7 @@ import {
   renderConfigs, editarConfigs, cancelarEditConfigs, salvarConfigs,
   editarConfigIA, cancelarEditConfigIA, salvarConfigIA,
   adminEditarLimite,
+  adminAbrirEdicao, adminSalvarEdicao, adminFecharEdicao,
   resetPrompt, toggleTokenVisibility, removerTokenIA,
   carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
   _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario
@@ -66,6 +67,9 @@ window.carregarUsuarios      = carregarUsuarios;
 window.adminEnviarConvite    = adminEnviarConvite;
 window.adminCriarUsuario     = adminCriarUsuario;
 window.adminEditarLimite     = adminEditarLimite;
+window.adminAbrirEdicao      = adminAbrirEdicao;
+window.adminSalvarEdicao     = adminSalvarEdicao;
+window.adminFecharEdicao     = adminFecharEdicao;
 window.adminToggleIA         = adminToggleIA;
 window.adminToggleAtivo      = adminToggleAtivo;
 window.adminRemoverUsuario   = adminRemoverUsuario;
