@@ -198,6 +198,7 @@ export function carregarUsuarios() {
           (u.ativo
             ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', false)">Desativar</div>'
             : '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', true)">Ativar</div>') +
+          '<div class="btn-small" onclick="adminEditarLimite(\'' + u.email + '\', ' + (u.limiteAlertas ?? 10) + ')">Limite</div>' +
           (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + u.email + '\', \'' + u.nome + '\')">Remover</div>' : '') +
         '</div>' +
       '</div>';
@@ -271,6 +272,27 @@ export function _executarCriarUsuarioManual() {
     carregarUsuarios();
   })
   .catch(function () { showToast('Erro ao cadastrar', 'error'); });
+}
+
+export function adminEditarLimite(email, limiteAtual) {
+  var novoLimite = prompt('Novo limite de alertas para ' + email + ':
+(0 = ilimitado para admins, padrão = 10)', limiteAtual);
+  if (novoLimite === null) return;
+  var limite = parseInt(novoLimite);
+  if (isNaN(limite) || limite < 1) { showToast('Limite inválido — mínimo 1', 'error'); return; }
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ limiteAlertas: limite })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Limite atualizado para ' + limite + ' alertas!', 'success');
+    carregarUsuarios();
+  })
+  .catch(function () { showToast('Erro ao atualizar limite', 'error'); });
 }
 
 export function adminToggleIA(email, ativo) {
