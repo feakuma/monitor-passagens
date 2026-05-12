@@ -2,40 +2,9 @@
 //  api.js — Chamadas para o Worker (alertas, análise IA)
 // ============================================================
 
-import { WORKER_URL, IS_GAS, getSessao, limparSessao } from './config.js';
+import { WORKER_URL, getSessao, limparSessao } from './config.js';
 
 export var alertasData = [];
-
-// ── GENÉRICA (Apps Script / Worker) ──────────────────────────
-
-export function api(action, data) {
-  data = data || {};
-  var sessao  = getSessao();
-  var headers = { 'Content-Type': 'text/plain' };
-  if (sessao) headers['Authorization'] = 'Bearer ' + sessao.token;
-
-  if (IS_GAS) {
-    return new Promise(function (resolve, reject) {
-      google.script.run
-        .withSuccessHandler(resolve)
-        .withFailureHandler(reject)
-        .handleAction(JSON.stringify(Object.assign({ action: action }, data)));
-    });
-  }
-
-  return fetch(WORKER_URL, {
-    method: 'POST', redirect: 'follow', headers: headers,
-    body: JSON.stringify(Object.assign({ action: action }, data))
-  })
-  .then(function (r) {
-    if (r.status === 401) {
-      limparSessao();
-      if (window.mostrarTelaLogin) window.mostrarTelaLogin();
-      return Promise.reject('Sessão expirada');
-    }
-    return r.json();
-  });
-}
 
 // ── ALERTAS ───────────────────────────────────────────────────
 
@@ -85,6 +54,12 @@ export function removerAlertaAPI(indice) {
   }).then(function (r) { return r.json(); });
 }
 
+// Chama /analisar direto no Worker (não passa mais pelo Apps Script)
 export function analisarAlertaAPI(id) {
-  return api('analisar', { id: id });
+  var sessao = getSessao();
+  return fetch(WORKER_URL + '/analisar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ id: id })
+  }).then(function (r) { return r.json(); });
 }
