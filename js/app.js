@@ -19,6 +19,8 @@ import {
 import { openCal, calNav, selectDay, confirmCal } from './calendar.js';
 import {
   renderConfigs, editarConfigs, cancelarEditConfigs, salvarConfigs,
+  editarConfigIA, cancelarEditConfigIA, salvarConfigIA,
+  resetPrompt, toggleTokenVisibility, removerTokenIA,
   carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
   _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario
 } from './admin.js';
@@ -27,7 +29,7 @@ import {
   mostrarInstallToast, fecharInstallToast, instalarPWA
 } from './pwa.js';
 
-// ── EXPÕE TUDO AO WINDOW (necessário para onclick inline no HTML) ──
+// ── EXPÕE AO WINDOW ───────────────────────────────────────────
 
 window.solicitarOTP          = solicitarOTP;
 window.verificarOTP          = verificarOTP;
@@ -52,6 +54,13 @@ window.renderConfigs         = renderConfigs;
 window.editarConfigs         = editarConfigs;
 window.cancelarEditConfigs   = cancelarEditConfigs;
 window.salvarConfigs         = salvarConfigs;
+window.editarConfigIA        = editarConfigIA;
+window.cancelarEditConfigIA  = cancelarEditConfigIA;
+window.salvarConfigIA        = salvarConfigIA;
+window.resetPrompt           = resetPrompt;
+window.toggleTokenVisibility = toggleTokenVisibility;
+window.removerTokenIA        = removerTokenIA;
+
 window.carregarUsuarios      = carregarUsuarios;
 window.adminEnviarConvite    = adminEnviarConvite;
 window.adminCriarUsuario     = adminCriarUsuario;
@@ -129,17 +138,14 @@ export function inicializarApp() {
   }
 }
 
-// Expõe inicializarApp para uso em auth.js (via window, evita circular dep)
 window.inicializarApp = inicializarApp;
 
 // ── BOOT ──────────────────────────────────────────────────────
 
-// Verifica convite na URL antes de inicializar
 if (!verificarConviteURL()) {
   inicializarApp();
 }
 
-// Recarrega alertas a cada 5 minutos
 setInterval(function () {
   var sessao = getSessao();
   if (sessao) {
