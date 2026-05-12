@@ -1,4 +1,4 @@
-const CACHE_NAME = 'passagens-v2';
+const CACHE_NAME = 'passagens-v3';
 const ASSETS = [
   '/',
   '/index.html',
