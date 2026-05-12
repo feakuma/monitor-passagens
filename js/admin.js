@@ -1,10 +1,22 @@
 // ============================================================
-//  admin.js — Painel admin e configurações do usuário
+//  admin.js — Painel admin, configs do usuário e config de IA
 // ============================================================
 
 import { WORKER_URL, getSessao, showToast } from './config.js';
 
 var _cfgPctAtual = 0;
+
+export const DEFAULT_PROMPT =
+`Analise este voo como especialista em tarifas aéreas.
+Rota: {origem} → {destino}
+Ida: {dataIda}{dataVoltaStr}
+Preço atual: R$ {precoAtual}
+Variação desde início do monitoramento: {variacao}%
+Histórico recente de preços: {historicoPontos}
+
+Responda EXATAMENTE em 2 frases curtas em português:
+1. Veredicto claro: "COMPRE AGORA", "AGUARDE" ou "PREÇO ESTÁVEL"
+2. Justificativa objetiva em até 20 palavras explicando o motivo.`;
 
 // ── CONFIGS DO USUÁRIO ────────────────────────────────────────
 
@@ -16,12 +28,23 @@ export function renderConfigs() {
   .then(function (r) { return r.json(); })
   .then(function (u) {
     _cfgPctAtual = u.percentualMinimo || 0;
-    var pctEl = document.getElementById('cfg-pct');
-    var iaEl  = document.getElementById('cfg-ia');
-    var limEl = document.getElementById('cfg-limite');
+
+    var pctEl    = document.getElementById('cfg-pct');
+    var iaEl     = document.getElementById('cfg-ia');
+    var limEl    = document.getElementById('cfg-limite');
+    var provEl   = document.getElementById('cfg-provider-status');
+    var tokenEl  = document.getElementById('cfg-token-status');
+
     if (pctEl) pctEl.textContent = _cfgPctAtual + '%';
-    if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa' : '❌ Inativa (solicite ao admin)';
+    if (iaEl)  iaEl.textContent  = u.analiseIA ? '✅ Ativa (sistema)' : '❌ Inativa';
     if (limEl) limEl.textContent = u.isAdmin ? 'Ilimitado' : (u.limiteAlertas ?? 10) + ' alertas';
+
+    // Status do token próprio
+    var provedores = { anthropic: 'Claude (Anthropic)', openai: 'GPT (OpenAI)', google: 'Gemini (Google)' };
+    if (provEl) provEl.textContent = u.tokenIA
+      ? (provedores[u.providerIA] || 'Anthropic')
+      : '— não configurado';
+    if (tokenEl) tokenEl.textContent = u.tokenIA ? '🔑 Configurado' : '— não configurado';
   });
 }
 
@@ -56,6 +79,85 @@ export function salvarConfigs() {
   .catch(function () { showToast('Erro ao salvar', 'error'); });
 }
 
+// ── CONFIG DE IA ──────────────────────────────────────────────
+
+export function editarConfigIA() {
+  var sessao = getSessao();
+  if (!sessao) return;
+
+  // Carrega dados atuais do usuário para preencher o form
+  fetch(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function (r) { return r.json(); })
+  .then(function (u) {
+    var provInput   = document.getElementById('cfg-provider-input');
+    var tokenInput  = document.getElementById('cfg-token-input');
+    var promptInput = document.getElementById('cfg-prompt-input');
+
+    if (provInput)   provInput.value   = u.providerIA  || 'anthropic';
+    if (tokenInput)  tokenInput.value  = '';            // nunca pré-preenche por segurança
+    if (promptInput) promptInput.value = u.promptIA    || DEFAULT_PROMPT;
+
+    document.getElementById('cfg-ia-edit-form').style.display = 'block';
+  });
+}
+
+export function cancelarEditConfigIA() {
+  document.getElementById('cfg-ia-edit-form').style.display = 'none';
+}
+
+export function salvarConfigIA() {
+  var provider = document.getElementById('cfg-provider-input').value;
+  var token    = document.getElementById('cfg-token-input').value.trim();
+  var prompt   = document.getElementById('cfg-prompt-input').value.trim();
+  var sessao   = getSessao();
+
+  var payload = { providerIA: provider, promptIA: prompt || DEFAULT_PROMPT };
+  // Só envia tokenIA se o usuário digitou algo — campo vazio = mantém o token atual
+  if (token) payload.tokenIA = token;
+
+  fetch(WORKER_URL + '/auth/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify(payload)
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    document.getElementById('cfg-ia-edit-form').style.display = 'none';
+    showToast('Configuração de IA salva!', 'success');
+    renderConfigs();
+  })
+  .catch(function () { showToast('Erro ao salvar', 'error'); });
+}
+
+export function resetPrompt() {
+  var el = document.getElementById('cfg-prompt-input');
+  if (el) { el.value = DEFAULT_PROMPT; showToast('Prompt restaurado ao padrão', 'success'); }
+}
+
+export function toggleTokenVisibility() {
+  var input = document.getElementById('cfg-token-input');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+export function removerTokenIA() {
+  if (!confirm('Remover seu token de IA? A análise voltará a usar o token do sistema (se habilitado pelo admin).')) return;
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/auth/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ tokenIA: '' })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Token removido', 'success');
+    renderConfigs();
+  })
+  .catch(function () { showToast('Erro ao remover token', 'error'); });
+}
+
 // ── ADMIN — USUÁRIOS ──────────────────────────────────────────
 
 export function carregarUsuarios() {
@@ -80,6 +182,7 @@ export function carregarUsuarios() {
             (u.isAdmin   ? '<span class="badge badge-purple">admin</span>'    : '') +
             (u.ativo     ? '<span class="badge badge-green">ativo</span>'     : '<span class="badge badge-red">inativo</span>') +
             (u.analiseIA ? '<span class="badge badge-green">IA ✓</span>'      : '<span class="badge badge-gray">sem IA</span>') +
+            (u.tokenIA   ? '<span class="badge badge-purple">token próprio</span>' : '') +
           '</div>' +
         '</div>' +
         '<div class="usuario-meta">' +
