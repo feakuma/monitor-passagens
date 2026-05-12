@@ -20,6 +20,7 @@ import { openCal, calNav, selectDay, confirmCal } from './calendar.js';
 import {
   renderConfigs, editarConfigs, cancelarEditConfigs, salvarConfigs,
   editarConfigIA, cancelarEditConfigIA, salvarConfigIA,
+  adminEditarLimite,
   resetPrompt, toggleTokenVisibility, removerTokenIA,
   carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
   _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario
@@ -64,6 +65,7 @@ window.removerTokenIA        = removerTokenIA;
 window.carregarUsuarios      = carregarUsuarios;
 window.adminEnviarConvite    = adminEnviarConvite;
 window.adminCriarUsuario     = adminCriarUsuario;
+window.adminEditarLimite     = adminEditarLimite;
 window.adminToggleIA         = adminToggleIA;
 window.adminToggleAtivo      = adminToggleAtivo;
 window.adminRemoverUsuario   = adminRemoverUsuario;
