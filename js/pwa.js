@@ -173,3 +173,109 @@ if (_isIOS && !_isInStandalone) {
     }
   });
 }
+
+// ── PULL TO REFRESH ───────────────────────────────────────────
+
+(function () {
+  // Só ativa no modo PWA standalone
+  if (!window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone) return;
+
+  var _startY      = 0;
+  var _pulling     = false;
+  var _threshold   = 80;  // px para disparar o refresh
+  var _indicator   = null;
+
+  // Cria o indicador visual
+  function _criarIndicador() {
+    var el = document.createElement('div');
+    el.id  = 'ptr-indicator';
+    el.style.cssText = [
+      'position:fixed',
+      'top:-60px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'width:40px',
+      'height:40px',
+      'background:#1A1A1A',
+      'border:1px solid #2A2A2A',
+      'border-radius:50%',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'font-size:18px',
+      'transition:top 0.15s ease',
+      'z-index:9999',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.5)',
+    ].join(';');
+    el.textContent = '⚙️';
+    document.body.appendChild(el);
+    return el;
+  }
+
+  document.addEventListener('touchstart', function (e) {
+    // Só inicia se estiver no topo da página
+    if (window.scrollY !== 0) return;
+    _startY  = e.touches[0].clientY;
+    _pulling = true;
+    if (!_indicator) _indicator = _criarIndicador();
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function (e) {
+    if (!_pulling) return;
+    var dy = e.touches[0].clientY - _startY;
+    if (dy <= 0) { _pulling = false; return; }
+
+    // Move o indicador conforme o pull
+    var progress = Math.min(dy, _threshold * 1.5);
+    var top      = Math.min(progress - 60, 20);
+    _indicator.style.top = top + 'px';
+
+    // Rotaciona a engrenagem conforme puxa
+    var rotate = (progress / _threshold) * 180;
+    _indicator.style.transform = 'translateX(-50%) rotate(' + rotate + 'deg)';
+
+    // Muda cor quando atingir threshold
+    if (dy >= _threshold) {
+      _indicator.style.borderColor = '#5A9E6F';
+      _indicator.style.color       = '#5A9E6F';
+    } else {
+      _indicator.style.borderColor = '#2A2A2A';
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function (e) {
+    if (!_pulling || !_indicator) return;
+    _pulling = false;
+
+    var dy = e.changedTouches[0].clientY - _startY;
+
+    if (dy >= _threshold) {
+      // Dispara refresh — anima antes de recarregar
+      _indicator.style.top       = '20px';
+      _indicator.style.borderColor = '#5A9E6F';
+      _indicator.textContent       = '⚙️';
+      _indicator.style.animation   = 'ptr-spin 0.5s linear';
+
+      var style = document.createElement('style');
+      style.textContent = '@keyframes ptr-spin { to { transform: translateX(-50%) rotate(360deg); } }';
+      document.head.appendChild(style);
+
+      setTimeout(function () {
+        // Em vez de recarregar a página, recarrega os alertas
+        if (window.carregarAlertas) {
+          window.carregarAlertas().then(function () {
+            if (window.renderAlertas)      window.renderAlertas();
+            if (window.renderHistorico)    window.renderHistorico();
+            if (window.renderConfigAlertas) window.renderConfigAlertas();
+          });
+        }
+        // Esconde o indicador
+        _indicator.style.top = '-60px';
+      }, 600);
+    } else {
+      // Não atingiu threshold — volta o indicador
+      _indicator.style.top       = '-60px';
+      _indicator.style.transform = 'translateX(-50%)';
+    }
+  }, { passive: true });
+})();
