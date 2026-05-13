@@ -191,23 +191,19 @@ if (_isIOS && !_isInStandalone) {
     el.id  = 'ptr-indicator';
     el.style.cssText = [
       'position:fixed',
-      'top:-60px',
+      'top:-70px',
       'left:50%',
       'transform:translateX(-50%)',
-      'width:40px',
-      'height:40px',
-      'background:#1A1A1A',
-      'border:1px solid #2A2A2A',
-      'border-radius:50%',
-      'display:flex',
-      'align-items:center',
-      'justify-content:center',
-      'font-size:18px',
+      'width:52px',
+      'height:52px',
       'transition:top 0.15s ease',
       'z-index:9999',
-      'box-shadow:0 4px 20px rgba(0,0,0,0.5)',
+      'pointer-events:none',
     ].join(';');
-    el.textContent = '⚙️';
+    var img = document.createElement('img');
+    img.src = '/OTRii.gif';
+    img.style.cssText = 'width:100%;height:100%;opacity:0.85;';
+    el.appendChild(img);
     document.body.appendChild(el);
     return el;
   }
@@ -230,16 +226,10 @@ if (_isIOS && !_isInStandalone) {
     var top      = Math.min(progress - 60, 20);
     _indicator.style.top = top + 'px';
 
-    // Rotaciona a engrenagem conforme puxa
-    var rotate = (progress / _threshold) * 180;
-    _indicator.style.transform = 'translateX(-50%) rotate(' + rotate + 'deg)';
-
-    // Muda cor quando atingir threshold
-    if (dy >= _threshold) {
-      _indicator.style.borderColor = '#5A9E6F';
-      _indicator.style.color       = '#5A9E6F';
-    } else {
-      _indicator.style.borderColor = '#2A2A2A';
+    // Aumenta opacidade quando atingir threshold
+    if (_indicator) {
+      var img2 = _indicator.querySelector('img');
+      if (img2) img2.style.opacity = dy >= _threshold ? '1' : '0.5';
     }
   }, { passive: true });
 
@@ -252,13 +242,7 @@ if (_isIOS && !_isInStandalone) {
     if (dy >= _threshold) {
       // Dispara refresh — anima antes de recarregar
       _indicator.style.top       = '20px';
-      _indicator.style.borderColor = '#5A9E6F';
-      _indicator.textContent       = '⚙️';
-      _indicator.style.animation   = 'ptr-spin 0.5s linear';
-
-      var style = document.createElement('style');
-      style.textContent = '@keyframes ptr-spin { to { transform: translateX(-50%) rotate(360deg); } }';
-      document.head.appendChild(style);
+      // O GIF já é animado — só mantém visível
 
       setTimeout(function () {
         // Em vez de recarregar a página, recarrega os alertas
