@@ -127,6 +127,7 @@ export function inicializarApp() {
     ocultarTelaLogin();
     if (sessao.usuario && sessao.usuario.isAdmin) {
       document.getElementById('tab-admin-btn').style.display = '';
+      document.getElementById('nav-admin-btn').style.display = '';
     }
     var emailEl = document.getElementById('sessao-email');
     if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;

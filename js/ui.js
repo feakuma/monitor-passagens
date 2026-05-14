@@ -71,7 +71,7 @@ export function showTab(tab) {
   var tabBtn = document.querySelectorAll('.tab')[tabs.indexOf(tab)];
   if (tabBtn) tabBtn.classList.add('active');
 
-  ['alertas', 'historico', 'config'].forEach(function (t) {
+  ['alertas', 'historico', 'config', 'admin'].forEach(function (t) {
     var ni = document.getElementById('nav-' + t);
     var nl = document.getElementById('navl-' + t);
     if (ni) ni.classList.toggle('on', t === tab);

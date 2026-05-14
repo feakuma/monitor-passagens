@@ -32,9 +32,8 @@
   .header-title { font-size: 26px; font-weight: 600; letter-spacing: -0.8px; }
 
   /* TABS */
-  .tabs { display: flex; padding: 0 24px; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-  .tab { font-size: 14px; color: var(--text3); padding-bottom: 12px; cursor: pointer; border-bottom: 1.5px solid transparent; margin-bottom: -1px; transition: color 0.2s; }
-  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+  .tabs { display: none; }
+  .tab { display: none; }
 
   /* PAGES */
   .page { display: none; padding: 0 16px; }
@@ -694,6 +693,10 @@
   <div class="nav-item" onclick="showTab('config')">
     <div class="nav-icon" id="nav-config">○</div>
     <div class="nav-label" id="navl-config">config</div>
+  </div>
+  <div class="nav-item" id="nav-admin-btn" style="display:none;" onclick="showTab('admin')">
+    <div class="nav-icon" id="nav-admin">⚙</div>
+    <div class="nav-label" id="navl-admin">admin</div>
   </div>
 </div>
 
