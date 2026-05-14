@@ -146,11 +146,6 @@ export function renderAlertas() {
     '</div>';
   }).join('');
 
-  var m = document.createElement('div');
-  m.className = 'monitor-row';
-  m.innerHTML = '<div class="monitor-dot"></div><div class="monitor-text">verificando 4x por dia</div>';
-  el.appendChild(m);
-
   setTimeout(function () { renderGraficos(alertasData); }, 100);
 }
 
