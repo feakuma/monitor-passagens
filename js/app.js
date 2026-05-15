@@ -24,7 +24,8 @@ import {
   adminAbrirEdicao, adminSalvarEdicao, adminFecharEdicao,
   resetPrompt, toggleTokenVisibility, removerTokenIA,
   carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
-  _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario
+  _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario,
+  adminVerAlertas, fecharModalAlertasUsuario
 } from './admin.js';
 import {
   inicializarPush, togglePush, atualizarStatusPush,
@@ -70,9 +71,11 @@ window.adminEditarLimite     = adminEditarLimite;
 window.adminAbrirEdicao      = adminAbrirEdicao;
 window.adminSalvarEdicao     = adminSalvarEdicao;
 window.adminFecharEdicao     = adminFecharEdicao;
-window.adminToggleIA         = adminToggleIA;
-window.adminToggleAtivo      = adminToggleAtivo;
-window.adminRemoverUsuario   = adminRemoverUsuario;
+window.adminToggleIA               = adminToggleIA;
+window.adminToggleAtivo            = adminToggleAtivo;
+window.adminRemoverUsuario         = adminRemoverUsuario;
+window.adminVerAlertas             = adminVerAlertas;
+window.fecharModalAlertasUsuario   = fecharModalAlertasUsuario;
 
 window.inicializarPush       = inicializarPush;
 window.togglePush            = togglePush;

@@ -175,7 +175,7 @@ export function carregarUsuarios() {
       return '<div class="usuario-card">' +
         '<div class="usuario-header">' +
           '<div>' +
-            '<div class="usuario-nome">' + u.nome + '</div>' +
+            '<div class="usuario-nome" style="cursor:pointer;text-decoration:underline dotted;" onclick="adminVerAlertas(\'' + u.email + '\', \'' + u.nome.replace(/'/g, "\\'") + '\')">' + u.nome + '</div>' +
             '<div class="usuario-email">' + u.email + '</div>' +
           '</div>' +
           '<div class="usuario-badges">' +
@@ -390,4 +390,41 @@ export function adminRemoverUsuario(email, nome) {
     carregarUsuarios();
   })
   .catch(function () { showToast('Erro ao remover', 'error'); });
+}
+
+export function adminVerAlertas(email, nome) {
+  var modal = document.getElementById('modal-alertas-usuario');
+  var lista = document.getElementById('modal-alertas-lista');
+  var nomeEl = document.getElementById('modal-alertas-nome');
+  nomeEl.textContent = nome + ' (' + email + ')';
+  lista.innerHTML = '<div class="empty">Carregando...</div>';
+  modal.style.display = '';
+
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/alertas', {
+    headers: { 'Authorization': 'Bearer ' + sessao.token }
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (alertas) {
+    if (!alertas || alertas.erro) { lista.innerHTML = '<div class="empty">Erro ao carregar alertas.</div>'; return; }
+    if (!alertas.length) { lista.innerHTML = '<div class="empty">Nenhum alerta cadastrado.</div>'; return; }
+    lista.innerHTML = alertas.map(function (a) {
+      return '<div class="card" style="margin-bottom:10px;">' +
+        '<div class="card-body">' +
+          '<div class="card-top">' +
+            '<div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div>' +
+          '</div>' +
+          '<div class="dates">' +
+            (a.dataIda    ? '<div class="date-row">Ida: <strong>' + a.dataIda + '</strong></div>' : '') +
+            (a.dataVolta  ? '<div class="date-row">Volta: <strong>' + a.dataVolta + '</strong></div>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  })
+  .catch(function () { lista.innerHTML = '<div class="empty">Erro ao carregar alertas.</div>'; });
+}
+
+export function fecharModalAlertasUsuario() {
+  document.getElementById('modal-alertas-usuario').style.display = 'none';
 }
