@@ -409,14 +409,21 @@ export function adminVerAlertas(email, nome) {
     if (!alertas || alertas.erro) { lista.innerHTML = '<div class="empty">Erro ao carregar alertas.</div>'; return; }
     if (!alertas.length) { lista.innerHTML = '<div class="empty">Nenhum alerta cadastrado.</div>'; return; }
     lista.innerHTML = alertas.map(function (a) {
+      var temPreco = a.precoAtual > 0;
+      var varClass = a.variacao < 0 ? 'price-drop' : (a.variacao > 0 ? 'price-up' : 'price-neutral');
+      var varSinal = a.variacao < 0 ? '↓ ' : (a.variacao > 0 ? '↑ ' : '');
       return '<div class="card" style="margin-bottom:10px;">' +
         '<div class="card-body">' +
           '<div class="card-top">' +
             '<div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div>' +
+            (temPreco ? '<div class="price-block">' +
+              '<div class="price">R$ ' + a.precoAtual.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</div>' +
+              (a.variacao !== 0 ? '<div class="' + varClass + '">' + varSinal + Math.abs(a.variacao) + '%</div>' : '') +
+            '</div>' : '') +
           '</div>' +
           '<div class="dates">' +
-            (a.dataIda    ? '<div class="date-row">Ida: <strong>' + a.dataIda + '</strong></div>' : '') +
-            (a.dataVolta  ? '<div class="date-row">Volta: <strong>' + a.dataVolta + '</strong></div>' : '') +
+            (a.dataIda   ? '<div class="date-row">ida <strong>' + a.dataIda + '</strong></div>' : '') +
+            (a.dataVolta ? '<div class="date-row">volta <strong>' + a.dataVolta + '</strong></div>' : '') +
           '</div>' +
         '</div>' +
       '</div>';
