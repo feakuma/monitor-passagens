@@ -10,43 +10,43 @@ import { renderGraficos } from './charts.js';
 
 var AEROPORTOS = [
   // BRASIL
-  { code:'CGH', name:'Congonhas',                    city:'Sao Paulo, SP' },
-  { code:'GRU', name:'Guarulhos',                    city:'Sao Paulo, SP' },
-  { code:'VCP', name:'Viracopos',                    city:'Campinas, SP' },
-  { code:'FLN', name:'Hercilio Luz',                 city:'Florianopolis, SC' },
-  { code:'GIG', name:'Galeao',                       city:'Rio de Janeiro, RJ' },
-  { code:'SDU', name:'Santos Dumont',                city:'Rio de Janeiro, RJ' },
-  { code:'BSB', name:'Juscelino Kubitschek',         city:'Brasilia, DF' },
-  { code:'SSA', name:'Luis Eduardo Magalhaes',       city:'Salvador, BA' },
-  { code:'REC', name:'Guararapes',                   city:'Recife, PE' },
-  { code:'FOR', name:'Pinto Martins',                city:'Fortaleza, CE' },
-  { code:'BEL', name:'Val de Cans',                  city:'Belem, PA' },
-  { code:'MAO', name:'Eduardo Gomes',                city:'Manaus, AM' },
-  { code:'CWB', name:'Afonso Pena',                  city:'Curitiba, PR' },
-  { code:'POA', name:'Salgado Filho',                city:'Porto Alegre, RS' },
-  { code:'GYN', name:'Santa Genoveva',               city:'Goiania, GO' },
-  { code:'VIX', name:'Eurico Salles',                city:'Vitoria, ES' },
-  { code:'CNF', name:'Tancredo Neves',               city:'Belo Horizonte, MG' },
-  { code:'IGU', name:'Cataratas',                    city:'Foz do Iguacu, PR' },
-  { code:'NVT', name:'Victor Konder',                city:'Navegantes, SC' },
-  { code:'NAT', name:'Sao Goncalo do Amarante',      city:'Natal, RN' },
-  { code:'MCZ', name:'Zumbi dos Palmares',           city:'Maceio, AL' },
-  { code:'JPA', name:'Castro Pinto',                 city:'Joao Pessoa, PB' },
+  { code:'CGH', name:'Congonhas',                    city:'Sao Paulo, SP',        icon:'🇧🇷' },
+  { code:'GRU', name:'Guarulhos',                    city:'Sao Paulo, SP',        icon:'🇧🇷' },
+  { code:'VCP', name:'Viracopos',                    city:'Campinas, SP',         icon:'🇧🇷' },
+  { code:'FLN', name:'Hercilio Luz',                 city:'Florianopolis, SC',    icon:'🇧🇷' },
+  { code:'GIG', name:'Galeao',                       city:'Rio de Janeiro, RJ',   icon:'🇧🇷' },
+  { code:'SDU', name:'Santos Dumont',                city:'Rio de Janeiro, RJ',   icon:'🇧🇷' },
+  { code:'BSB', name:'Juscelino Kubitschek',         city:'Brasilia, DF',         icon:'🇧🇷' },
+  { code:'SSA', name:'Luis Eduardo Magalhaes',       city:'Salvador, BA',         icon:'🇧🇷' },
+  { code:'REC', name:'Guararapes',                   city:'Recife, PE',           icon:'🇧🇷' },
+  { code:'FOR', name:'Pinto Martins',                city:'Fortaleza, CE',        icon:'🇧🇷' },
+  { code:'BEL', name:'Val de Cans',                  city:'Belem, PA',            icon:'🇧🇷' },
+  { code:'MAO', name:'Eduardo Gomes',                city:'Manaus, AM',           icon:'🇧🇷' },
+  { code:'CWB', name:'Afonso Pena',                  city:'Curitiba, PR',         icon:'🇧🇷' },
+  { code:'POA', name:'Salgado Filho',                city:'Porto Alegre, RS',     icon:'🇧🇷' },
+  { code:'GYN', name:'Santa Genoveva',               city:'Goiania, GO',          icon:'🇧🇷' },
+  { code:'VIX', name:'Eurico Salles',                city:'Vitoria, ES',          icon:'🇧🇷' },
+  { code:'CNF', name:'Tancredo Neves',               city:'Belo Horizonte, MG',   icon:'🇧🇷' },
+  { code:'IGU', name:'Cataratas',                    city:'Foz do Iguacu, PR',    icon:'🇧🇷' },
+  { code:'NVT', name:'Victor Konder',                city:'Navegantes, SC',       icon:'🇧🇷' },
+  { code:'NAT', name:'Sao Goncalo do Amarante',      city:'Natal, RN',            icon:'🇧🇷' },
+  { code:'MCZ', name:'Zumbi dos Palmares',           city:'Maceio, AL',           icon:'🇧🇷' },
+  { code:'JPA', name:'Castro Pinto',                 city:'Joao Pessoa, PB',      icon:'🇧🇷' },
   // ARGENTINA
-  { code:'EZE', name:'Ministro Pistarini (Ezeiza)',  city:'Buenos Aires, AR' },
-  { code:'AEP', name:'Jorge Newbery (Aeroparque)',   city:'Buenos Aires, AR' },
-  { code:'COR', name:'Ambrosio Taravella',           city:'Cordoba, AR' },
-  { code:'MDZ', name:'El Plumerillo',                city:'Mendoza, AR' },
-  { code:'BRC', name:'Teniente Candelaria',          city:'Bariloche, AR' },
-  { code:'IGR', name:'Cataratas del Iguazu',         city:'Puerto Iguazu, AR' },
-  { code:'USH', name:'Malvinas Argentinas',          city:'Ushuaia, AR' },
-  { code:'SLA', name:'Martin Miguel de Guemes',      city:'Salta, AR' },
+  { code:'EZE', name:'Ministro Pistarini (Ezeiza)',  city:'Buenos Aires, AR',     icon:'🇦🇷' },
+  { code:'AEP', name:'Jorge Newbery (Aeroparque)',   city:'Buenos Aires, AR',     icon:'🇦🇷' },
+  { code:'COR', name:'Ambrosio Taravella',           city:'Cordoba, AR',          icon:'🇦🇷' },
+  { code:'MDZ', name:'El Plumerillo',                city:'Mendoza, AR',          icon:'🇦🇷' },
+  { code:'BRC', name:'Teniente Candelaria',          city:'Bariloche, AR',        icon:'🇦🇷' },
+  { code:'IGR', name:'Cataratas del Iguazu',         city:'Puerto Iguazu, AR',    icon:'🇦🇷' },
+  { code:'USH', name:'Malvinas Argentinas',          city:'Ushuaia, AR',          icon:'🇦🇷' },
+  { code:'SLA', name:'Martin Miguel de Guemes',      city:'Salta, AR',            icon:'🇦🇷' },
   // PORTUGAL
-  { code:'LIS', name:'Humberto Delgado',             city:'Lisboa, PT' },
-  { code:'OPO', name:'Francisco Sa Carneiro',        city:'Porto, PT' },
-  { code:'FAO', name:'Faro',                         city:'Faro, PT' },
-  { code:'FNC', name:'Cristiano Ronaldo',            city:'Funchal, PT' },
-  { code:'PDL', name:'Joao Paulo II',                city:'Ponta Delgada, PT' }
+  { code:'LIS', name:'Humberto Delgado',             city:'Lisboa, PT',           icon:'🇵🇹' },
+  { code:'OPO', name:'Francisco Sa Carneiro',        city:'Porto, PT',            icon:'🇵🇹' },
+  { code:'FAO', name:'Faro',                         city:'Faro, PT',             icon:'🇵🇹' },
+  { code:'FNC', name:'Cristiano Ronaldo',            city:'Funchal, PT',          icon:'🇵🇹' },
+  { code:'PDL', name:'Joao Paulo II',                city:'Ponta Delgada, PT',    icon:'🇵🇹' }
 ];
 
 // ── CLOCK ─────────────────────────────────────────────────────
@@ -182,9 +182,10 @@ export function renderHistorico() {
       else if (diff > 1) { varStr = '↑ R$ ' + diff.toFixed(0); varClass = 'hist-var up'; }
     }
 
+    var checkDateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     html += '<div class="hist-item">' +
-      '<div class="hist-left"><div class="hist-route">' + item.rota + '</div><div class="hist-meta">' + timeStr + ' · ida ' + formatData(item.dataIda) + '</div></div>' +
-      '<div class="hist-right"><div class="hist-price">R$ ' + item.preco.toFixed(2).replace('.', ',') + '</div><div class="' + varClass + '">' + varStr + '</div></div>' +
+      '<div class="hist-left"><div class="hist-route">' + item.rota + '</div><div class="hist-meta">ida ' + formatData(item.dataIda) + '</div></div>' +
+      '<div class="hist-right"><div class="hist-price">R$ ' + item.preco.toFixed(2).replace('.', ',') + '</div><div class="' + varClass + '">' + varStr + '</div><div class="hist-check">checagem ' + checkDateStr + ' ' + timeStr + '</div></div>' +
     '</div>';
   });
   el.innerHTML = html;
@@ -306,7 +307,7 @@ export function doAutocomplete(input, tipo) {
       ' onmousedown="pickAirport(\'' + a.code + '\',\'' + tipo + '\')"' +
       ' ontouchstart="pickAirport(\'' + a.code + '\',\'' + tipo + '\')">' +
       '<div class="ac-code">' + a.code + '</div>' +
-      '<div class="ac-info"><div class="ac-name">' + a.name + '</div><div class="ac-city">' + a.city + '</div></div>' +
+      '<div class="ac-info"><div class="ac-name">' + a.name + '</div><div class="ac-city">' + a.city + ' ' + a.icon + '</div></div>' +
     '</div>';
   }).join('');
   drop.classList.add('open');
