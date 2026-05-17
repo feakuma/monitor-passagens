@@ -390,6 +390,10 @@ var worker_fase14_default = {
       try {
         const sessao = await requireAuth(request);
         if (!sessao) return json({ erro: "N\xE3o autenticado" }, 401);
+        // Rastrear acesso do usuário (bucket diário)
+        const hoje = new Date().toISOString().slice(0, 10);
+        await redisCmd("INCR", `acessos:${sessao.email}:${hoje}`);
+        await redisCmd("SET", `ultimo_acesso:${sessao.email}`, new Date().toISOString());
         const alertas = await redisGet(`alertas:${sessao.email}`) || [];
         const result = await Promise.all(alertas.map(async (a, i) => {
           const precoAtual = parseFloat(await redisGet(`preco:${sessao.email}:${a.id}`) || 0);
@@ -440,6 +444,66 @@ var worker_fase14_default = {
         alertas.splice(indice - 1, 1);
         await redisSet(`alertas:${sessao.email}`, alertas);
         return json({ ok: true });
+      } catch (err) {
+        return json({ erro: "Erro interno" }, 500);
+      }
+    }
+    if (path === "/admin/dashboard" && method === "GET") {
+      try {
+        const sessao = await requireAdmin(request);
+        if (!sessao) return json({ erro: "Acesso negado" }, 403);
+
+        const url = new URL(request.url);
+        const ate = url.searchParams.get("ate") || new Date().toISOString().slice(0, 10);
+        const de  = url.searchParams.get("de")  || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+
+        // Soma buckets diários de acesso dentro do período
+        const acessoKeys = await redisKeys("acessos:*") || [];
+        const acessosPorEmail = {};
+        for (const key of acessoKeys) {
+          // formato: acessos:email@x.com:2026-05-17
+          const parts = key.split(":");
+          if (parts.length < 3) continue;
+          const dataKey = parts[parts.length - 1];
+          if (dataKey < de || dataKey > ate) continue;
+          const emailKey = parts.slice(1, -1).join(":");
+          const count = parseInt(await redisCmd("GET", key) || 0);
+          acessosPorEmail[emailKey] = (acessosPorEmail[emailKey] || 0) + count;
+        }
+
+        const chaves = await redisKeys("usuario:*") || [];
+        let totalUsuarios = 0, totalAtivos = 0, totalAlertas = 0, totalChecagens = 0;
+        const rotasCount = {};
+        const acessos = [];
+
+        for (const chave of chaves) {
+          const u = await redisGet(chave);
+          if (!u) continue;
+          totalUsuarios++;
+          if (u.ativo) totalAtivos++;
+
+          const alertas = await redisGet(`alertas:${u.email}`) || [];
+          totalAlertas += alertas.length;
+
+          for (const a of alertas) {
+            const rota = `${a.origem} → ${a.destino}`;
+            rotasCount[rota] = (rotasCount[rota] || 0) + 1;
+            const hist = await redisGet(`historico:${u.email}:${a.id}`) || [];
+            totalChecagens += hist.length;
+          }
+
+          const ultimoAcesso = await redisCmd("GET", `ultimo_acesso:${u.email}`);
+          acessos.push({ nome: u.nome, email: u.email, acessos: acessosPorEmail[u.email] || 0, ultimoAcesso: ultimoAcesso || null });
+        }
+
+        const rotasTop = Object.entries(rotasCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([rota, count]) => ({ rota, count }));
+
+        acessos.sort((a, b) => b.acessos - a.acessos);
+
+        return json({ totalUsuarios, totalAtivos, totalAlertas, totalChecagens, rotasTop, acessos, de, ate });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
       }

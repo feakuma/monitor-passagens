@@ -444,8 +444,17 @@ export function carregarDashboard() {
   var rotasEl   = document.getElementById('dash-rotas');
   if (!statsEl) return;
 
+  var deEl  = document.getElementById('dash-de');
+  var ateEl = document.getElementById('dash-ate');
+  var hoje  = new Date().toISOString().slice(0, 10);
+  var trintaDiasAtras = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  if (deEl  && !deEl.value)  deEl.value  = trintaDiasAtras;
+  if (ateEl && !ateEl.value) ateEl.value = hoje;
+  var de  = (deEl  && deEl.value)  ? deEl.value  : trintaDiasAtras;
+  var ate = (ateEl && ateEl.value) ? ateEl.value : hoje;
+
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/dashboard', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  fetch(WORKER_URL + '/admin/dashboard?de=' + de + '&ate=' + ate, { headers: { 'Authorization': 'Bearer ' + sessao.token } })
   .then(function (r) { return r.json(); })
   .then(function (data) {
     if (data.erro) { statsEl.innerHTML = '<div class="empty">Erro ao carregar.</div>'; return; }
