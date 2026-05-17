@@ -555,20 +555,17 @@
 </div>
 
 <div id="tab-dash" class="page">
-  <div class="section-label">período</div>
-  <div class="form-card" style="margin-bottom:16px;">
-    <div class="form-row two-col" style="align-items:center;">
-      <div class="form-col">
-        <div class="field-label">de</div>
-        <input id="dash-de" type="date" style="background:transparent;border:none;color:var(--text);font-size:14px;font-weight:500;outline:none;margin-top:4px;width:100%;" />
-      </div>
-      <div class="form-col" style="align-items:flex-start;">
-        <div class="field-label">até</div>
-        <input id="dash-ate" type="date" style="background:transparent;border:none;color:var(--text);font-size:14px;font-weight:500;outline:none;margin-top:4px;width:100%;" />
-      </div>
+  <div class="form-card" style="margin-bottom:20px;">
+    <div class="form-row">
+      <div class="field-label">período</div>
+      <select id="dash-periodo" onchange="carregarDashboard()" style="background:transparent;border:none;color:var(--text);font-size:15px;font-weight:500;outline:none;margin-top:4px;width:100%;-webkit-appearance:none;">
+        <option value="7">Últimos 7 dias</option>
+        <option value="15">Últimos 15 dias</option>
+        <option value="30" selected>Últimos 30 dias</option>
+        <option value="0">Hoje</option>
+      </select>
     </div>
   </div>
-  <div class="submit-btn" onclick="carregarDashboard()" style="margin-bottom:20px;">Aplicar</div>
 
   <div class="section-label">sistema</div>
   <div class="dash-grid" id="dash-stats">

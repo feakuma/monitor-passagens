@@ -444,14 +444,10 @@ export function carregarDashboard() {
   var rotasEl   = document.getElementById('dash-rotas');
   if (!statsEl) return;
 
-  var deEl  = document.getElementById('dash-de');
-  var ateEl = document.getElementById('dash-ate');
-  var hoje  = new Date().toISOString().slice(0, 10);
-  var trintaDiasAtras = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
-  if (deEl  && !deEl.value)  deEl.value  = trintaDiasAtras;
-  if (ateEl && !ateEl.value) ateEl.value = hoje;
-  var de  = (deEl  && deEl.value)  ? deEl.value  : trintaDiasAtras;
-  var ate = (ateEl && ateEl.value) ? ateEl.value : hoje;
+  var hoje = new Date().toISOString().slice(0, 10);
+  var dias = parseInt((document.getElementById('dash-periodo') || {}).value || '30');
+  var de   = new Date(Date.now() - dias * 86400000).toISOString().slice(0, 10);
+  var ate  = hoje;
 
   var sessao = getSessao();
   fetch(WORKER_URL + '/admin/dashboard?de=' + de + '&ate=' + ate, { headers: { 'Authorization': 'Bearer ' + sessao.token } })
