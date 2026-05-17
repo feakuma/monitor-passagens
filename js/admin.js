@@ -474,11 +474,17 @@ export function carregarDashboard() {
           '<div class="dash-user-info">' +
             '<div class="dash-user-name">' + u.nome + '</div>' +
             '<div class="dash-user-email">' + u.email + '</div>' +
-            '<div class="dash-user-meta">último: ' + ts + '</div>' +
+            '<div class="dash-user-meta">último acesso: ' + ts + '</div>' +
           '</div>' +
-          '<div style="text-align:right;">' +
-            '<div class="dash-stat-num" style="font-size:22px;">' + (u.acessos || 0) + '</div>' +
-            '<div class="dash-user-meta">acessos</div>' +
+          '<div style="display:flex;gap:16px;align-items:center;">' +
+            '<div style="text-align:center;">' +
+              '<div class="dash-stat-num" style="font-size:20px;">' + (u.acessos || 0) + '</div>' +
+              '<div class="dash-user-meta">acessos</div>' +
+            '</div>' +
+            '<div style="text-align:center;">' +
+              '<div class="dash-stat-num" style="font-size:20px;color:var(--text2);">' + (u.push || 0) + '</div>' +
+              '<div class="dash-user-meta">push</div>' +
+            '</div>' +
           '</div>' +
         '</div>';
       }).join('') + '</div>';

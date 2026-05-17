@@ -457,10 +457,13 @@ var worker_fase14_default = {
         const ate = url.searchParams.get("ate") || new Date().toISOString().slice(0, 10);
         const de  = url.searchParams.get("de")  || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
-        // Soma buckets diários de acesso dentro do período
-        const acessoKeys = await redisKeys("acessos:*") || [];
+        // Soma buckets diários de acesso e notificações dentro do período
+        const bucketKeys = await redisKeys("acessos:*") || [];
+        const pushKeys   = await redisKeys("notif_push:*") || [];
         const acessosPorEmail = {};
-        for (const key of acessoKeys) {
+        const pushPorEmail    = {};
+
+        for (const key of bucketKeys) {
           // formato: acessos:email@x.com:2026-05-17
           const parts = key.split(":");
           if (parts.length < 3) continue;
@@ -469,6 +472,17 @@ var worker_fase14_default = {
           const emailKey = parts.slice(1, -1).join(":");
           const count = parseInt(await redisCmd("GET", key) || 0);
           acessosPorEmail[emailKey] = (acessosPorEmail[emailKey] || 0) + count;
+        }
+
+        for (const key of pushKeys) {
+          // formato: notif_push:email@x.com:2026-05-17
+          const parts = key.split(":");
+          if (parts.length < 3) continue;
+          const dataKey = parts[parts.length - 1];
+          if (dataKey < de || dataKey > ate) continue;
+          const emailKey = parts.slice(1, -1).join(":");
+          const count = parseInt(await redisCmd("GET", key) || 0);
+          pushPorEmail[emailKey] = (pushPorEmail[emailKey] || 0) + count;
         }
 
         const chaves = await redisKeys("usuario:*") || [];
@@ -493,7 +507,7 @@ var worker_fase14_default = {
           }
 
           const ultimoAcesso = await redisCmd("GET", `ultimo_acesso:${u.email}`);
-          acessos.push({ nome: u.nome, email: u.email, acessos: acessosPorEmail[u.email] || 0, ultimoAcesso: ultimoAcesso || null });
+          acessos.push({ nome: u.nome, email: u.email, acessos: acessosPorEmail[u.email] || 0, push: pushPorEmail[u.email] || 0, ultimoAcesso: ultimoAcesso || null });
         }
 
         const rotasTop = Object.entries(rotasCount)
@@ -870,6 +884,10 @@ var worker_fase14_default = {
         if (resp.status === 410 || resp.status === 404) {
           await redisDel(`push:${email}`);
           return json({ ok: false, motivo: "Subscription expirada, removida" });
+        }
+        if (resp.ok || resp.status === 201) {
+          const hoje2 = new Date().toISOString().slice(0, 10);
+          await redisCmd("INCR", `notif_push:${email}:${hoje2}`);
         }
         return json({ ok: true, status: resp.status });
       } catch (err) {
