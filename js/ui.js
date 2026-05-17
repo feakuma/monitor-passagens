@@ -71,14 +71,14 @@ export function showTab(tab) {
   var tabBtn = document.querySelectorAll('.tab')[tabs.indexOf(tab)];
   if (tabBtn) tabBtn.classList.add('active');
 
-  ['alertas', 'historico', 'config', 'admin'].forEach(function (t) {
+  ['alertas', 'historico', 'config', 'admin', 'dash'].forEach(function (t) {
     var ni = document.getElementById('nav-' + t);
     var nl = document.getElementById('navl-' + t);
     if (ni) ni.classList.toggle('on', t === tab);
     if (nl) nl.classList.toggle('on', t === tab);
   });
 
-  var titles = { alertas: 'Passagens', historico: 'Historico', config: 'Config', admin: 'Admin' };
+  var titles = { alertas: 'Passagens', historico: 'Histórico', config: 'Config', admin: 'Admin', dash: 'Dashboard' };
   document.getElementById('page-title').textContent = titles[tab] || 'Passagens';
 
   if (tab === 'alertas' || tab === 'historico') {
@@ -91,6 +91,9 @@ export function showTab(tab) {
   }
   if (tab === 'admin') {
     if (window.carregarUsuarios) window.carregarUsuarios();
+  }
+  if (tab === 'dash') {
+    if (window.carregarDashboard) window.carregarDashboard();
   }
 }
 

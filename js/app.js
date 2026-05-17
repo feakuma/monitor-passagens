@@ -25,7 +25,8 @@ import {
   resetPrompt, toggleTokenVisibility, removerTokenIA,
   carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
   _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario,
-  adminVerAlertas, fecharModalAlertasUsuario
+  adminVerAlertas, fecharModalAlertasUsuario,
+  carregarDashboard
 } from './admin.js';
 import {
   inicializarPush, togglePush, atualizarStatusPush,
@@ -76,6 +77,7 @@ window.adminToggleAtivo            = adminToggleAtivo;
 window.adminRemoverUsuario         = adminRemoverUsuario;
 window.adminVerAlertas             = adminVerAlertas;
 window.fecharModalAlertasUsuario   = fecharModalAlertasUsuario;
+window.carregarDashboard           = carregarDashboard;
 
 window.inicializarPush       = inicializarPush;
 window.togglePush            = togglePush;
@@ -131,6 +133,7 @@ export function inicializarApp() {
     if (sessao.usuario && sessao.usuario.isAdmin) {
       document.getElementById('tab-admin-btn').style.display = '';
       document.getElementById('nav-admin-btn').style.display = '';
+      document.getElementById('nav-dash-btn').style.display  = '';
     }
     var emailEl = document.getElementById('sessao-email');
     if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;

@@ -171,6 +171,21 @@
   .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.3px; }
   .nav-label.on { color: var(--text2); }
 
+  /* DASHBOARD */
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
+  .dash-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; }
+  .dash-stat-num { font-size: 28px; font-weight: 600; letter-spacing: -0.8px; }
+  .dash-stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .dash-user-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
+  .dash-user-row:last-child { border-bottom: none; }
+  .dash-user-info { flex: 1; min-width: 0; }
+  .dash-user-name { font-size: 14px; font-weight: 500; }
+  .dash-user-email { font-size: 11px; color: var(--text3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dash-user-meta { font-size: 10px; color: var(--text4); margin-top: 2px; }
+  .dash-rota-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .dash-rota-row:last-child { border-bottom: none; }
+  .dash-refresh { text-align: center; padding: 16px 0 8px; font-size: 12px; color: var(--text4); cursor: pointer; letter-spacing: 0.3px; }
+
   /* SPINNER */
   .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -539,6 +554,24 @@
   <div style="text-align:center;padding:20px 0 8px;font-size:10px;color:var(--text4);letter-spacing:0.5px;">v2026.05.17 · build 116</div>
 </div>
 
+<div id="tab-dash" class="page">
+  <div class="section-label">sistema</div>
+  <div class="dash-grid" id="dash-stats">
+    <div class="dash-stat"><div class="dash-stat-num">—</div><div class="dash-stat-label">usuários</div></div>
+    <div class="dash-stat"><div class="dash-stat-num">—</div><div class="dash-stat-label">ativos</div></div>
+    <div class="dash-stat"><div class="dash-stat-num">—</div><div class="dash-stat-label">alertas</div></div>
+    <div class="dash-stat"><div class="dash-stat-num">—</div><div class="dash-stat-label">checagens</div></div>
+  </div>
+
+  <div class="section-label" style="margin-top:16px;">acessos por usuário</div>
+  <div id="dash-acessos"><div class="empty">Carregando...</div></div>
+
+  <div class="section-label" style="margin-top:16px;">rotas mais monitoradas</div>
+  <div id="dash-rotas"><div class="empty">Carregando...</div></div>
+
+  <div class="dash-refresh" onclick="carregarDashboard()">↻ atualizar</div>
+</div>
+
 <!-- ── MODAIS ─────────────────────────────────────────────── -->
 
 
@@ -713,6 +746,10 @@
   <div class="nav-item" id="nav-admin-btn" style="display:none;" onclick="showTab('admin')">
     <div class="nav-icon" id="nav-admin">⚙</div>
     <div class="nav-label" id="navl-admin">admin</div>
+  </div>
+  <div class="nav-item" id="nav-dash-btn" style="display:none;" onclick="showTab('dash')">
+    <div class="nav-icon" id="nav-dash">◫</div>
+    <div class="nav-label" id="navl-dash">dash</div>
   </div>
 </div>
 

@@ -435,3 +435,64 @@ export function adminVerAlertas(email, nome) {
 export function fecharModalAlertasUsuario() {
   document.getElementById('modal-alertas-usuario').style.display = 'none';
 }
+
+// ── ADMIN — DASHBOARD ─────────────────────────────────────────
+
+export function carregarDashboard() {
+  var statsEl   = document.getElementById('dash-stats');
+  var acessosEl = document.getElementById('dash-acessos');
+  var rotasEl   = document.getElementById('dash-rotas');
+  if (!statsEl) return;
+
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/dashboard', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { statsEl.innerHTML = '<div class="empty">Erro ao carregar.</div>'; return; }
+
+    statsEl.innerHTML = [
+      { num: data.totalUsuarios,  label: 'usuários'  },
+      { num: data.totalAtivos,    label: 'ativos'    },
+      { num: data.totalAlertas,   label: 'alertas'   },
+      { num: data.totalChecagens, label: 'checagens' }
+    ].map(function (s) {
+      return '<div class="dash-stat"><div class="dash-stat-num">' + (s.num ?? '—') + '</div>' +
+             '<div class="dash-stat-label">' + s.label + '</div></div>';
+    }).join('');
+
+    if (data.acessos && data.acessos.length) {
+      acessosEl.innerHTML = '<div class="card">' + data.acessos.map(function (u) {
+        var ts = u.ultimoAcesso
+          ? new Date(u.ultimoAcesso).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })
+          : '—';
+        return '<div class="dash-user-row">' +
+          '<div class="dash-user-info">' +
+            '<div class="dash-user-name">' + u.nome + '</div>' +
+            '<div class="dash-user-email">' + u.email + '</div>' +
+            '<div class="dash-user-meta">último: ' + ts + '</div>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+            '<div class="dash-stat-num" style="font-size:22px;">' + (u.acessos || 0) + '</div>' +
+            '<div class="dash-user-meta">acessos</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+    } else {
+      acessosEl.innerHTML = '<div class="empty">Nenhum acesso registrado ainda.</div>';
+    }
+
+    if (data.rotasTop && data.rotasTop.length) {
+      rotasEl.innerHTML = '<div class="card">' + data.rotasTop.map(function (r) {
+        return '<div class="dash-rota-row">' +
+          '<div style="font-size:15px;font-weight:500;">' + r.rota + '</div>' +
+          '<div style="font-size:13px;color:var(--text2);">' + r.count + '×</div>' +
+        '</div>';
+      }).join('') + '</div>';
+    } else {
+      rotasEl.innerHTML = '<div class="empty">Sem dados de rotas.</div>';
+    }
+  })
+  .catch(function () {
+    if (statsEl) statsEl.innerHTML = '<div class="empty">Erro ao carregar dashboard.</div>';
+  });
+}
