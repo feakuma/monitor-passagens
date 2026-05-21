@@ -26,6 +26,7 @@ import {
   carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
   _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario,
   adminVerAlertas, fecharModalAlertasUsuario,
+  adminVerAudit, fecharModalAudit, recarregarAudit,
   carregarDashboard
 } from './admin.js';
 import {
@@ -77,6 +78,9 @@ window.adminToggleAtivo            = adminToggleAtivo;
 window.adminRemoverUsuario         = adminRemoverUsuario;
 window.adminVerAlertas             = adminVerAlertas;
 window.fecharModalAlertasUsuario   = fecharModalAlertasUsuario;
+window.adminVerAudit               = adminVerAudit;
+window.fecharModalAudit            = fecharModalAudit;
+window.recarregarAudit             = recarregarAudit;
 window.carregarDashboard           = carregarDashboard;
 
 window.inicializarPush       = inicializarPush;

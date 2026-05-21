@@ -193,6 +193,7 @@ export function carregarUsuarios() {
         '</div>' +
         '<div class="usuario-actions">' +
           '<div class="btn-small" onclick="adminAbrirEdicao(\'' + u.email + '\')">✏️ Editar</div>' +
+          '<div class="btn-small" onclick="adminVerAudit(\'' + u.email + '\', \'' + u.nome.replace(/'/g, "\\'") + '\')">📋 Audit</div>' +
           (u.ativo
             ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', false)">Desativar</div>'
             : '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', true)">Ativar</div>') +
@@ -434,6 +435,99 @@ export function adminVerAlertas(email, nome) {
 
 export function fecharModalAlertasUsuario() {
   document.getElementById('modal-alertas-usuario').style.display = 'none';
+}
+
+// ── ADMIN — AUDITORIA ────────────────────────────────────────
+
+var _auditEmail = null;
+
+var _auditIcones = {
+  login:           '🔑',
+  otp_solicitado:  '📧',
+  alerta_criado:   '✈️',
+  alerta_removido: '🗑️',
+  push_ativado:    '🔔',
+  push_desativado: '🔕',
+  analise_ia:      '🤖',
+  telegram_ok:     '✅',
+  telegram_falhou: '❌',
+  push_ok:         '📲',
+  push_falhou:     '⚠️',
+  email_ok:        '📩',
+  email_falhou:    '⚠️',
+};
+
+var _auditLabels = {
+  login:           'Login',
+  otp_solicitado:  'Código de acesso solicitado',
+  alerta_criado:   'Alerta criado',
+  alerta_removido: 'Alerta removido',
+  push_ativado:    'Push ativado',
+  push_desativado: 'Push desativado',
+  analise_ia:      'Análise de IA',
+  telegram_ok:     'Telegram enviado',
+  telegram_falhou: 'Telegram falhou',
+  push_ok:         'Push enviado',
+  push_falhou:     'Push falhou',
+  email_ok:        'E-mail enviado',
+  email_falhou:    'E-mail falhou',
+};
+
+export function adminVerAudit(email, nome) {
+  _auditEmail = email;
+  document.getElementById('modal-audit-nome').textContent = nome + ' (' + email + ')';
+  document.getElementById('modal-audit-usuario').style.display = '';
+  _buscarAudit(email);
+}
+
+export function fecharModalAudit() {
+  document.getElementById('modal-audit-usuario').style.display = 'none';
+  _auditEmail = null;
+}
+
+export function recarregarAudit() {
+  if (_auditEmail) _buscarAudit(_auditEmail);
+}
+
+function _buscarAudit(email) {
+  var lista = document.getElementById('modal-audit-lista');
+  lista.innerHTML = '<div class="empty">Carregando...</div>';
+
+  var dias = parseInt((document.getElementById('audit-periodo') || {}).value || '6');
+  var ate  = new Date().toISOString().slice(0, 10);
+  var de   = new Date(Date.now() - dias * 86400000).toISOString().slice(0, 10);
+
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/audit?de=' + de + '&ate=' + ate, {
+    headers: { 'Authorization': 'Bearer ' + sessao.token }
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (!data.eventos || !data.eventos.length) {
+      lista.innerHTML = '<div class="empty">Nenhum evento registrado no período.</div>';
+      return;
+    }
+    lista.innerHTML = '<div class="card" style="padding:0 16px;">' +
+      data.eventos.map(function (e) {
+        var icone  = _auditIcones[e.tipo]  || '•';
+        var label  = _auditLabels[e.tipo]  || e.tipo;
+        var d      = new Date(e.ts);
+        var tsStr  = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) +
+                     ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return '<div class="audit-evento">' +
+          '<div class="audit-icon">' + icone + '</div>' +
+          '<div class="audit-body">' +
+            '<div class="audit-tipo">' + label + '</div>' +
+            (e.detalhe ? '<div class="audit-detalhe">' + e.detalhe + '</div>' : '') +
+            '<div class="audit-ts">' + tsStr + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  })
+  .catch(function () {
+    lista.innerHTML = '<div class="empty">Erro ao carregar auditoria.</div>';
+  });
 }
 
 // ── ADMIN — DASHBOARD ─────────────────────────────────────────
