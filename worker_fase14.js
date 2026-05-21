@@ -616,6 +616,42 @@ var worker_fase14_default = {
         return json({ erro: "Erro interno" }, 500);
       }
     }
+    if (path.startsWith("/admin/usuarios/") && path.endsWith("/audit") && method === "GET") {
+      try {
+        const sessao = await requireAdmin(request);
+        if (!sessao) return json({ erro: "Acesso negado" }, 403);
+        const email = decodeURIComponent(path.split("/")[3]);
+        const hoje  = new Date().toISOString().slice(0, 10);
+        const ate   = url.searchParams.get("ate") || hoje;
+        const de    = url.searchParams.get("de")  || new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10);
+
+        // Gera lista de datas no intervalo
+        const datas = [];
+        let cursor = new Date(de);
+        const fim  = new Date(ate);
+        while (cursor <= fim) {
+          datas.push(cursor.toISOString().slice(0, 10));
+          cursor.setDate(cursor.getDate() + 1);
+        }
+
+        // Busca eventos de cada dia e achata em lista única
+        const eventos = [];
+        for (const data of datas) {
+          const raw = await redisCmd("LRANGE", `audit:${email}:${data}`, "0", "-1");
+          if (!raw || !Array.isArray(raw)) continue;
+          for (const item of raw) {
+            try { eventos.push(JSON.parse(item)); } catch (_) {}
+          }
+        }
+
+        // Ordena por timestamp desc (mais recente primeiro)
+        eventos.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+
+        return json({ email, de, ate, total: eventos.length, eventos });
+      } catch (err) {
+        return json({ erro: "Erro interno" }, 500);
+      }
+    }
     if (path.startsWith("/admin/usuarios/") && method === "DELETE") {
       try {
         const sessao = await requireAdmin(request);
