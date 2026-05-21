@@ -547,6 +547,15 @@ var worker_fase14_default = {
             usuarios.push({ ...u, totalAlertas: alertas.length });
           }
         }
+        // Inclui convites pendentes
+        const conviteChaves = await redisKeys("convite:*");
+        for (const chave of conviteChaves || []) {
+          const c = await redisGet(chave);
+          if (c && c.email) {
+            const token = chave.replace("convite:", "");
+            usuarios.push({ email: c.email, criadoEm: c.criadoEm, pendente: true, token });
+          }
+        }
         return json(usuarios);
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -665,6 +674,18 @@ var worker_fase14_default = {
         }
         await redisDel(`alertas:${email}`);
         await redisDel(`usuario:${email}`);
+        return json({ ok: true });
+      } catch (err) {
+        return json({ erro: "Erro interno" }, 500);
+      }
+    }
+    if (path.startsWith("/admin/convite/") && method === "DELETE") {
+      try {
+        const sessao = await requireAdmin(request);
+        if (!sessao) return json({ erro: "Acesso negado" }, 403);
+        const token = path.split("/")[3];
+        if (!token) return json({ erro: "Token obrigatório" }, 400);
+        await redisDel(`convite:${token}`);
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);

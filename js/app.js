@@ -23,7 +23,8 @@ import {
   adminEditarLimite,
   adminAbrirEdicao, adminSalvarEdicao, adminFecharEdicao,
   resetPrompt, toggleTokenVisibility, removerTokenIA,
-  carregarUsuarios, adminEnviarConvite, adminCriarUsuario,
+  carregarUsuarios, adminEnviarConvite, adminReenviarConvite, adminCancelarConvite,
+  adminCriarUsuario,
   _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario,
   adminVerAlertas, fecharModalAlertasUsuario,
   adminVerAudit, fecharModalAudit, recarregarAudit,
@@ -68,6 +69,8 @@ window.removerTokenIA        = removerTokenIA;
 
 window.carregarUsuarios      = carregarUsuarios;
 window.adminEnviarConvite    = adminEnviarConvite;
+window.adminReenviarConvite  = adminReenviarConvite;
+window.adminCancelarConvite  = adminCancelarConvite;
 window.adminCriarUsuario     = adminCriarUsuario;
 window.adminEditarLimite     = adminEditarLimite;
 window.adminAbrirEdicao      = adminAbrirEdicao;

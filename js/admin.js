@@ -172,6 +172,26 @@ export function carregarUsuarios() {
     if (!usuarios.length)           { el.innerHTML = '<div class="empty">Nenhum usuário cadastrado.</div>'; return; }
 
     el.innerHTML = usuarios.map(function (u) {
+      // ── Card de convite pendente ────────────────────────────
+      if (u.pendente) {
+        var dataConvite = u.criadoEm ? new Date(u.criadoEm).toLocaleDateString('pt-BR') : '—';
+        return '<div class="usuario-card usuario-card-pendente">' +
+          '<div class="usuario-header">' +
+            '<div>' +
+              '<div class="usuario-nome" style="color:var(--text2);">✉️ ' + u.email + '</div>' +
+              '<div class="usuario-email">Convite enviado em ' + dataConvite + '</div>' +
+            '</div>' +
+            '<div class="usuario-badges">' +
+              '<span class="badge badge-yellow">aguardando</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="usuario-actions">' +
+            '<div class="btn-small" onclick="adminReenviarConvite(\'' + u.email + '\')">📨 Reenviar</div>' +
+            '<div class="btn-small danger" onclick="adminCancelarConvite(\'' + u.token + '\', \'' + u.email + '\')">Cancelar</div>' +
+          '</div>' +
+        '</div>';
+      }
+      // ── Card de usuário cadastrado ──────────────────────────
       return '<div class="usuario-card">' +
         '<div class="usuario-header">' +
           '<div>' +
@@ -224,11 +244,45 @@ export function adminEnviarConvite() {
     if (data.erro) { showToast(data.erro, 'error'); return; }
     showToast('Convite enviado!', 'success');
     document.getElementById('convite-email').value = '';
+    carregarUsuarios();
   })
   .catch(function () {
     if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = ''; btn.textContent = 'Enviar convite'; }
     showToast('Erro ao enviar convite', 'error');
   });
+}
+
+export function adminReenviarConvite(email) {
+  if (!confirm('Reenviar convite para ' + email + '?')) return;
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/convite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ email: email })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Convite reenviado para ' + email + '!', 'success');
+    carregarUsuarios();
+  })
+  .catch(function () { showToast('Erro ao reenviar convite', 'error'); });
+}
+
+export function adminCancelarConvite(token, email) {
+  if (!confirm('Cancelar convite para ' + email + '?')) return;
+  var sessao = getSessao();
+  fetch(WORKER_URL + '/admin/convite/' + encodeURIComponent(token), {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + sessao.token }
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    if (data.erro) { showToast(data.erro, 'error'); return; }
+    showToast('Convite cancelado.', 'success');
+    carregarUsuarios();
+  })
+  .catch(function () { showToast('Erro ao cancelar convite', 'error'); });
 }
 
 export function adminCriarUsuario() {
