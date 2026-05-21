@@ -547,15 +547,19 @@ var worker_fase14_default = {
             usuarios.push({ ...u, totalAlertas: alertas.length });
           }
         }
-        // Inclui convites pendentes
-        const conviteChaves = await redisKeys("convite:*");
-        for (const chave of conviteChaves || []) {
-          const c = await redisGet(chave);
-          if (c && c.email) {
-            const token = chave.replace("convite:", "");
-            usuarios.push({ email: c.email, criadoEm: c.criadoEm, pendente: true, token });
+        // Inclui convites pendentes (falha silenciosa para não quebrar a lista)
+        try {
+          const conviteChaves = await redisKeys("convite:*");
+          for (const chave of conviteChaves || []) {
+            try {
+              const c = await redisGet(chave);
+              if (c && c.email) {
+                const token = chave.replace("convite:", "");
+                usuarios.push({ email: c.email, criadoEm: c.criadoEm, pendente: true, token });
+              }
+            } catch (_) { /* ignora key inválida */ }
           }
-        }
+        } catch (_) { /* ignora falha no scan de convites */ }
         return json(usuarios);
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
