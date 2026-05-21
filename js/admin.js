@@ -393,6 +393,32 @@ export function adminRemoverUsuario(email, nome) {
   .catch(function () { showToast('Erro ao remover', 'error'); });
 }
 
+function _sparkline(historico, w, h) {
+  if (!historico || historico.length < 2) return '';
+  var precos = historico.map(function (p) { return p.preco; });
+  var mn = Math.min.apply(null, precos);
+  var mx = Math.max.apply(null, precos);
+  var range = mx - mn || 1;
+  var pad = 4;
+  var W = w - pad * 2;
+  var H = h - pad * 2;
+  var pts = precos.map(function (p, i) {
+    var x = pad + (i / (precos.length - 1)) * W;
+    var y = pad + (1 - (p - mn) / range) * H;
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  var lastY = (pad + (1 - (precos[precos.length - 1] - mn) / range) * H).toFixed(1);
+  var lastX = (pad + W).toFixed(1);
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" class="sparkline-svg">' +
+    '<polyline points="' + pts + '" fill="none" stroke="var(--accent,#6c63ff)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>' +
+    '<circle cx="' + lastX + '" cy="' + lastY + '" r="2.5" fill="var(--accent,#6c63ff)"/>' +
+  '</svg>';
+}
+
+function _fmtBRL(v) {
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
 export function adminVerAlertas(email, nome) {
   var modal = document.getElementById('modal-alertas-usuario');
   var lista = document.getElementById('modal-alertas-lista');
@@ -413,6 +439,28 @@ export function adminVerAlertas(email, nome) {
       var temPreco = a.precoAtual > 0;
       var varClass = a.variacao < 0 ? 'price-drop' : (a.variacao > 0 ? 'price-up' : 'price-neutral');
       var varSinal = a.variacao < 0 ? '↓ ' : (a.variacao > 0 ? '↑ ' : '');
+
+      var hist = Array.isArray(a.historico) ? a.historico : [];
+      var temHist = hist.length >= 2;
+      var precos  = hist.map(function (p) { return p.preco; });
+      var minP    = temHist ? Math.min.apply(null, precos) : null;
+      var maxP    = temHist ? Math.max.apply(null, precos) : null;
+      var lastP   = temHist ? precos[precos.length - 1] : null;
+
+      var sparkHTML = temHist ? (
+        '<div class="sparkline-wrap">' +
+          _sparkline(hist, 200, 48) +
+          '<div class="sparkline-stats">' +
+            '<span class="spark-min">↓ min ' + _fmtBRL(minP) + '</span>' +
+            '<span class="spark-last">atual ' + _fmtBRL(lastP) + '</span>' +
+            '<span class="spark-max">↑ max ' + _fmtBRL(maxP) + '</span>' +
+          '</div>' +
+          '<div class="sparkline-count">' + hist.length + ' registro' + (hist.length > 1 ? 's' : '') + '</div>' +
+        '</div>'
+      ) : (
+        '<div class="sparkline-empty">Sem histórico de preços</div>'
+      );
+
       return '<div class="card" style="margin-bottom:10px;">' +
         '<div class="card-body">' +
           '<div class="card-top">' +
@@ -426,6 +474,7 @@ export function adminVerAlertas(email, nome) {
             (a.dataIda   ? '<div class="date-row">ida <strong>' + a.dataIda + '</strong></div>' : '') +
             (a.dataVolta ? '<div class="date-row">volta <strong>' + a.dataVolta + '</strong></div>' : '') +
           '</div>' +
+          sparkHTML +
         '</div>' +
       '</div>';
     }).join('');

@@ -195,6 +195,16 @@
   .dash-rota-row:last-child { border-bottom: none; }
   .dash-refresh { text-align: center; padding: 16px 0 8px; font-size: 12px; color: var(--text4); cursor: pointer; letter-spacing: 0.3px; }
 
+  /* SPARKLINE */
+  .sparkline-wrap { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .sparkline-svg { display: block; width: 100%; height: 48px; }
+  .sparkline-stats { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; }
+  .spark-min { color: var(--green); }
+  .spark-max { color: var(--red); }
+  .spark-last { color: var(--text2); }
+  .sparkline-count { font-size: 10px; color: var(--text4); margin-top: 2px; text-align: right; }
+  .sparkline-empty { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text4); text-align: center; }
+
   /* SPINNER */
   .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
