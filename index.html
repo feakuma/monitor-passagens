@@ -209,6 +209,31 @@
   .spinner { width: 14px; height: 14px; border: 1.5px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* LANDING */
+  #page-landing { display: none; min-height: 100vh; background: var(--bg); overflow-y: auto; padding-bottom: 48px; }
+  .landing-hero { padding: 56px 24px 40px; text-align: center; }
+  .landing-hero-icon { font-size: 52px; margin-bottom: 20px; }
+  .landing-h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; color: var(--text); line-height: 1.25; margin-bottom: 14px; }
+  .landing-lead { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; }
+  .landing-cta-btn { display: block; width: 100%; background: var(--text); color: var(--bg); border: none; border-radius: 14px; padding: 17px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .landing-cta-btn:active { opacity: 0.85; }
+  .landing-section { padding: 0 24px; margin-bottom: 36px; }
+  .landing-label { font-size: 10px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; }
+  .landing-h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; color: var(--text); margin-bottom: 20px; }
+  .landing-step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 22px; }
+  .landing-step:last-child { margin-bottom: 0; }
+  .landing-step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text3); flex-shrink: 0; margin-top: 1px; }
+  .landing-step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .landing-step-desc { font-size: 13px; color: var(--text3); line-height: 1.55; }
+  .landing-features { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+  .landing-feature { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .landing-feature:last-child { border-bottom: none; }
+  .landing-feature-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .landing-feature-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .landing-feature-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .landing-divider { height: 1px; background: var(--border); margin: 0 24px 36px; }
+  .landing-footer { padding: 0 24px; text-align: center; font-size: 12px; color: var(--text4); line-height: 1.7; }
+
   /* ADMIN */
   .usuario-card { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
   .usuario-header { padding: 14px 16px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -249,6 +274,105 @@
 </style>
 </head>
 <body>
+
+<!-- ── LANDING PAGE ──────────────────────────────────────── -->
+
+<div id="page-landing">
+
+  <!-- Hero -->
+  <div class="landing-hero">
+    <div class="landing-hero-icon">✈️</div>
+    <h1 class="landing-h1">Monitor de Passagens Aéreas</h1>
+    <p class="landing-lead">Defina um alerta de preço e relaxe. Te avisamos no Telegram, e-mail ou push quando o valor cair — com análise de IA incluída.</p>
+    <button class="landing-cta-btn" onclick="mostrarFormLogin()">Acessar o app →</button>
+  </div>
+
+  <!-- Como funciona -->
+  <div class="landing-section">
+    <div class="landing-label">Como funciona</div>
+    <div class="landing-step">
+      <div class="landing-step-num">1</div>
+      <div>
+        <div class="landing-step-title">Cadastre a rota e o gatilho</div>
+        <div class="landing-step-desc">Informe origem, destino, datas e o percentual mínimo de queda para ser notificado.</div>
+      </div>
+    </div>
+    <div class="landing-step">
+      <div class="landing-step-num">2</div>
+      <div>
+        <div class="landing-step-title">Monitoramos 4× ao dia</div>
+        <div class="landing-step-desc">O sistema consulta o Google Flights automaticamente e registra o histórico de preços da sua rota.</div>
+      </div>
+    </div>
+    <div class="landing-step">
+      <div class="landing-step-num">3</div>
+      <div>
+        <div class="landing-step-title">Você recebe o alerta na hora</div>
+        <div class="landing-step-desc">Notificação via Telegram, e-mail ou push web — com análise de IA dizendo se é bom momento para comprar.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-divider"></div>
+
+  <!-- Recursos -->
+  <div class="landing-section">
+    <div class="landing-label">Recursos</div>
+    <div class="landing-features">
+      <div class="landing-feature">
+        <div class="landing-feature-icon">🤖</div>
+        <div>
+          <div class="landing-feature-title">Análise de IA</div>
+          <div class="landing-feature-desc">Claude, GPT ou Gemini avaliam o preço e dizem se é hora de comprar ou aguardar.</div>
+        </div>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-icon">📊</div>
+        <div>
+          <div class="landing-feature-title">Histórico de preços</div>
+          <div class="landing-feature-desc">Acompanhe a evolução do valor ao longo do tempo com gráficos por rota.</div>
+        </div>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-icon">🔔</div>
+        <div>
+          <div class="landing-feature-title">Telegram, e-mail e push web</div>
+          <div class="landing-feature-desc">Receba alertas onde preferir. Push web funciona mesmo com o browser fechado.</div>
+        </div>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-icon">📱</div>
+        <div>
+          <div class="landing-feature-title">Funciona como app (PWA)</div>
+          <div class="landing-feature-desc">Instale na tela inicial do celular para acesso rápido, sem precisar de loja de apps.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AdSense -->
+  <div class="landing-section">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-7941337038303308"
+      data-ad-slot="auto"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <div class="landing-divider"></div>
+
+  <!-- Footer -->
+  <div class="landing-footer">
+    <div style="margin-bottom:16px;">
+      <button class="landing-cta-btn" onclick="mostrarFormLogin()" style="max-width:280px;margin:0 auto;">Acessar o app →</button>
+    </div>
+    <p>Sistema fechado · acesso por convite</p>
+    <p style="margin-top:4px;"><a href="https://passagens.fetadeu.com.br" style="color:var(--text4);text-decoration:none;">passagens.fetadeu.com.br</a></p>
+  </div>
+
+</div>
 
 <!-- ── TELA DE LOGIN ──────────────────────────────────────── -->
 

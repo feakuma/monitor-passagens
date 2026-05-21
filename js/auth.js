@@ -9,8 +9,9 @@ export var _conviteEmail = null;
 
 // ── VISIBILIDADE ─────────────────────────────────────────────
 
-export function mostrarTelaLogin() {
-  document.getElementById('tela-login').style.display = 'block';
+function _esconderApp() {
+  document.getElementById('tela-login').style.display = 'none';
+  document.getElementById('page-landing').style.display = 'none';
   document.querySelector('.status-bar').style.display = 'none';
   document.querySelector('.header').style.display = 'none';
   document.querySelector('.tabs').style.display = 'none';
@@ -18,8 +19,24 @@ export function mostrarTelaLogin() {
   document.querySelector('.bottom-nav').style.display = 'none';
 }
 
+export function mostrarLanding() {
+  _esconderApp();
+  document.getElementById('page-landing').style.display = 'block';
+}
+
+export function mostrarFormLogin() {
+  _esconderApp();
+  document.getElementById('tela-login').style.display = 'block';
+}
+
+// Mantido para compatibilidade com fluxo de convite
+export function mostrarTelaLogin() {
+  mostrarFormLogin();
+}
+
 export function ocultarTelaLogin() {
   document.getElementById('tela-login').style.display = 'none';
+  document.getElementById('page-landing').style.display = 'none';
   document.querySelector('.status-bar').style.display = '';
   document.querySelector('.header').style.display = '';
   document.querySelector('.tabs').style.display = '';
@@ -99,7 +116,7 @@ export function logout() {
   var sessao = getSessao();
   if (sessao) fetch(WORKER_URL + '/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao.token } });
   limparSessao();
-  mostrarTelaLogin();
+  mostrarLanding();
 }
 
 // ── CONVITE ───────────────────────────────────────────────────

@@ -5,7 +5,7 @@
 import { getSessao } from './config.js';
 import { carregarAlertas } from './api.js';
 import {
-  mostrarTelaLogin, ocultarTelaLogin,
+  mostrarTelaLogin, mostrarLanding, mostrarFormLogin, ocultarTelaLogin,
   solicitarOTP, verificarOTP, voltarParaEmail,
   verificarConviteURL, criarContaConvite, _executarCriarContaConvite,
   logout
@@ -42,6 +42,7 @@ window.verificarOTP          = verificarOTP;
 window.voltarParaEmail       = voltarParaEmail;
 window.logout                = logout;
 window.mostrarTelaLogin      = mostrarTelaLogin;
+window.mostrarFormLogin      = mostrarFormLogin;
 window.criarContaConvite     = criarContaConvite;
 
 window.showTab               = showTab;
@@ -154,7 +155,7 @@ export function inicializarApp() {
     setTimeout(inicializarPush, 3000);
     if (!localStorage.getItem('pwa_install_dismissed')) setTimeout(mostrarInstallToast, 5000);
   } else {
-    mostrarTelaLogin();
+    mostrarLanding();
   }
 }
 
