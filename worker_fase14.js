@@ -966,11 +966,16 @@ var worker_fase14_default = {
           await redisDel(`push:${email}`);
           return json({ ok: false, motivo: "Subscription expirada, removida" });
         }
-        if (resp.ok || resp.status === 201) {
+        if (resp.status === 400) {
+          await redisDel(`push:${email}`);
+          return json({ ok: false, motivo: "Subscription inválida (400), removida" });
+        }
+        const pushOk = resp.ok || resp.status === 201;
+        if (pushOk) {
           const hoje2 = new Date().toISOString().slice(0, 10);
           await redisCmd("INCR", `notif_push:${email}:${hoje2}`);
         }
-        return json({ ok: true, status: resp.status });
+        return json({ ok: pushOk, status: resp.status });
       } catch (err) {
         return json({ erro: err.toString() }, 500);
       }
