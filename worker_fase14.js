@@ -253,6 +253,14 @@ var worker_fase14_default = {
     const redisKeys = /* @__PURE__ */ __name(async (pattern) => redisCmd("KEYS", pattern), "redisKeys");
     const redisIncr = /* @__PURE__ */ __name(async (key) => redisCmd("INCR", key), "redisIncr");
     const redisExpire = /* @__PURE__ */ __name(async (key, ttl) => redisCmd("EXPIRE", key, ttl), "redisExpire");
+    const auditLog = /* @__PURE__ */ __name(async (email, tipo, detalhe) => {
+      const data = new Date().toISOString().slice(0, 10);
+      const key  = `audit:${email}:${data}`;
+      const entry = JSON.stringify({ ts: new Date().toISOString(), tipo, detalhe: detalhe || "" });
+      await redisCmd("RPUSH", key, entry);
+      await redisCmd("LTRIM", key, "-200", "-1");  // mantém últimos 200 por dia
+      await redisCmd("EXPIRE", key, 7776000);       // 90 dias
+    }, "auditLog");
     const gerarOTP = /* @__PURE__ */ __name(() => {
       const a = new Uint32Array(1);
       crypto.getRandomValues(a);
@@ -304,6 +312,7 @@ var worker_fase14_default = {
         if (!usuario || !usuario.ativo) return json({ ok: true, mensagem: "Se este e-mail estiver cadastrado, voc\xEA receber\xE1 um c\xF3digo." });
         const otp = gerarOTP();
         await redisSetEx(`otp:${email}`, { otp, tentativas: 0 }, 600);
+        await auditLog(email, "otp_solicitado", "Código de acesso solicitado");
         await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { "Authorization": `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
@@ -343,6 +352,7 @@ var worker_fase14_default = {
         const token = gerarToken();
         const usuario = await redisGet(`usuario:${email}`);
         await redisSetEx(`sessao:${token}`, { email, nome: usuario.nome, isAdmin: usuario.isAdmin }, 604800);
+        await auditLog(email, "login", "Login realizado com sucesso");
         return json({ ok: true, token, usuario: { nome: usuario.nome, email: usuario.email, isAdmin: usuario.isAdmin, analiseIA: usuario.analiseIA } });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -426,6 +436,7 @@ var worker_fase14_default = {
         const id = Date.now();
         alertas.push({ id, origem: origem.toUpperCase(), destino: destino.toUpperCase(), dataIda, dataVolta: dataVolta || null });
         await redisSet(`alertas:${sessao.email}`, alertas);
+        await auditLog(sessao.email, "alerta_criado", `${origem.toUpperCase()} → ${destino.toUpperCase()} | ida: ${dataIda}${dataVolta ? ' volta: ' + dataVolta : ''}`);
         return json({ ok: true, id });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -443,6 +454,7 @@ var worker_fase14_default = {
         await redisDel(`historico:${sessao.email}:${removido.id}`);
         alertas.splice(indice - 1, 1);
         await redisSet(`alertas:${sessao.email}`, alertas);
+        await auditLog(sessao.email, "alerta_removido", `${removido.origem} → ${removido.destino} | ida: ${removido.dataIda}`);
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -828,6 +840,7 @@ var worker_fase14_default = {
         const body = await request.json();
         if (!body.endpoint || !body.keys) return json({ erro: "Subscription inv\xE1lida" }, 400);
         await redisSet(`push:${sessao.email}`, body);
+        await auditLog(sessao.email, "push_ativado", "Push notification ativado");
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -838,6 +851,7 @@ var worker_fase14_default = {
         const sessao = await requireAuth(request);
         if (!sessao) return json({ erro: "N\xE3o autenticado" }, 401);
         await redisDel(`push:${sessao.email}`);
+        await auditLog(sessao.email, "push_desativado", "Push notification desativado");
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -983,6 +997,7 @@ Volta: ${alerta.dataVolta}` : "";
         } else {
           return json({ erro: `Provider desconhecido: ${provider}` }, 400);
         }
+        await auditLog(sessao.email, "analise_ia", `${alerta.origem} → ${alerta.destino} via ${provider}`);
         return json({ ok: true, analise: analise.trim() });
       } catch (err) {
         return json({ erro: "Erro interno: " + err.toString() }, 500);
