@@ -875,8 +875,10 @@ var worker_fase14_default = {
         if (!sessao) return json({ erro: "N\xE3o autenticado" }, 401);
         const body = await request.json();
         if (!body.endpoint || !body.keys) return json({ erro: "Subscription inv\xE1lida" }, 400);
+        const subAtual = await redisGet(`push:${sessao.email}`);
+        const nova = !subAtual || subAtual.endpoint !== body.endpoint;
         await redisSet(`push:${sessao.email}`, body);
-        await auditLog(sessao.email, "push_ativado", "Push notification ativado");
+        if (nova) await auditLog(sessao.email, "push_ativado", "Push notification ativado");
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
