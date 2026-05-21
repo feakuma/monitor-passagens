@@ -685,7 +685,9 @@ var worker_fase14_default = {
         if (!sessao) return json({ erro: "Acesso negado" }, 403);
         const token = path.split("/")[3];
         if (!token) return json({ erro: "Token obrigatório" }, 400);
+        const convite = await redisGet(`convite:${token}`);
         await redisDel(`convite:${token}`);
+        await auditLog(sessao.email, "convite_cancelado", convite?.email || token);
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -789,6 +791,7 @@ var worker_fase14_default = {
 </body></html>`
           })
         });
+        await auditLog(sessao.email, "convite_enviado", email);
         return json({ ok: true, mensagem: `Convite enviado para ${email}!` });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -827,6 +830,7 @@ var worker_fase14_default = {
         });
         await redisSet(`alertas:${convite.email}`, []);
         await redisDel(`convite:${token}`);
+        await auditLog(convite.email, "cadastro", nome);
         return json({ ok: true, mensagem: "Conta criada com sucesso! Fa\xE7a login para continuar." });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
