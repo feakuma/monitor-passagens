@@ -8,6 +8,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#0D0D0D">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <title>Monitor de Passagens Aéreas — Alertas de Preço com IA</title>
 <meta name="description" content="Monitore preços de passagens aéreas automaticamente. Receba alertas no Telegram, e-mail ou push web quando o valor do seu voo cair. Análise de IA para saber o melhor momento de compra.">
 <meta name="keywords" content="monitor de passagens, alerta de preço passagem, passagem aérea barata, monitorar voo, alerta voo barato, google flights alerta, queda de preço voo">
@@ -68,15 +72,19 @@
     --bg: #0D0D0D; --bg2: #141414; --bg3: #1A1A1A;
     --border: #1C1C1C; --border2: #2A2A2A;
     --text: #F0F0F0; --text2: #999; --text3: #666; --text4: #555;
-    --green: #5A9E6F; --red: #9E5A5A;
+    --green: #5A9E6F; --red: #9E5A5A; --accent: #5A9E6F;
+    --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius-xl: 20px; --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
 
   /* STATUS BAR & HEADER */
   .status-bar { padding: 16px 24px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
   .header { padding: 16px 24px 20px; }
-  .header-eyebrow { font-size: 11px; color: var(--text3); font-weight: 300; margin-bottom: 4px; }
-  .header-title { font-size: 26px; font-weight: 600; letter-spacing: -0.8px; }
+  .header-eyebrow { font-size: 11px; color: var(--text3); font-weight: 400; margin-bottom: 4px; letter-spacing: 0.02em; }
+  .header-title { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; font-family: var(--font-display); }
 
   /* TABS */
   .tabs { display: none; }
@@ -87,42 +95,45 @@
   .page.active { display: block; }
 
   /* CARDS */
-  .card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
+  .card { background: var(--bg2); border-radius: var(--radius-xl); border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; transition: border-color 0.2s var(--ease-out); }
   .card-body { padding: 16px 18px; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-  .route { font-size: 24px; font-weight: 600; letter-spacing: -0.8px; }
+  .route { font-size: 24px; font-weight: 700; letter-spacing: -0.8px; font-family: var(--font-display); }
   .route-sep { color: var(--text4); font-weight: 300; margin: 0 2px; }
   .price-block { text-align: right; }
-  .price { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .price { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; font-family: var(--font-display); }
   .price-drop { font-size: 12px; color: var(--green); margin-top: 2px; }
   .price-up { font-size: 12px; color: var(--red); margin-top: 2px; }
   .price-neutral { font-size: 12px; color: var(--text4); margin-top: 2px; }
   .card-meta { display: flex; justify-content: space-between; align-items: flex-end; }
   .dates { display: flex; flex-direction: column; gap: 3px; }
-  .date-row { font-size: 12px; color: var(--text3); font-weight: 300; }
+  .date-row { font-size: 12px; color: var(--text3); font-weight: 400; }
   .date-row strong { color: var(--text2); font-weight: 500; }
-  .card-action { border-top: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .card-action { border-top: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.15s; }
+  .card-action:active { background: var(--bg3); }
   .action-left { display: flex; flex-direction: column; gap: 2px; }
   .action-title { font-size: 13px; color: var(--text); font-weight: 400; }
-  .action-sub { font-size: 11px; color: var(--text3); font-weight: 300; }
+  .action-sub { font-size: 11px; color: var(--text3); font-weight: 400; }
   .action-arrow { font-size: 14px; color: var(--text4); }
   .action-arrow.active { color: var(--green); }
 
   /* IA */
-  .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: 14px; border: 1px solid #1A2E20; background: #0F1A12; }
-  .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.5px; margin-bottom: 6px; }
-  .ai-verdict { font-size: 15px; color: var(--green); font-weight: 600; margin-bottom: 5px; }
+  .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid #1A2E20; background: #0F1A12; }
+  .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+  .ai-verdict { font-size: 15px; color: var(--green); font-weight: 600; margin-bottom: 5px; font-family: var(--font-display); }
   .ai-text { font-size: 13px; color: #3A7A4A; line-height: 1.7; }
-  .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid #1A2E20; border-radius: 12px; background: #0F1A12; cursor: pointer; font-size: 13px; color: #3A7A4A; margin-top: 8px; }
+  .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid #1A2E20; border-radius: var(--radius-sm); background: #0F1A12; cursor: pointer; font-size: 13px; color: #3A7A4A; margin-top: 8px; transition: background 0.15s; }
+  .ai-btn:active { background: #111f13; }
 
   /* MONITOR DOT */
   .monitor-row { display: flex; align-items: center; gap: 7px; padding: 4px 2px 16px; }
-  .monitor-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text4); animation: blink 2.5s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  .monitor-text { font-size: 12px; color: var(--text4); }
+  .monitor-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 3s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:0.9;transform:scale(1)} 50%{opacity:0.2;transform:scale(0.7)} }
+  .monitor-text { font-size: 11px; color: var(--text4); letter-spacing: 0.01em; }
 
   /* EMPTY */
-  .empty { text-align: center; padding: 48px 24px; color: var(--text3); font-size: 13px; line-height: 1.7; }
+  .empty { text-align: center; padding: 56px 24px; color: var(--text4); font-size: 13px; line-height: 1.8; }
+  .empty::before { content: ''; display: block; width: 32px; height: 1px; background: var(--border2); margin: 0 auto 20px; }
 
   /* HISTÓRICO */
   .hist-item { background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); padding: 13px 16px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
@@ -138,9 +149,9 @@
   .hist-sep { font-size: 11px; color: var(--text4); padding: 12px 2px 6px; }
 
   /* CONFIG — lista de alertas */
-  .alerta-item { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
+  .alerta-item { background: var(--bg2); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; margin-bottom: 8px; }
   .alerta-header { padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
-  .alerta-route { font-size: 19px; font-weight: 600; letter-spacing: -0.5px; }
+  .alerta-route { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; font-family: var(--font-display); }
   .alerta-route span { color: var(--text4); font-weight: 300; }
   .remove-btn { font-size: 22px; color: var(--text4); cursor: pointer; padding: 0 4px; line-height: 1; }
   .remove-btn:active { color: var(--red); }
@@ -150,10 +161,10 @@
   .alerta-cia { font-size: 12px; color: var(--text4); }
 
   /* SEÇÕES */
-  .section-label { font-size: 12px; color: var(--text3); padding: 16px 2px 10px; letter-spacing: 0.3px; }
+  .section-label { font-size: 11px; color: var(--text4); padding: 16px 2px 10px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
 
   /* FORMULÁRIO */
-  .form-card { background: var(--bg2); border-radius: 18px; border: 1px solid var(--border); overflow: visible; margin-bottom: 10px; }
+  .form-card { background: var(--bg2); border-radius: var(--radius-xl); border: 1px solid var(--border); overflow: visible; margin-bottom: 10px; }
   .form-row { padding: 14px 16px; border-bottom: 1px solid var(--border); position: relative; }
   .form-row:last-child { border-bottom: none; }
   .form-row.two-col { display: flex; justify-content: space-between; gap: 8px; }
@@ -200,8 +211,8 @@
   .cal-confirm:active { opacity: 0.8; }
 
   /* BOTÕES */
-  .submit-btn { background: var(--text); color: var(--bg); border-radius: 16px; padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; }
-  .submit-btn:active { opacity: 0.8; }
+  .submit-btn { background: var(--text); color: var(--bg); border-radius: var(--radius-lg); padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; font-family: var(--font-display); letter-spacing: -0.2px; transition: opacity 0.15s, transform 0.15s var(--ease-out); }
+  .submit-btn:active { opacity: 0.85; transform: scale(0.98); }
   .submit-btn.loading { opacity: 0.5; pointer-events: none; }
 
   /* TOAST */
@@ -211,11 +222,12 @@
   .toast.error { color: var(--red); border-color: #3A1A1A; }
 
   /* BOTTOM NAV */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(13,13,13,0.97); border-top: 1px solid var(--border); padding: 12px 0 20px; display: flex; justify-content: space-around; }
-  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 20px; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(13,13,13,0.98); border-top: 1px solid var(--border); padding: 12px 0 22px; display: flex; justify-content: space-around; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; padding: 4px 20px; transition: opacity 0.15s; }
+  .nav-item:active { opacity: 0.6; }
   .nav-icon { font-size: 16px; color: var(--text4); }
   .nav-icon.on { color: var(--text); }
-  .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.3px; }
+  .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.06em; font-weight: 500; text-transform: uppercase; }
   .nav-label.on { color: var(--text2); }
 
   /* AUDITORIA */
@@ -229,9 +241,9 @@
 
   /* DASHBOARD */
   .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
-  .dash-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; }
-  .dash-stat-num { font-size: 28px; font-weight: 600; letter-spacing: -0.8px; }
-  .dash-stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .dash-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 16px; text-align: center; }
+  .dash-stat-num { font-size: 30px; font-weight: 700; letter-spacing: -1px; font-family: var(--font-display); }
+  .dash-stat-label { font-size: 10px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 5px; font-weight: 500; }
   .dash-user-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
   .dash-user-row:last-child { border-bottom: none; }
   .dash-user-info { flex: 1; min-width: 0; }
@@ -257,28 +269,36 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* LANDING */
-  #page-landing { display: none; min-height: 100vh; background: var(--bg); overflow-y: auto; padding-bottom: 48px; }
-  .landing-hero { padding: 56px 24px 40px; text-align: center; }
-  .landing-hero-icon { font-size: 52px; margin-bottom: 20px; }
-  .landing-h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; color: var(--text); line-height: 1.25; margin-bottom: 14px; }
-  .landing-lead { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 32px; }
-  .landing-cta-btn { display: block; width: 100%; background: var(--text); color: var(--bg); border: none; border-radius: 14px; padding: 17px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
-  .landing-cta-btn:active { opacity: 0.85; }
-  .landing-section { padding: 0 24px; margin-bottom: 36px; }
-  .landing-label { font-size: 10px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; }
-  .landing-h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; color: var(--text); margin-bottom: 20px; }
-  .landing-step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 22px; }
+  #page-landing { display: none; min-height: 100dvh; background: var(--bg); overflow-y: auto; padding-bottom: 56px; }
+
+  /* Hero */
+  .landing-hero { padding: 56px 24px 44px; }
+  .landing-eyebrow { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin-bottom: 18px; }
+  .landing-h1 { font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -1px; color: var(--text); line-height: 1.12; margin-bottom: 16px; }
+  .landing-lead { font-size: 15px; color: var(--text3); line-height: 1.7; margin-bottom: 32px; max-width: 38ch; }
+  .landing-cta-btn { display: block; width: 100%; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius-lg); padding: 17px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-display); letter-spacing: -0.2px; transition: opacity 0.15s, transform 0.15s var(--ease-out); }
+  .landing-cta-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  /* Sections */
+  .landing-section { padding: 0 24px; margin-bottom: 40px; }
+  .landing-label { font-size: 11px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; font-weight: 500; }
+
+  /* Steps */
+  .landing-step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
   .landing-step:last-child { margin-bottom: 0; }
-  .landing-step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text3); flex-shrink: 0; margin-top: 1px; }
-  .landing-step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .landing-step-desc { font-size: 13px; color: var(--text3); line-height: 1.55; }
-  .landing-features { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
-  .landing-feature { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-bottom: 1px solid var(--border); }
-  .landing-feature:last-child { border-bottom: none; }
-  .landing-feature-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-  .landing-feature-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .landing-feature-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
-  .landing-divider { height: 1px; background: var(--border); margin: 0 24px 36px; }
+  .landing-step-num { width: 26px; height: 26px; border-radius: 50%; background: transparent; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--accent); flex-shrink: 0; margin-top: 2px; font-family: var(--font-display); }
+  .landing-step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 5px; font-family: var(--font-display); }
+  .landing-step-desc { font-size: 13px; color: var(--text3); line-height: 1.6; }
+
+  /* Features grid - 2x2 */
+  .landing-features { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .landing-feature { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .landing-feature-mark { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; font-family: var(--font-display); }
+  .landing-feature-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.35; font-family: var(--font-display); }
+  .landing-feature-desc { font-size: 12px; color: var(--text3); line-height: 1.55; }
+  .landing-feature-icon { display: none; }
+
+  .landing-divider { height: 1px; background: var(--border); margin: 0 24px 40px; }
   .landing-footer { padding: 0 24px; text-align: center; font-size: 12px; color: var(--text4); line-height: 1.7; }
 
   /* ADMIN */
@@ -328,10 +348,10 @@
 
   <!-- Hero -->
   <div class="landing-hero">
-    <div class="landing-hero-icon">✈️</div>
-    <h1 class="landing-h1">Monitor de Passagens Aéreas</h1>
-    <p class="landing-lead">Defina um alerta de preço e relaxe. Te avisamos no Telegram, e-mail ou push quando o valor cair — com análise de IA incluída.</p>
-    <button class="landing-cta-btn" onclick="mostrarFormLogin()">Acessar o app →</button>
+    <div class="landing-eyebrow">Alertas de preço</div>
+    <h1 class="landing-h1">Monitor de<br>Passagens Aéreas</h1>
+    <p class="landing-lead">Defina uma rota e receba alertas no Telegram, e-mail ou push quando o preço cair. Com análise de IA incluída.</p>
+    <button class="landing-cta-btn" onclick="mostrarFormLogin()">Acessar o app</button>
   </div>
 
   <!-- AdSense: após hero -->
@@ -366,7 +386,7 @@
       <div class="landing-step-num">3</div>
       <div>
         <div class="landing-step-title">Você recebe o alerta na hora</div>
-        <div class="landing-step-desc">Notificação via Telegram, e-mail ou push web — com análise de IA dizendo se é bom momento para comprar.</div>
+        <div class="landing-step-desc">Notificação via Telegram, e-mail ou push web, com análise de IA dizendo se é bom momento para comprar.</div>
       </div>
     </div>
   </div>
@@ -378,32 +398,24 @@
     <div class="landing-label">Recursos</div>
     <div class="landing-features">
       <div class="landing-feature">
-        <div class="landing-feature-icon">🤖</div>
-        <div>
-          <div class="landing-feature-title">Análise de IA</div>
-          <div class="landing-feature-desc">Claude, GPT ou Gemini avaliam o preço e dizem se é hora de comprar ou aguardar.</div>
-        </div>
+        <div class="landing-feature-mark">IA</div>
+        <div class="landing-feature-title">Análise de IA</div>
+        <div class="landing-feature-desc">Claude, GPT ou Gemini avaliam o preço e dizem se é hora de comprar ou aguardar.</div>
       </div>
       <div class="landing-feature">
-        <div class="landing-feature-icon">📊</div>
-        <div>
-          <div class="landing-feature-title">Histórico de preços</div>
-          <div class="landing-feature-desc">Acompanhe a evolução do valor ao longo do tempo com gráficos por rota.</div>
-        </div>
+        <div class="landing-feature-mark">Hist.</div>
+        <div class="landing-feature-title">Histórico de preços</div>
+        <div class="landing-feature-desc">Acompanhe a evolução do valor ao longo do tempo com gráficos por rota.</div>
       </div>
       <div class="landing-feature">
-        <div class="landing-feature-icon">🔔</div>
-        <div>
-          <div class="landing-feature-title">Telegram, e-mail e push web</div>
-          <div class="landing-feature-desc">Receba alertas onde preferir. Push web funciona mesmo com o browser fechado.</div>
-        </div>
+        <div class="landing-feature-mark">Push</div>
+        <div class="landing-feature-title">Telegram, e-mail e push</div>
+        <div class="landing-feature-desc">Receba alertas onde preferir. Push web funciona mesmo com o browser fechado.</div>
       </div>
       <div class="landing-feature">
-        <div class="landing-feature-icon">📱</div>
-        <div>
-          <div class="landing-feature-title">Funciona como app (PWA)</div>
-          <div class="landing-feature-desc">Instale na tela inicial do celular para acesso rápido, sem precisar de loja de apps.</div>
-        </div>
+        <div class="landing-feature-mark">PWA</div>
+        <div class="landing-feature-title">Funciona como app</div>
+        <div class="landing-feature-desc">Instale na tela inicial do celular, sem precisar de loja de apps.</div>
       </div>
     </div>
   </div>
@@ -423,11 +435,11 @@
 
   <!-- Footer -->
   <div class="landing-footer">
-    <div style="margin-bottom:16px;">
-      <button class="landing-cta-btn" onclick="mostrarFormLogin()" style="max-width:280px;margin:0 auto;">Acessar o app →</button>
+    <div style="margin-bottom:20px;">
+      <button class="landing-cta-btn" onclick="mostrarFormLogin()" style="max-width:280px;margin:0 auto;">Acessar o app</button>
     </div>
-    <p>Sistema fechado · acesso por convite</p>
-    <p style="margin-top:4px;"><a href="https://passagens.fetadeu.com.br" style="color:var(--text4);text-decoration:none;">passagens.fetadeu.com.br</a></p>
+    <p>Acesso por convite</p>
+    <p style="margin-top:6px;"><a href="https://passagens.fetadeu.com.br" style="color:var(--text4);text-decoration:none;">passagens.fetadeu.com.br</a></p>
   </div>
 
 </div>
@@ -435,11 +447,10 @@
 <!-- ── TELA DE LOGIN ──────────────────────────────────────── -->
 
 <div id="tela-login" style="display:none;">
-  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#0D0D0D;">
+  <div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#0D0D0D;">
     <div style="text-align:center;margin-bottom:48px;">
-      <div style="font-size:36px;margin-bottom:12px;">✈️</div>
-      <div style="font-size:24px;font-weight:600;color:#F0F0F0;letter-spacing:-0.8px;">Monitor de Passagens</div>
-      <div style="font-size:13px;color:#444;margin-top:6px;">Faça login para continuar</div>
+      <div style="font-family:'Outfit',-apple-system,sans-serif;font-size:22px;font-weight:700;color:#F0F0F0;letter-spacing:-0.6px;">Monitor de Passagens</div>
+      <div style="font-size:13px;color:#444;margin-top:8px;">Faça login para continuar</div>
     </div>
 
     <!-- ETAPA 1: E-MAIL -->
@@ -754,7 +765,7 @@
   </div>
   <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
 
-  <div style="text-align:center;padding:20px 0 8px;font-size:10px;color:var(--text4);letter-spacing:0.5px;">v2026.05.21 · build 133</div>
+
 </div>
 
 <div id="tab-dash" class="page">
