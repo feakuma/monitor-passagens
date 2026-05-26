@@ -80,7 +80,13 @@
     --radius-xl: 20px; --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
-  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 70% 45% at 100% 0%, rgba(6,182,212,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 25% at 5% 85%,  rgba(6,182,212,0.04) 0%, transparent 50%);
+    color: var(--text); font-family: var(--font-body); font-size: 15px; min-height: 100vh; max-width: 480px; margin: 0 auto; padding-bottom: 80px;
+  }
 
   /* STATUS BAR & HEADER */
   .status-bar { padding: 16px 24px 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
@@ -103,7 +109,7 @@
   .route { font-size: 24px; font-weight: 700; letter-spacing: -0.8px; font-family: var(--font-display); }
   .route-sep { color: var(--text4); font-weight: 300; margin: 0 2px; }
   .price-block { text-align: right; }
-  .price { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; font-family: var(--font-mono); }
+  .price { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; font-family: var(--font-mono); color: var(--text); }
   .price-drop { font-size: 12px; color: var(--green); margin-top: 2px; }
   .price-up { font-size: 12px; color: var(--red); margin-top: 2px; }
   .price-neutral { font-size: 12px; color: var(--text4); margin-top: 2px; }
@@ -228,9 +234,9 @@
   .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; padding: 4px 20px; transition: opacity 0.15s; }
   .nav-item:active { opacity: 0.6; }
   .nav-icon { font-size: 16px; color: var(--text4); }
-  .nav-icon.on { color: var(--text); }
+  .nav-icon.on { color: var(--accent); }
   .nav-label { font-size: 9px; color: var(--text4); letter-spacing: 0.06em; font-weight: 500; text-transform: uppercase; }
-  .nav-label.on { color: var(--text2); }
+  .nav-label.on { color: var(--accent); }
 
   /* AUDITORIA */
   .audit-evento { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
@@ -335,6 +341,118 @@
   .install-toast-btn:active { opacity: 0.8; }
   .install-toast-close { font-size: 18px; color: var(--text4); cursor: pointer; flex-shrink: 0; padding: 0 4px; }
 
+  /* ═══════════════════════════════════════════
+     ANIMATIONS
+  ═══════════════════════════════════════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes cyanPulse {
+    0%,100% { opacity: 0.5; transform: scale(1); }
+    50%     { opacity: 1;   transform: scale(1.12); }
+  }
+  @keyframes ctaGlow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(6,182,212,0); }
+    50%     { box-shadow: 0 0 28px 6px rgba(6,182,212,0.22); }
+  }
+  @keyframes radarRing {
+    from { transform: scale(0.8); opacity: 0.6; }
+    to   { transform: scale(1.8); opacity: 0; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Landing page — stagger de entrada */
+    .landing-eyebrow { animation: fadeUp 0.55s var(--ease-out) 0.05s both; }
+    .landing-h1      { animation: fadeUp 0.65s var(--ease-out) 0.12s both; }
+    .landing-lead    { animation: fadeUp 0.65s var(--ease-out) 0.24s both; }
+    .landing-cta-btn {
+      animation:
+        fadeUp  0.65s var(--ease-out) 0.34s both,
+        ctaGlow 3.5s  ease-in-out    1.2s  infinite;
+    }
+    .landing-step:nth-child(1) { animation: fadeUp 0.5s var(--ease-out) 0.08s both; }
+    .landing-step:nth-child(2) { animation: fadeUp 0.5s var(--ease-out) 0.18s both; }
+    .landing-step:nth-child(3) { animation: fadeUp 0.5s var(--ease-out) 0.28s both; }
+    .landing-feature:nth-child(1) { animation: fadeUp 0.5s var(--ease-out) 0.08s both; }
+    .landing-feature:nth-child(2) { animation: fadeUp 0.5s var(--ease-out) 0.18s both; }
+    .landing-feature:nth-child(3) { animation: fadeUp 0.5s var(--ease-out) 0.28s both; }
+    .landing-feature:nth-child(4) { animation: fadeUp 0.5s var(--ease-out) 0.38s both; }
+
+    /* Cards — hover lift */
+    .card {
+      transition: border-color 0.25s var(--ease-out), transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+    }
+    .card:hover {
+      border-color: rgba(6,182,212,0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(6,182,212,0.08);
+    }
+
+    /* Feature cards hover */
+    .landing-feature {
+      transition: border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+    }
+    .landing-feature:hover {
+      border-color: rgba(6,182,212,0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Nav ativo com glow */
+    .nav-icon.on {
+      filter: drop-shadow(0 0 5px rgba(6,182,212,0.6));
+    }
+
+    /* Step numbers — pulse suave */
+    .landing-step-num {
+      animation: cyanPulse 4s ease-in-out infinite;
+    }
+
+    /* Submit/CTA botão glow */
+    .submit-btn {
+      animation: ctaGlow 4s ease-in-out 0.5s infinite;
+    }
+
+    /* Toast entrada */
+    .toast.show { animation: slideUp 0.3s var(--ease-out); }
+  }
+
+  /* Radar ring — decorativo no hero da landing */
+  .landing-radar {
+    position: absolute;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    border: 1px solid rgba(6,182,212,0.12);
+    top: -80px; right: -120px;
+    pointer-events: none;
+  }
+  .landing-radar::before,
+  .landing-radar::after {
+    content: '';
+    position: absolute;
+    inset: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(6,182,212,0.08);
+  }
+  .landing-radar::after { inset: 70px; border-color: rgba(6,182,212,0.05); }
+  @media (prefers-reduced-motion: no-preference) {
+    .landing-radar { animation: cyanPulse 6s ease-in-out infinite; }
+    .landing-radar-ring {
+      position: absolute;
+      inset: 0; border-radius: 50%;
+      border: 1px solid rgba(6,182,212,0.15);
+      animation: radarRing 3s ease-out infinite;
+    }
+  }
+
   /* iOS MODAL */
   .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; justify-content: center; }
   .ios-modal.open { display: flex; }
@@ -349,7 +467,8 @@
 <div id="page-landing">
 
   <!-- Hero -->
-  <div class="landing-hero">
+  <div class="landing-hero" style="position:relative;overflow:hidden;">
+    <div class="landing-radar"><div class="landing-radar-ring"></div></div>
     <div class="landing-eyebrow">Alertas de preço</div>
     <h1 class="landing-h1">Monitor de<br>Passagens Aéreas</h1>
     <p class="landing-lead">Defina uma rota e receba alertas no Telegram, e-mail ou push quando o preço cair. Com análise de IA incluída.</p>
