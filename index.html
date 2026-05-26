@@ -6,11 +6,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="theme-color" content="#0D0D0D">
+<meta name="theme-color" content="#070D1A">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <title>Monitor de Passagens Aéreas — Alertas de Preço com IA</title>
 <meta name="description" content="Monitore preços de passagens aéreas automaticamente. Receba alertas no Telegram, e-mail ou push web quando o valor do seu voo cair. Análise de IA para saber o melhor momento de compra.">
@@ -69,12 +69,14 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   :root {
-    --bg: #0D0D0D; --bg2: #141414; --bg3: #1A1A1A;
-    --border: #1C1C1C; --border2: #2A2A2A;
-    --text: #F0F0F0; --text2: #999; --text3: #666; --text4: #555;
-    --green: #5A9E6F; --red: #9E5A5A; --accent: #5A9E6F;
+    --bg: #070D1A; --bg2: #0D1525; --bg3: #111C2E;
+    --border: #1A2540; --border2: #243050;
+    --text: #E8F0FF; --text2: #7B93C0; --text3: #4A6080; --text4: #2D4060;
+    --green: #10B981; --red: #F43F5E; --accent: #06B6D4;
+    --accent-dim: #0891B2; --accent-glow: rgba(6,182,212,0.12);
     --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
     --radius-xl: 20px; --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -101,7 +103,7 @@
   .route { font-size: 24px; font-weight: 700; letter-spacing: -0.8px; font-family: var(--font-display); }
   .route-sep { color: var(--text4); font-weight: 300; margin: 0 2px; }
   .price-block { text-align: right; }
-  .price { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; font-family: var(--font-display); }
+  .price { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; font-family: var(--font-mono); }
   .price-drop { font-size: 12px; color: var(--green); margin-top: 2px; }
   .price-up { font-size: 12px; color: var(--red); margin-top: 2px; }
   .price-neutral { font-size: 12px; color: var(--text4); margin-top: 2px; }
@@ -118,12 +120,12 @@
   .action-arrow.active { color: var(--green); }
 
   /* IA */
-  .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid #1A2E20; background: #0F1A12; }
-  .ai-label { font-size: 10px; color: #2D5A38; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
-  .ai-verdict { font-size: 15px; color: var(--green); font-weight: 600; margin-bottom: 5px; font-family: var(--font-display); }
-  .ai-text { font-size: 13px; color: #3A7A4A; line-height: 1.7; }
-  .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid #1A2E20; border-radius: var(--radius-sm); background: #0F1A12; cursor: pointer; font-size: 13px; color: #3A7A4A; margin-top: 8px; transition: background 0.15s; }
-  .ai-btn:active { background: #111f13; }
+  .ai-block { margin-bottom: 10px; padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid rgba(6,182,212,0.2); background: rgba(6,182,212,0.05); }
+  .ai-label { font-size: 10px; color: var(--accent-dim); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+  .ai-verdict { font-size: 15px; color: var(--accent); font-weight: 600; margin-bottom: 5px; font-family: var(--font-display); }
+  .ai-text { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid rgba(6,182,212,0.15); border-radius: var(--radius-sm); background: transparent; cursor: pointer; font-size: 13px; color: var(--text2); margin-top: 8px; transition: background 0.15s; }
+  .ai-btn:active { background: var(--accent-glow); }
 
   /* MONITOR DOT */
   .monitor-row { display: flex; align-items: center; gap: 7px; padding: 4px 2px 16px; }
@@ -141,7 +143,7 @@
   .hist-route { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
   .hist-meta { font-size: 11px; color: var(--text3); }
   .hist-right { text-align: right; display: flex; flex-direction: column; gap: 3px; }
-  .hist-price { font-size: 15px; font-weight: 600; }
+  .hist-price { font-size: 15px; font-weight: 600; font-family: var(--font-mono); }
   .hist-var { font-size: 11px; }
   .hist-var.down { color: var(--green); }
   .hist-var.up { color: var(--red); }
@@ -178,48 +180,48 @@
   .autocomplete-wrap { position: relative; overflow: visible; }
   .autocomplete-input { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; letter-spacing: -0.3px; padding: 0; -webkit-appearance: none; }
   .autocomplete-input::placeholder { color: var(--text4); font-weight: 400; }
-  .autocomplete-dropdown { display: none; position: absolute; top: calc(100% + 8px); left: -16px; right: -16px; background: #202020; border: 1px solid #3A3A3A; border-radius: 16px; overflow: hidden; z-index: 999; box-shadow: 0 12px 40px rgba(0,0,0,0.9); }
+  .autocomplete-dropdown { display: none; position: absolute; top: calc(100% + 8px); left: -16px; right: -16px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-lg); overflow: hidden; z-index: 999; box-shadow: 0 16px 48px rgba(0,0,0,0.8); }
   .autocomplete-dropdown.open { display: block; }
-  .autocomplete-item { padding: 14px 16px; border-bottom: 1px solid #2A2A2A; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+  .autocomplete-item { padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 12px; }
   .autocomplete-item:last-child { border-bottom: none; }
-  .autocomplete-item:active { background: #2A2A2A; }
-  .ac-code { font-size: 15px; font-weight: 700; color: #F0F0F0; min-width: 42px; letter-spacing: 0.5px; }
-  .ac-icon { font-size: 32px; margin-left: auto; line-height: 1; filter: grayscale(1) brightness(0.6); }
+  .autocomplete-item:active { background: var(--bg2); }
+  .ac-code { font-size: 15px; font-weight: 600; color: var(--accent); min-width: 42px; letter-spacing: 0.5px; font-family: var(--font-mono); }
+  .ac-icon { font-size: 32px; margin-left: auto; line-height: 1; filter: grayscale(1) brightness(0.4); }
   .ac-info { display: flex; flex-direction: column; gap: 2px; }
-  .ac-name { font-size: 13px; color: #AAA; }
-  .ac-city { font-size: 11px; color: #666; }
+  .ac-name { font-size: 13px; color: var(--text2); }
+  .ac-city { font-size: 11px; color: var(--text3); }
 
   /* CALENDÁRIO */
   .calendar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; justify-content: center; }
   .calendar-overlay.open { display: flex; }
-  .calendar-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding-bottom: 20px; }
-  .cal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 14px auto 18px; }
-  .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px 16px; border-bottom: 1px solid #2A2A2A; margin-bottom: 8px; }
-  .cal-title { font-size: 17px; font-weight: 700; color: #F5F5F5; }
-  .cal-nav { font-size: 24px; color: #888; cursor: pointer; padding: 4px 12px; user-select: none; }
-  .cal-nav:active { color: #F0F0F0; }
+  .calendar-sheet { background: var(--bg2); border-radius: 24px 24px 0 0; border-top: 1px solid var(--border2); width: 100%; padding-bottom: 20px; }
+  .cal-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 14px auto 18px; }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px 16px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  .cal-title { font-size: 17px; font-weight: 700; color: var(--text); font-family: var(--font-display); }
+  .cal-nav { font-size: 24px; color: var(--text3); cursor: pointer; padding: 4px 12px; user-select: none; }
+  .cal-nav:active { color: var(--text); }
   .cal-table { width: 100%; border-collapse: collapse; padding: 0 8px; table-layout: fixed; }
-  .cal-table th { text-align: center; font-size: 12px; color: #555; font-weight: 600; padding: 8px 0; }
+  .cal-table th { text-align: center; font-size: 12px; color: var(--text4); font-weight: 600; padding: 8px 0; }
   .cal-table td { text-align: center; padding: 4px 0; }
-  .cal-day { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; font-size: 15px; color: #D0D0D0; border-radius: 50%; cursor: pointer; font-weight: 400; margin: 0 auto; }
-  .cal-day:active { background: #2A2A2A; }
-  .cal-day.past { color: #444; pointer-events: none; cursor: default; }
-  .cal-day.today { color: #F5F5F5; font-weight: 700; border: 1.5px solid #666; }
-  .cal-day.selected { background: #F5F5F5; color: #0D0D0D; font-weight: 700; }
-  .cal-day.in-range { background: #2A2A2A; color: #D0D0D0; border-radius: 0; }
-  .cal-confirm { margin: 8px 16px 0; background: #F5F5F5; color: #0D0D0D; border-radius: 14px; padding: 16px; text-align: center; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .cal-day { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; font-size: 15px; color: var(--text2); border-radius: 50%; cursor: pointer; font-weight: 400; margin: 0 auto; font-family: var(--font-mono); }
+  .cal-day:active { background: var(--bg3); }
+  .cal-day.past { color: var(--text4); pointer-events: none; cursor: default; }
+  .cal-day.today { color: var(--text); font-weight: 700; border: 1.5px solid var(--accent); }
+  .cal-day.selected { background: var(--accent); color: #070D1A; font-weight: 700; }
+  .cal-day.in-range { background: var(--accent-glow); color: var(--text); border-radius: 0; }
+  .cal-confirm { margin: 8px 16px 0; background: var(--accent); color: #070D1A; border-radius: var(--radius-md); padding: 16px; text-align: center; font-size: 16px; font-weight: 700; cursor: pointer; font-family: var(--font-display); transition: opacity 0.15s; }
   .cal-confirm:active { opacity: 0.8; }
 
   /* BOTÕES */
-  .submit-btn { background: var(--text); color: var(--bg); border-radius: var(--radius-lg); padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; font-family: var(--font-display); letter-spacing: -0.2px; transition: opacity 0.15s, transform 0.15s var(--ease-out); }
+  .submit-btn { background: var(--accent); color: #070D1A; border-radius: var(--radius-lg); padding: 16px; text-align: center; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 24px; font-family: var(--font-display); letter-spacing: -0.2px; transition: opacity 0.15s, transform 0.15s var(--ease-out); }
   .submit-btn:active { opacity: 0.85; transform: scale(0.98); }
   .submit-btn.loading { opacity: 0.5; pointer-events: none; }
 
   /* TOAST */
-  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #202020; border: 1px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; color: var(--text2); opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; }
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--bg3); border: 1px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; color: var(--text2); opacity: 0; transition: all 0.3s var(--ease-out); z-index: 300; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.success { color: var(--green); border-color: #1A3A22; }
-  .toast.error { color: var(--red); border-color: #3A1A1A; }
+  .toast.success { color: var(--green); border-color: rgba(16,185,129,0.3); }
+  .toast.error { color: var(--red); border-color: rgba(244,63,94,0.3); }
 
   /* BOTTOM NAV */
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 430px; margin: 0 auto; background: rgba(13,13,13,0.98); border-top: 1px solid var(--border); padding: 12px 0 22px; display: flex; justify-content: space-around; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
@@ -242,7 +244,7 @@
   /* DASHBOARD */
   .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px; }
   .dash-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 16px; text-align: center; }
-  .dash-stat-num { font-size: 30px; font-weight: 700; letter-spacing: -1px; font-family: var(--font-display); }
+  .dash-stat-num { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; font-family: var(--font-mono); }
   .dash-stat-label { font-size: 10px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 5px; font-weight: 500; }
   .dash-user-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
   .dash-user-row:last-child { border-bottom: none; }
@@ -276,7 +278,7 @@
   .landing-eyebrow { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin-bottom: 18px; }
   .landing-h1 { font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -1px; color: var(--text); line-height: 1.12; margin-bottom: 16px; }
   .landing-lead { font-size: 15px; color: var(--text3); line-height: 1.7; margin-bottom: 32px; max-width: 38ch; }
-  .landing-cta-btn { display: block; width: 100%; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius-lg); padding: 17px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-display); letter-spacing: -0.2px; transition: opacity 0.15s, transform 0.15s var(--ease-out); }
+  .landing-cta-btn { display: block; width: 100%; background: var(--accent); color: #070D1A; border: none; border-radius: var(--radius-lg); padding: 17px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-display); letter-spacing: -0.2px; transition: opacity 0.15s, transform 0.15s var(--ease-out); }
   .landing-cta-btn:active { opacity: 0.85; transform: scale(0.98); }
 
   /* Sections */
@@ -323,21 +325,21 @@
   .btn-small.danger { color: var(--red); border-color: #4A1A1A; }
 
   /* PWA INSTALL TOAST */
-  .install-toast { position: fixed; bottom: 90px; left: 16px; right: 16px; max-width: 398px; margin: 0 auto; background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; z-index: 400; transform: translateY(200px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .install-toast { position: fixed; bottom: 90px; left: 16px; right: 16px; max-width: 398px; margin: 0 auto; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 14px 16px; display: flex; align-items: center; gap: 12px; z-index: 400; transform: translateY(200px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
   .install-toast.show { transform: translateY(0); opacity: 1; }
   .install-toast-icon { font-size: 24px; flex-shrink: 0; }
   .install-toast-text { flex: 1; }
   .install-toast-title { font-size: 13px; font-weight: 500; color: var(--text); }
   .install-toast-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .install-toast-btn { background: var(--green); color: #fff; border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; }
+  .install-toast-btn { background: var(--accent); color: #070D1A; border: none; border-radius: var(--radius-sm); padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: var(--font-display); }
   .install-toast-btn:active { opacity: 0.8; }
   .install-toast-close { font-size: 18px; color: var(--text4); cursor: pointer; flex-shrink: 0; padding: 0 4px; }
 
   /* iOS MODAL */
   .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; justify-content: center; }
   .ios-modal.open { display: flex; }
-  .ios-modal-sheet { background: #1C1C1E; border-radius: 24px 24px 0 0; border-top: 1px solid #3A3A3A; width: 100%; padding: 24px 24px 40px; }
-  .ios-modal-handle { width: 40px; height: 4px; background: #3A3A3A; border-radius: 2px; margin: 0 auto 20px; }
+  .ios-modal-sheet { background: var(--bg2); border-radius: 24px 24px 0 0; border-top: 1px solid var(--border2); width: 100%; padding: 24px 24px 40px; }
+  .ios-modal-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 20px; }
 </style>
 </head>
 <body>
@@ -447,25 +449,25 @@
 <!-- ── TELA DE LOGIN ──────────────────────────────────────── -->
 
 <div id="tela-login" style="display:none;">
-  <div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:#0D0D0D;">
+  <div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--bg);">
     <div style="text-align:center;margin-bottom:48px;">
-      <div style="font-family:'Outfit',-apple-system,sans-serif;font-size:22px;font-weight:700;color:#F0F0F0;letter-spacing:-0.6px;">Monitor de Passagens</div>
-      <div style="font-size:13px;color:#444;margin-top:8px;">Faça login para continuar</div>
+      <div style="font-family:'Outfit',-apple-system,sans-serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.6px;">Monitor de Passagens</div>
+      <div style="font-size:13px;color:var(--text4);margin-top:8px;">Faça login para continuar</div>
     </div>
 
     <!-- ETAPA 1: E-MAIL -->
     <div id="login-step-email" style="width:100%;max-width:320px;">
-      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
-          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">e-mail</div>
+          <div style="font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">e-mail</div>
           <input id="login-email" type="email" placeholder="seu@email.com"
-            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;"
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:var(--text);font-family:var(--font-body);padding:0;"
             onkeyup="if(event.key==='Enter') solicitarOTP()" />
         </div>
       </div>
-      <div id="login-email-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
+      <div id="login-email-erro" style="font-size:12px;color:var(--red);padding:4px 4px 8px;display:none;"></div>
       <div id="btn-solicitar-otp" onclick="solicitarOTP()"
-        style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">
+        style="background:var(--accent);color:#070D1A;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-display);">
         Enviar código
       </div>
     </div>
@@ -473,51 +475,50 @@
     <!-- ETAPA 2: OTP -->
     <div id="login-step-otp" style="width:100%;max-width:320px;display:none;">
       <div style="text-align:center;margin-bottom:24px;">
-        <div style="font-size:13px;color:#888;">Código enviado para</div>
-        <div id="login-email-display" style="font-size:14px;color:#F0F0F0;font-weight:500;margin-top:4px;"></div>
+        <div style="font-size:13px;color:var(--text3);">Código enviado para</div>
+        <div id="login-email-display" style="font-size:14px;color:var(--text);font-weight:500;margin-top:4px;"></div>
       </div>
-      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:12px;">
         <div style="padding:16px 18px;">
-          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">código de 6 dígitos</div>
+          <div style="font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">código de 6 dígitos</div>
           <input id="login-otp" type="number" placeholder="000000" maxlength="6"
-            style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;letter-spacing:6px;padding:0;"
+            style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:var(--accent);font-family:var(--font-mono);font-weight:600;letter-spacing:6px;padding:0;"
             onkeyup="if(event.key==='Enter') verificarOTP()" />
         </div>
       </div>
-      <div id="login-otp-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
+      <div id="login-otp-erro" style="font-size:12px;color:var(--red);padding:4px 4px 8px;display:none;"></div>
       <div id="btn-verificar-otp" onclick="verificarOTP()"
-        style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;">
+        style="background:var(--accent);color:#070D1A;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;font-family:var(--font-display);">
         Entrar
       </div>
-      <div onclick="voltarParaEmail()" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;">← Usar outro e-mail</div>
-      <div id="btn-reenviar-otp" onclick="solicitarOTP(true)" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;display:none;">Reenviar código</div>
+      <div onclick="voltarParaEmail()" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;">← Usar outro e-mail</div>
+      <div id="btn-reenviar-otp" onclick="solicitarOTP(true)" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;display:none;">Reenviar código</div>
     </div>
 
     <!-- ETAPA 3: CADASTRO VIA CONVITE -->
     <div id="login-step-convite" style="width:100%;max-width:320px;display:none;">
       <div style="text-align:center;margin-bottom:24px;">
-        <div style="font-size:20px;margin-bottom:8px;">🎉</div>
-        <div style="font-size:16px;color:#F0F0F0;font-weight:600;">Criar sua conta</div>
-        <div id="convite-email-display" style="font-size:13px;color:#888;margin-top:6px;"></div>
+        <div style="font-size:16px;color:var(--text);font-weight:600;font-family:var(--font-display);">Criar sua conta</div>
+        <div id="convite-email-display" style="font-size:13px;color:var(--text3);margin-top:6px;"></div>
       </div>
-      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:18px;overflow:hidden;margin-bottom:12px;">
-        <div style="padding:16px 18px;border-bottom:1px solid #1C1C1C;">
-          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">seu nome</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:12px;">
+        <div style="padding:16px 18px;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">seu nome</div>
           <input id="convite-nome" type="text" placeholder="Como quer ser chamado?"
-            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:var(--text);font-family:var(--font-body);padding:0;" />
         </div>
         <div style="padding:16px 18px;">
-          <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">telegram chat id</div>
+          <div style="font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">telegram chat id</div>
           <input id="convite-chatid" type="number" placeholder="ex: 123456789 (opcional)"
-            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:0;" />
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:var(--text);font-family:var(--font-mono);padding:0;" />
         </div>
       </div>
-      <div style="background:#141414;border:1px solid #1C1C1C;border-radius:12px;padding:14px 16px;margin-bottom:16px;">
-        <div style="font-size:12px;color:#666;line-height:1.6;">💡 Para obter seu Chat ID:<br>1. Abra o Telegram<br>2. Busque <strong style="color:#888;">@userinfobot</strong><br>3. Envie /start e copie o ID</div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--text3);line-height:1.6;">Para obter seu Chat ID:<br>1. Abra o Telegram<br>2. Busque <strong style="color:var(--text2);">@userinfobot</strong><br>3. Envie /start e copie o ID</div>
       </div>
-      <div id="convite-erro" style="font-size:12px;color:#9E5A5A;padding:4px 4px 8px;display:none;"></div>
+      <div id="convite-erro" style="font-size:12px;color:var(--red);padding:4px 4px 8px;display:none;"></div>
       <div id="btn-criar-conta" onclick="criarContaConvite()"
-        style="background:#F0F0F0;color:#0D0D0D;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;">
+        style="background:var(--accent);color:#070D1A;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-display);">
         Criar minha conta
       </div>
     </div>
@@ -803,10 +804,10 @@
 
 <!-- Modal Editar Usuário (Admin) -->
 <div id="modal-edit-usuario" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
-  <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px;padding:28px;max-width:360px;width:100%;max-height:90vh;overflow-y:auto;">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:28px;max-width:360px;width:100%;max-height:90vh;overflow-y:auto;">
     <div style="margin-bottom:20px;">
-      <div id="modal-edit-nome" style="font-size:17px;font-weight:600;color:#F0F0F0;margin-bottom:4px;"></div>
-      <div id="modal-edit-email" style="font-size:12px;color:#666;"></div>
+      <div id="modal-edit-nome" style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:4px;font-family:var(--font-display);"></div>
+      <div id="modal-edit-email" style="font-size:12px;color:var(--text3);"></div>
     </div>
 
     <!-- Percentual mínimo -->
@@ -841,7 +842,7 @@
     </div>
 
     <div style="display:flex;gap:8px;">
-      <div onclick="adminSalvarEdicao()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;">Salvar</div>
+      <div onclick="adminSalvarEdicao()" style="flex:1;background:var(--accent);color:#070D1A;border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-display);">Salvar</div>
       <div onclick="adminFecharEdicao()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer;">Cancelar</div>
     </div>
   </div>
@@ -849,22 +850,21 @@
 
 <!-- Modal sem Chat ID -->
 <div id="modal-sem-chatid" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;padding:24px;">
-  <div style="background:#141414;border:1px solid #2A2A2A;border-radius:24px;padding:28px;max-width:320px;width:100%;">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:28px;max-width:320px;width:100%;">
     <div style="text-align:center;margin-bottom:20px;">
-      <div style="font-size:32px;margin-bottom:12px;">📧</div>
-      <div style="font-size:17px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">Sem Telegram?</div>
-      <div style="font-size:13px;color:#888;line-height:1.6;">Sem problema! Você receberá os alertas de queda de preço diretamente no seu <strong style="color:#F0F0F0;">e-mail</strong>.</div>
+      <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:8px;font-family:var(--font-display);">Sem Telegram?</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Sem problema. Você receberá os alertas de queda de preço diretamente no seu <strong style="color:var(--text);">e-mail</strong>.</div>
     </div>
-    <div style="background:#1A1A1A;border-radius:12px;padding:14px;margin-bottom:20px;">
-      <div style="font-size:12px;color:#666;line-height:1.7;">
-        💡 Se quiser ativar o Telegram depois:<br>
-        1. Busque <strong style="color:#888;">@userinfobot</strong> no Telegram<br>
+    <div style="background:var(--bg3);border-radius:12px;padding:14px;margin-bottom:20px;">
+      <div style="font-size:12px;color:var(--text3);line-height:1.7;">
+        Para ativar o Telegram depois:<br>
+        1. Busque <strong style="color:var(--text2);">@userinfobot</strong> no Telegram<br>
         2. Envie /start para obter seu Chat ID<br>
         3. Atualize seu perfil nas configurações
       </div>
     </div>
-    <div onclick="confirmarSemChatId()" style="background:#F0F0F0;color:#0D0D0D;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">Entendido, continuar</div>
-    <div onclick="fecharModalSemChatId()" style="text-align:center;font-size:13px;color:#444;cursor:pointer;padding:8px;">← Voltar e adicionar Chat ID</div>
+    <div onclick="confirmarSemChatId()" style="background:var(--accent);color:#070D1A;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:var(--font-display);">Entendido, continuar</div>
+    <div onclick="fecharModalSemChatId()" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;">← Voltar e adicionar Chat ID</div>
   </div>
 </div>
 
@@ -906,35 +906,34 @@
   <div class="ios-modal-sheet">
     <div class="ios-modal-handle"></div>
     <div style="text-align:center;margin-bottom:20px;">
-      <div style="font-size:32px;margin-bottom:10px;">📱</div>
-      <div style="font-size:17px;font-weight:600;color:#F0F0F0;margin-bottom:6px;">Adicionar à tela inicial</div>
-      <div style="font-size:13px;color:#888;">Siga os passos abaixo no Safari</div>
+      <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:6px;font-family:var(--font-display);">Adicionar à tela inicial</div>
+      <div style="font-size:13px;color:var(--text3);">Siga os passos abaixo no Safari</div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;">
-      <div style="display:flex;align-items:center;gap:14px;background:#141414;border-radius:12px;padding:14px;">
-        <div style="font-size:22px;width:32px;text-align:center;">1</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:12px;padding:14px;">
+        <div style="font-size:14px;font-weight:600;width:32px;text-align:center;color:var(--accent);font-family:var(--font-mono);">1</div>
         <div>
-          <div style="font-size:13px;color:#F0F0F0;margin-bottom:2px;">Toque no botão compartilhar</div>
-          <div style="font-size:12px;color:#666;">Ícone ↑ na barra inferior do Safari</div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:2px;">Toque no botão compartilhar</div>
+          <div style="font-size:12px;color:var(--text3);">Ícone ↑ na barra inferior do Safari</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:14px;background:#141414;border-radius:12px;padding:14px;">
-        <div style="font-size:22px;width:32px;text-align:center;">2</div>
+      <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:12px;padding:14px;">
+        <div style="font-size:14px;font-weight:600;width:32px;text-align:center;color:var(--accent);font-family:var(--font-mono);">2</div>
         <div>
-          <div style="font-size:13px;color:#F0F0F0;margin-bottom:2px;">Toque em "Adicionar à tela de início"</div>
-          <div style="font-size:12px;color:#666;">Role para baixo nas opções se necessário</div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:2px;">Toque em "Adicionar à tela de início"</div>
+          <div style="font-size:12px;color:var(--text3);">Role para baixo nas opções se necessário</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:14px;background:#141414;border-radius:12px;padding:14px;">
-        <div style="font-size:22px;width:32px;text-align:center;">3</div>
+      <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:12px;padding:14px;">
+        <div style="font-size:14px;font-weight:600;width:32px;text-align:center;color:var(--accent);font-family:var(--font-mono);">3</div>
         <div>
-          <div style="font-size:13px;color:#F0F0F0;margin-bottom:2px;">Toque em "Adicionar"</div>
-          <div style="font-size:12px;color:#666;">O app aparecerá na sua tela inicial</div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:2px;">Toque em "Adicionar"</div>
+          <div style="font-size:12px;color:var(--text3);">O app aparecerá na sua tela inicial</div>
         </div>
       </div>
     </div>
     <div onclick="document.getElementById('ios-modal').classList.remove('open');fecharInstallToast();"
-      style="background:#F0F0F0;color:#0D0D0D;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;">
+      style="background:var(--accent);color:#070D1A;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-display);">
       Entendido!
     </div>
   </div>
