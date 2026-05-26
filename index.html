@@ -79,6 +79,8 @@
     --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
     --radius-xl: 20px; --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in:  cubic-bezier(0.55, 0, 1, 0.45);
+    --spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   body {
     background: var(--bg);
@@ -451,6 +453,136 @@
       border: 1px solid rgba(6,182,212,0.15);
       animation: radarRing 3s ease-out infinite;
     }
+  }
+
+  /* ═══════════════════════════════════════════
+     INTERACTIONS — skeletons · ripple · stagger · spring · transitions
+  ═══════════════════════════════════════════ */
+
+  /* ── Skeleton shimmer ── */
+  @keyframes skeleton-shimmer {
+    0%   { background-position: -300px 0; }
+    100% { background-position:  300px 0; }
+  }
+  .skel {
+    background: linear-gradient(
+      90deg,
+      var(--bg3) 0%,
+      rgba(6,182,212,0.07) 40%,
+      var(--bg3) 80%
+    );
+    background-size: 600px 100%;
+    border-radius: var(--radius-sm);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .skel { animation: skeleton-shimmer 1.6s ease-in-out infinite; }
+  }
+
+  /* Skeleton card matching real card layout */
+  .skeleton-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .skeleton-card .sk-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .skeleton-card .sk-route { height: 24px; width: 42%; border-radius: 6px; }
+  .skeleton-card .sk-price { height: 22px; width: 26%; border-radius: 6px; }
+  .skeleton-card .sk-meta  { display: flex; gap: 8px; margin-bottom: 10px; }
+  .skeleton-card .sk-pill  { height: 14px; width: 90px; border-radius: 20px; }
+  .skeleton-card .sk-pill.lg { width: 130px; }
+  .skeleton-card .sk-action { height: 40px; border-radius: var(--radius-sm); margin: 0 -18px -16px; border-top: 1px solid var(--border); }
+
+  /* ── Card entrance stagger ── */
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card-in {
+    opacity: 0;
+    animation: cardIn 0.42s var(--ease-out) both;
+  }
+
+  /* ── Ripple on tap ── */
+  @keyframes rippleOut {
+    0%   { transform: scale(0);   opacity: 0.35; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+  .ripple-host { position: relative; overflow: hidden; }
+  .ripple-dot {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    pointer-events: none;
+    transform: scale(0);
+    margin-left: -40px; margin-top: -40px;
+    animation: rippleOut 0.55s var(--ease-out) forwards;
+  }
+  .ripple-dot-dark {
+    background: rgba(6,182,212,0.22);
+  }
+
+  /* ── Spring press on buttons ── */
+  @media (prefers-reduced-motion: no-preference) {
+    .submit-btn, .landing-cta-btn {
+      transition: transform 0.12s var(--spring), filter 0.12s var(--ease-out);
+    }
+    .submit-btn:active, .landing-cta-btn:active {
+      transform: scale(0.96) translateY(1px);
+      filter: brightness(1.15);
+    }
+
+    /* card-action tactile press */
+    .card-action {
+      transition: background 0.12s var(--ease-out), transform 0.1s var(--spring);
+    }
+    .card-action:active {
+      background: var(--bg3);
+      transform: scale(0.99);
+    }
+  }
+
+  /* ── Page tab entrance ── */
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .page.active { animation: pageIn 0.3s var(--ease-out) both; }
+  }
+
+  /* ── Price-drop flash ── */
+  @keyframes priceDropFlash {
+    0%   { color: var(--text); }
+    30%  { color: var(--green); text-shadow: 0 0 12px rgba(16,185,129,0.6); }
+    100% { color: var(--text); text-shadow: none; }
+  }
+  .price.flash-drop {
+    animation: priceDropFlash 1.4s var(--ease-out) forwards;
+  }
+
+  /* ── Nav active indicator line ── */
+  .nav-item {
+    position: relative;
+    transition: transform 0.1s var(--spring);
+  }
+  .nav-item:active { transform: scale(0.92); }
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 50%; transform: translateX(-50%) scaleX(0);
+    width: 18px; height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: transform 0.25s var(--spring), opacity 0.25s var(--ease-out);
+    opacity: 0;
+  }
+  .nav-item.nav-active::after {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
   }
 
   /* iOS MODAL */
@@ -1122,6 +1254,114 @@
 
 <!-- ── ENTRY POINT ─────────────────────────────────────────── -->
 <script type="module" src="js/app.js"></script>
+
+<!-- ── MICROINTERACTIONS ─────────────────────────────────── -->
+<script>
+(function() {
+  /* ── Ripple helper ──────────────────────────────────────── */
+  function spawnRipple(el, e, dark) {
+    const rect = el.getBoundingClientRect();
+    const dot  = document.createElement('span');
+    dot.className = 'ripple-dot' + (dark ? ' ripple-dot-dark' : '');
+    dot.style.left = (e.clientX - rect.left)  + 'px';
+    dot.style.top  = (e.clientY - rect.top)   + 'px';
+    el.appendChild(dot);
+    dot.addEventListener('animationend', () => dot.remove(), { once: true });
+  }
+
+  function attachRipple(selector, dark) {
+    document.querySelectorAll(selector).forEach(el => {
+      if (el.dataset.ripple) return;
+      el.dataset.ripple = '1';
+      el.classList.add('ripple-host');
+      el.addEventListener('pointerdown', e => spawnRipple(el, e, dark));
+    });
+  }
+
+  /* Attach to static buttons on load */
+  function initRipples() {
+    attachRipple('.submit-btn',      false);
+    attachRipple('.landing-cta-btn', false);
+    attachRipple('.card-action',     true);
+  }
+
+  /* ── Card entrance stagger via MutationObserver ─────────── */
+  function staggerNewCards(container) {
+    const cards = container.querySelectorAll(
+      '.card:not(.card-in-done), [class*="alerta-card"]:not(.card-in-done), [class*="hist-"]:not(.card-in-done)'
+    );
+    cards.forEach((card, i) => {
+      card.classList.add('card-in', 'card-in-done');
+      card.style.animationDelay = (i * 65) + 'ms';
+    });
+  }
+
+  function watchList(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const obs = new MutationObserver(() => {
+      /* small tick so DOM is fully painted */
+      requestAnimationFrame(() => staggerNewCards(el));
+      /* re-attach ripple to any new card-actions */
+      requestAnimationFrame(() => attachRipple('.card-action', true));
+    });
+    obs.observe(el, { childList: true, subtree: true });
+  }
+
+  ['alertas-list','historico-list','config-alertas-list','admin-usuarios-list']
+    .forEach(watchList);
+
+  /* ── Skeleton helper (callable by app.js or inline) ─────── */
+  window.mostrarSkeleton = function(containerId, count) {
+    count = count || 3;
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = Array.from({ length: count }, () => `
+      <div class="skeleton-card">
+        <div class="sk-row">
+          <div class="skel sk-route"></div>
+          <div class="skel sk-price"></div>
+        </div>
+        <div class="sk-meta">
+          <div class="skel sk-pill lg"></div>
+          <div class="skel sk-pill"></div>
+        </div>
+        <div class="skel sk-action"></div>
+      </div>`).join('');
+  };
+
+  /* ── Nav active indicator ─────────────────────────────────── */
+  function syncNavIndicator() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      const icon = item.querySelector('.nav-icon');
+      const isActive = icon && icon.classList.contains('on');
+      item.classList.toggle('nav-active', isActive);
+    });
+  }
+
+  /* watch nav icons for .on class changes */
+  const navEl = document.querySelector('.bottom-nav');
+  if (navEl) {
+    syncNavIndicator();
+    new MutationObserver(syncNavIndicator)
+      .observe(navEl, { attributes: true, subtree: true, attributeFilter: ['class'] });
+  }
+
+  /* ── Show skeletons while lists are initially empty ──────── */
+  document.addEventListener('DOMContentLoaded', () => {
+    initRipples();
+    const alertasList   = document.getElementById('alertas-list');
+    const historicoList = document.getElementById('historico-list');
+    if (alertasList   && alertasList.querySelector('.empty'))   window.mostrarSkeleton('alertas-list',   3);
+    if (historicoList && historicoList.querySelector('.empty')) window.mostrarSkeleton('historico-list', 3);
+  });
+
+  /* init ripples after any dynamic modal opens */
+  document.addEventListener('click', () => {
+    requestAnimationFrame(() => attachRipple('.card-action', true));
+  });
+})();
+</script>
 
 </body>
 </html>
