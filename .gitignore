@@ -1,0 +1,22 @@
+# Cloudflare Wrangler — cache local e credenciais de conta
+.wrangler/
+
+# Variáveis de ambiente locais — NUNCA comitar
+.env
+.env.local
+.env.*.local
+.dev.vars
+
+# Segredos do wrangler em desenvolvimento
+wrangler.toml.bak
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/settings.json
+.idea/
+
+# Logs
+*.log
