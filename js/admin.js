@@ -2,7 +2,7 @@
 //  admin.js — Painel admin, configs do usuário e config de IA
 // ============================================================
 
-import { WORKER_URL, getSessao, showToast } from './config.js';
+import { WORKER_URL, getSessao, showToast, esc, escAttr } from './config.js';
 
 var _cfgPctAtual = 0;
 
@@ -178,16 +178,16 @@ export function carregarUsuarios() {
         return '<div class="usuario-card usuario-card-pendente">' +
           '<div class="usuario-header">' +
             '<div>' +
-              '<div class="usuario-nome" style="color:var(--text2);">✉️ ' + u.email + '</div>' +
-              '<div class="usuario-email">Convite enviado em ' + dataConvite + '</div>' +
+              '<div class="usuario-nome" style="color:var(--text2);">✉️ ' + esc(u.email) + '</div>' +
+              '<div class="usuario-email">Convite enviado em ' + esc(dataConvite) + '</div>' +
             '</div>' +
             '<div class="usuario-badges">' +
               '<span class="badge badge-yellow">aguardando</span>' +
             '</div>' +
           '</div>' +
           '<div class="usuario-actions">' +
-            '<div class="btn-small" onclick="adminReenviarConvite(\'' + u.email + '\')">📨 Reenviar</div>' +
-            '<div class="btn-small danger" onclick="adminCancelarConvite(\'' + u.token + '\', \'' + u.email + '\')">Cancelar</div>' +
+            '<div class="btn-small" onclick="adminReenviarConvite(\'' + escAttr(u.email) + '\')">📨 Reenviar</div>' +
+            '<div class="btn-small danger" onclick="adminCancelarConvite(\'' + escAttr(u.token) + '\', \'' + escAttr(u.email) + '\')">Cancelar</div>' +
           '</div>' +
         '</div>';
       }
@@ -195,8 +195,8 @@ export function carregarUsuarios() {
       return '<div class="usuario-card">' +
         '<div class="usuario-header">' +
           '<div>' +
-            '<div class="usuario-nome" style="cursor:pointer;text-decoration:underline dotted;" onclick="adminVerAlertas(\'' + u.email + '\', \'' + u.nome.replace(/'/g, "\\'") + '\')">' + u.nome + '</div>' +
-            '<div class="usuario-email">' + u.email + '</div>' +
+            '<div class="usuario-nome" style="cursor:pointer;text-decoration:underline dotted;" onclick="adminVerAlertas(\'' + escAttr(u.email) + '\', \'' + escAttr(u.nome) + '\')">' + esc(u.nome) + '</div>' +
+            '<div class="usuario-email">' + esc(u.email) + '</div>' +
           '</div>' +
           '<div class="usuario-badges">' +
             (u.isAdmin   ? '<span class="badge badge-purple">admin</span>'    : '') +
@@ -206,18 +206,18 @@ export function carregarUsuarios() {
           '</div>' +
         '</div>' +
         '<div class="usuario-meta">' +
-          '<div class="usuario-meta-item">Chat ID: <strong>' + (u.chatId || '—') + '</strong></div>' +
+          '<div class="usuario-meta-item">Chat ID: <strong>' + esc(u.chatId || '—') + '</strong></div>' +
           '<div class="usuario-meta-item">Alertas: <strong>' + (u.totalAlertas || 0) + '</strong></div>' +
           '<div class="usuario-meta-item">Queda mín: <strong>' + (u.percentualMinimo || 0) + '%</strong></div>' +
           '<div class="usuario-meta-item">Limite: <strong>' + (u.limiteAlertas ?? 10) + '</strong></div>' +
         '</div>' +
         '<div class="usuario-actions">' +
-          '<div class="btn-small" onclick="adminAbrirEdicao(\'' + u.email + '\')">✏️ Editar</div>' +
-          '<div class="btn-small" onclick="adminVerAudit(\'' + u.email + '\', \'' + u.nome.replace(/'/g, "\\'") + '\')">📋 Audit</div>' +
+          '<div class="btn-small" onclick="adminAbrirEdicao(\'' + escAttr(u.email) + '\')">✏️ Editar</div>' +
+          '<div class="btn-small" onclick="adminVerAudit(\'' + escAttr(u.email) + '\', \'' + escAttr(u.nome) + '\')">📋 Audit</div>' +
           (u.ativo
-            ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', false)">Desativar</div>'
-            : '<div class="btn-small" onclick="adminToggleAtivo(\'' + u.email + '\', true)">Ativar</div>') +
-          (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + u.email + '\', \'' + u.nome + '\')">Remover</div>' : '') +
+            ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + escAttr(u.email) + '\', false)">Desativar</div>'
+            : '<div class="btn-small" onclick="adminToggleAtivo(\'' + escAttr(u.email) + '\', true)">Ativar</div>') +
+          (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + escAttr(u.email) + '\', \'' + escAttr(u.nome) + '\')">Remover</div>' : '') +
         '</div>' +
       '</div>';
     }).join('');
@@ -518,15 +518,15 @@ export function adminVerAlertas(email, nome) {
       return '<div class="card" style="margin-bottom:10px;">' +
         '<div class="card-body">' +
           '<div class="card-top">' +
-            '<div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div>' +
+            '<div class="route">' + esc(a.origem) + '<span class="route-sep"> → </span>' + esc(a.destino) + '</div>' +
             (temPreco ? '<div class="price-block">' +
               '<div class="price">R$ ' + a.precoAtual.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '</div>' +
               (a.variacao !== 0 ? '<div class="' + varClass + '">' + varSinal + Math.abs(a.variacao) + '%</div>' : '') +
             '</div>' : '') +
           '</div>' +
           '<div class="dates">' +
-            (a.dataIda   ? '<div class="date-row">ida <strong>' + a.dataIda + '</strong></div>' : '') +
-            (a.dataVolta ? '<div class="date-row">volta <strong>' + a.dataVolta + '</strong></div>' : '') +
+            (a.dataIda   ? '<div class="date-row">ida <strong>' + esc(a.dataIda) + '</strong></div>' : '') +
+            (a.dataVolta ? '<div class="date-row">volta <strong>' + esc(a.dataVolta) + '</strong></div>' : '') +
           '</div>' +
           sparkHTML +
         '</div>' +
@@ -629,7 +629,7 @@ function _buscarAudit(email) {
           '<div class="audit-icon">' + icone + '</div>' +
           '<div class="audit-body">' +
             '<div class="audit-tipo">' + label + '</div>' +
-            (e.detalhe ? '<div class="audit-detalhe">' + e.detalhe + '</div>' : '') +
+            (e.detalhe ? '<div class="audit-detalhe">' + esc(e.detalhe) + '</div>' : '') +
             '<div class="audit-ts">' + tsStr + '</div>' +
           '</div>' +
         '</div>';
@@ -677,9 +677,9 @@ export function carregarDashboard() {
           : '—';
         return '<div class="dash-user-row">' +
           '<div class="dash-user-info">' +
-            '<div class="dash-user-name">' + u.nome + '</div>' +
-            '<div class="dash-user-email">' + u.email + '</div>' +
-            '<div class="dash-user-meta">último acesso: ' + ts + '</div>' +
+            '<div class="dash-user-name">' + esc(u.nome) + '</div>' +
+            '<div class="dash-user-email">' + esc(u.email) + '</div>' +
+            '<div class="dash-user-meta">último acesso: ' + esc(ts) + '</div>' +
           '</div>' +
           '<div style="display:flex;gap:16px;align-items:center;">' +
             '<div style="text-align:center;">' +
@@ -700,7 +700,7 @@ export function carregarDashboard() {
     if (data.rotasTop && data.rotasTop.length) {
       rotasEl.innerHTML = '<div class="card">' + data.rotasTop.map(function (r) {
         return '<div class="dash-rota-row">' +
-          '<div style="font-size:15px;font-weight:500;">' + r.rota + '</div>' +
+          '<div style="font-size:15px;font-weight:500;">' + esc(r.rota) + '</div>' +
           '<div style="font-size:13px;color:var(--text2);">' + r.count + '×</div>' +
         '</div>';
       }).join('') + '</div>';

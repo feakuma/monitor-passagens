@@ -2,7 +2,7 @@
 //  ui.js — Render de alertas, histórico, config, tabs, autocomplete, CRUD
 // ============================================================
 
-import { getSessao, showToast, formatData, formatDataCurta } from './config.js';
+import { getSessao, showToast, formatData, formatDataCurta, esc, escAttr } from './config.js';
 import { alertasData, carregarAlertas, adicionarAlertaAPI, removerAlertaAPI, analisarAlertaAPI } from './api.js';
 import { renderGraficos } from './charts.js';
 
@@ -123,7 +123,7 @@ export function renderAlertas() {
     return '<div class="card">' +
       '<div class="card-body">' +
         '<div class="card-top">' +
-          '<div class="route">' + a.origem + '<span class="route-sep"> → </span>' + a.destino + '</div>' +
+          '<div class="route">' + esc(a.origem) + '<span class="route-sep"> → </span>' + esc(a.destino) + '</div>' +
           '<div class="price-block"><div class="price">' + precoStr + '</div><div class="' + varClass + '">' + varStr + '</div></div>' +
         '</div>' +
         '<div class="card-meta"><div class="dates">' +
@@ -132,10 +132,10 @@ export function renderAlertas() {
         '</div></div>' +
       '</div>' +
       (temHist ? '<div style="padding:0 16px 16px;"><canvas id="chart-' + a.id + '" height="80"></canvas></div>' : '') +
-      '<div class="card-action" onclick="window.open(\'' + url + '\',\'_blank\')">' +
+      '<div class="card-action" onclick="window.open(\'' + escAttr(url) + '\',\'_blank\')">' +
         '<div class="action-left">' +
           '<div class="action-title">Buscar no Google Flights</div>' +
-          '<div class="action-sub">' + a.origem + ' → ' + a.destino + ' · ' + formatDataCurta(a.dataIda) + '</div>' +
+          '<div class="action-sub">' + esc(a.origem) + ' → ' + esc(a.destino) + ' · ' + formatDataCurta(a.dataIda) + '</div>' +
         '</div>' +
         '<div class="action-arrow ' + (temQueda ? 'active' : '') + '">↗</div>' +
       '</div>' +
@@ -187,7 +187,7 @@ export function renderHistorico() {
 
     var checkDateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     html += '<div class="hist-item">' +
-      '<div class="hist-left"><div class="hist-route">' + item.rota + '</div><div class="hist-meta">ida ' + formatData(item.dataIda) + '</div></div>' +
+      '<div class="hist-left"><div class="hist-route">' + esc(item.rota) + '</div><div class="hist-meta">ida ' + formatData(item.dataIda) + '</div></div>' +
       '<div class="hist-right"><div class="hist-price">R$ ' + item.preco.toFixed(2).replace('.', ',') + '</div><div class="' + varClass + '">' + varStr + '</div><div class="hist-check">checagem ' + checkDateStr + ' ' + timeStr + '</div></div>' +
     '</div>';
   });
@@ -205,7 +205,7 @@ export function renderConfigAlertas() {
   el.innerHTML = alertasData.map(function (a) {
     return '<div class="alerta-item">' +
       '<div class="alerta-header">' +
-        '<div class="alerta-route">' + a.origem + ' <span>→</span> ' + a.destino + '</div>' +
+        '<div class="alerta-route">' + esc(a.origem) + ' <span>→</span> ' + esc(a.destino) + '</div>' +
         '<div class="remove-btn" onclick="removerAlerta(' + a.indice + ')">×</div>' +
       '</div>' +
       '<div class="alerta-dates">' +

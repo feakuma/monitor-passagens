@@ -49,3 +49,35 @@ export function formatDataCurta2(dt) {
   var m = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   return dt.getDate() + ' ' + m[dt.getMonth()];
 }
+
+// XSS PREVENTION ──────────────────────────────────────────────
+
+/**
+ * Escapa texto para inserção segura como conteúdo innerHTML.
+ * Usa em: + valor + dentro de tags HTML.
+ */
+export function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Escapa valor para uso dentro de onclick="func('VALUE')".
+ * Aplica JS escaping (quebra de string) + HTML attr escaping.
+ * Uso: onclick="func(\'' + escAttr(val) + '\')"
+ */
+export function escAttr(s) {
+  var js = String(s == null ? '' : s)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r?\n/g, ' ');
+  return js
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
