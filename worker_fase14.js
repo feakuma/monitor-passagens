@@ -487,36 +487,17 @@ var worker_fase14_default = {
         const sessao = await requireAdmin(request);
         if (!sessao) return json({ erro: "Acesso negado" }, 403);
 
-        const url = new URL(request.url);
-        const ate = url.searchParams.get("ate") || new Date().toISOString().slice(0, 10);
-        const de  = url.searchParams.get("de")  || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+        const dashUrl = new URL(request.url);
+        const ate = dashUrl.searchParams.get("ate") || new Date().toISOString().slice(0, 10);
+        const de  = dashUrl.searchParams.get("de")  || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
-        // Soma buckets diários de acesso e notificações dentro do período
-        const bucketKeys = await redisKeys("acessos:*") || [];
-        const pushKeys   = await redisKeys("notif_push:*") || [];
-        const acessosPorEmail = {};
-        const pushPorEmail    = {};
-
-        for (const key of bucketKeys) {
-          // formato: acessos:email@x.com:2026-05-17
-          const parts = key.split(":");
-          if (parts.length < 3) continue;
-          const dataKey = parts[parts.length - 1];
-          if (dataKey < de || dataKey > ate) continue;
-          const emailKey = parts.slice(1, -1).join(":");
-          const count = parseInt(await redisCmd("GET", key) || 0);
-          acessosPorEmail[emailKey] = (acessosPorEmail[emailKey] || 0) + count;
-        }
-
-        for (const key of pushKeys) {
-          // formato: notif_push:email@x.com:2026-05-17
-          const parts = key.split(":");
-          if (parts.length < 3) continue;
-          const dataKey = parts[parts.length - 1];
-          if (dataKey < de || dataKey > ate) continue;
-          const emailKey = parts.slice(1, -1).join(":");
-          const count = parseInt(await redisCmd("GET", key) || 0);
-          pushPorEmail[emailKey] = (pushPorEmail[emailKey] || 0) + count;
+        // Gera lista de datas no intervalo — evita KEYS scan O(N) no Redis
+        const dates = [];
+        let dCursor = new Date(de);
+        const dFim  = new Date(ate);
+        while (dCursor <= dFim) {
+          dates.push(dCursor.toISOString().slice(0, 10));
+          dCursor.setDate(dCursor.getDate() + 1);
         }
 
         const emails = await getAllUsuarioEmails();
@@ -540,8 +521,15 @@ var worker_fase14_default = {
             totalChecagens += hist.length;
           }
 
+          // Soma acessos e push no período — lookup direto por email:data sem KEYS scan
+          let totalAcesso = 0, totalPush = 0;
+          for (const date of dates) {
+            totalAcesso += parseInt(await redisCmd("GET", `acessos:${email}:${date}`) || 0);
+            totalPush   += parseInt(await redisCmd("GET", `notif_push:${email}:${date}`) || 0);
+          }
+
           const ultimoAcesso = await redisCmd("GET", `ultimo_acesso:${u.email}`);
-          acessos.push({ nome: u.nome, email: u.email, acessos: acessosPorEmail[u.email] || 0, push: pushPorEmail[u.email] || 0, ultimoAcesso: ultimoAcesso || null });
+          acessos.push({ nome: u.nome, email: u.email, acessos: totalAcesso, push: totalPush, ultimoAcesso: ultimoAcesso || null });
         }
 
         const rotasTop = Object.entries(rotasCount)
@@ -875,19 +863,6 @@ var worker_fase14_default = {
         return json({ ok: false, erro: "Erro interno" }, 500);
       }
     }
-    if (path === "/redis/migrar" && method === "POST") {
-      if (!requireAdminSecret(request)) return json({ erro: "N\xE3o autorizado" }, 403);
-      try {
-        const body = await request.json();
-        const { email, nome, chatId, alertas } = body;
-        if (!email || !nome || !chatId) return json({ erro: "email, nome e chatId s\xE3o obrigat\xF3rios" }, 400);
-        await redisSet(`usuario:${email}`, { nome, email, chatId, ativo: true, isAdmin: true, analiseIA: true, percentualMinimo: 0, limiteAlertas: null, criadoEm: (/* @__PURE__ */ new Date()).toISOString() });
-        if (alertas && alertas.length > 0) await redisSet(`alertas:${email}`, alertas);
-        return json({ ok: true, mensagem: `Usu\xE1rio ${nome} migrado!`, alertasMigrados: alertas ? alertas.length : 0 });
-      } catch (err) {
-        return json({ erro: "Erro interno" }, 500);
-      }
-    }
     if (path === "/redis/usuario" && method === "GET") {
       if (!requireAdminSecret(request)) return json({ erro: "N\xE3o autorizado" }, 403);
       try {
@@ -1100,74 +1075,6 @@ Volta: ${alerta.dataVolta}` : "";
         return json({ ok: true, analise: analise.trim() });
       } catch (err) {
         return json({ erro: "Erro interno: " + err.toString() }, 500);
-      }
-    }
-    if (path === "/poc/scrape-gol" && method === "POST") {
-      try {
-        if (!requireAdminSecret(request)) return json({ erro: "N\xE3o autorizado" }, 403);
-        const body = await request.json();
-        const { origem, destino, dataIda, dataVolta } = body;
-        if (!origem || !destino || !dataIda) return json({ erro: "origem, destino e dataIda s\xE3o obrigat\xF3rios" }, 400);
-        const CF_ACCOUNT_ID = "15d5be976fa0be913ce00c0418ed929d";
-        const CF_API_TOKEN = env.CF_BROWSER_TOKEN;
-        const outbound = `${dataIda}T00:00:00.000Z`;
-        const trip = dataVolta ? "RT" : "OW";
-        let urlLatam = `https://www.latamairlines.com/br/pt/oferta-voos?origin=${origem}&destination=${destino}&outbound=${encodeURIComponent(outbound)}&adt=1&chd=0&inf=0&trip=${trip}&cabin=Economy&redemption=false&sort=CHEAPEST`;
-        if (dataVolta) urlLatam += `&inbound=${encodeURIComponent(dataVolta + "T00:00:00.000Z")}`;
-        const brResp = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/browser-rendering/content`,
-          {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${CF_API_TOKEN}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              url: urlLatam,
-              gotoOptions: {
-                waitUntil: "domcontentloaded",
-                timeout: 55e3
-              }
-            })
-          }
-        );
-        const rawBody = await brResp.text();
-        if (!brResp.ok) {
-          let errBody = {};
-          try {
-            errBody = JSON.parse(rawBody);
-          } catch (e) {
-            errBody = { raw: rawBody.substring(0, 500) };
-          }
-          return json({ ok: false, erro: "Browser Rendering falhou", status: brResp.status, url: urlLatam, detalhes: errBody });
-        }
-        const htmlContent = rawBody;
-        const precoRegex = /R\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2}))/g;
-        const precos = [];
-        let match;
-        while ((match = precoRegex.exec(htmlContent)) !== null) {
-          const val = parseFloat(match[1].replace(/\./g, "").replace(",", "."));
-          if (val > 50 && val < 5e4) precos.push(val);
-        }
-        const precosUnicos = [...new Set(precos)].sort((a, b) => a - b);
-        const htmlLen = htmlContent.length;
-        const htmlInicio = htmlContent.substring(0, 2e3);
-        const htmlMeio = htmlContent.substring(Math.floor(htmlLen / 2), Math.floor(htmlLen / 2) + 2e3);
-        const htmlFim = htmlContent.substring(Math.max(0, htmlLen - 2e3));
-        return json({
-          ok: true,
-          url: urlLatam,
-          precoMinimo: precosUnicos.length > 0 ? precosUnicos[0] : null,
-          todosPrecos: precosUnicos.slice(0, 10),
-          totalPrecos: precosUnicos.length,
-          htmlTamanho: htmlLen,
-          htmlInicio,
-          htmlMeio,
-          htmlFim,
-          httpStatus: brResp.status
-        });
-      } catch (err) {
-        return json({ erro: err.toString() }, 500);
       }
     }
     return json({ erro: "Rota n\xE3o encontrada" }, 404);
