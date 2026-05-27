@@ -1,0 +1,11 @@
+# wrangler.toml — Monitor de Passagens Aéreas
+# ATENÇÃO: NÃO adicionar seção [vars] aqui.
+# Secrets e variáveis de ambiente ficam APENAS no Cloudflare Dashboard
+# (ou via `wrangler secret put`). Qualquer [vars] aqui substituiria os valores
+# de produção e apagaria o que está configurado no Dashboard.
+
+name       = "passagens-proxy"
+main       = "worker_fase14.js"
+compatibility_date = "2024-01-01"
+
+# Sem [vars], sem [secrets] — tudo gerenciado no Cloudflare Dashboard.
