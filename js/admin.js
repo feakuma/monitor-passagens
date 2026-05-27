@@ -189,8 +189,8 @@ export function carregarUsuarios() {
             '</div>' +
           '</div>' +
           '<div class="usuario-actions">' +
-            '<div class="btn-small" onclick="adminReenviarConvite(\'' + escAttr(u.email) + '\')">📨 Reenviar</div>' +
-            '<div class="btn-small danger" onclick="adminCancelarConvite(\'' + escAttr(u.token) + '\', \'' + escAttr(u.email) + '\')">Cancelar</div>' +
+            '<div class="btn-small" data-action="admin-reenviar-convite" data-email="' + esc(u.email) + '">📨 Reenviar</div>' +
+            '<div class="btn-small danger" data-action="admin-cancelar-convite" data-token="' + esc(u.token) + '" data-email="' + esc(u.email) + '">Cancelar</div>' +
           '</div>' +
         '</div>';
       }
@@ -198,7 +198,7 @@ export function carregarUsuarios() {
       return '<div class="usuario-card">' +
         '<div class="usuario-header">' +
           '<div>' +
-            '<div class="usuario-nome" style="cursor:pointer;text-decoration:underline dotted;" onclick="adminVerAlertas(\'' + escAttr(u.email) + '\', \'' + escAttr(u.nome) + '\')">' + esc(u.nome) + '</div>' +
+            '<div class="usuario-nome" style="cursor:pointer;text-decoration:underline dotted;" data-action="admin-ver-alertas" data-email="' + esc(u.email) + '" data-nome="' + esc(u.nome) + '">' + esc(u.nome) + '</div>' +
             '<div class="usuario-email">' + esc(u.email) + '</div>' +
           '</div>' +
           '<div class="usuario-badges">' +
@@ -215,12 +215,12 @@ export function carregarUsuarios() {
           '<div class="usuario-meta-item">Limite: <strong>' + (u.limiteAlertas ?? 10) + '</strong></div>' +
         '</div>' +
         '<div class="usuario-actions">' +
-          '<div class="btn-small" onclick="adminAbrirEdicao(\'' + escAttr(u.email) + '\')">✏️ Editar</div>' +
-          '<div class="btn-small" onclick="adminVerAudit(\'' + escAttr(u.email) + '\', \'' + escAttr(u.nome) + '\')">📋 Audit</div>' +
+          '<div class="btn-small" data-action="admin-abrir-edicao" data-email="' + esc(u.email) + '">✏️ Editar</div>' +
+          '<div class="btn-small" data-action="admin-ver-audit" data-email="' + esc(u.email) + '" data-nome="' + esc(u.nome) + '">📋 Audit</div>' +
           (u.ativo
-            ? '<div class="btn-small" onclick="adminToggleAtivo(\'' + escAttr(u.email) + '\', false)">Desativar</div>'
-            : '<div class="btn-small" onclick="adminToggleAtivo(\'' + escAttr(u.email) + '\', true)">Ativar</div>') +
-          (!u.isAdmin ? '<div class="btn-small danger" onclick="adminRemoverUsuario(\'' + escAttr(u.email) + '\', \'' + escAttr(u.nome) + '\')">Remover</div>' : '') +
+            ? '<div class="btn-small" data-action="admin-toggle-ativo" data-email="' + esc(u.email) + '" data-ativo="false">Desativar</div>'
+            : '<div class="btn-small" data-action="admin-toggle-ativo" data-email="' + esc(u.email) + '" data-ativo="true">Ativar</div>') +
+          (!u.isAdmin ? '<div class="btn-small danger" data-action="admin-remover-usuario" data-email="' + esc(u.email) + '" data-nome="' + esc(u.nome) + '">Remover</div>' : '') +
         '</div>' +
       '</div>';
     }).join('');
@@ -294,9 +294,7 @@ export function adminCriarUsuario() {
   var chatId = document.getElementById('admin-chatid').value.trim();
   if (!nome || !email) { showToast('Preencha nome e e-mail', 'error'); return; }
   if (!chatId) {
-    window._pendingNome = nome;
-    window._pendingTipo = 'manual';
-    document.getElementById('modal-sem-chatid').style.display = 'flex';
+    document.dispatchEvent(new CustomEvent('passagens:set-pending', { detail: { nome: nome, tipo: 'manual' } }));
     return;
   }
   _executarCriarUsuarioManual();
@@ -323,7 +321,6 @@ export function _executarCriarUsuarioManual() {
     document.getElementById('admin-email').value = '';
     document.getElementById('admin-chatid').value = '';
     document.getElementById('admin-pct').value = '0';
-    window._pendingNome = null; window._pendingTipo = null;
     carregarUsuarios();
   })
   .catch(function () { showToast('Erro ao cadastrar', 'error'); });

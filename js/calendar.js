@@ -53,8 +53,8 @@ function renderCal() {
         (isToday && !isPast ? ' today' : '') +
         ((isIda || isVolta) ? ' selected' : '') +
         (isRange ? ' in-range' : '');
-      var onclick = isPast ? '' : ' onclick="selectDay(' + day + ')"';
-      html += '<td><div class="' + cls + '"' + onclick + '>' + day + '</div></td>';
+      var dataAttr = isPast ? '' : ' data-action="select-day" data-day="' + day + '"';
+      html += '<td><div class="' + cls + '"' + dataAttr + '>' + day + '</div></td>';
       day++;
     }
     html += '</tr>'; row++;

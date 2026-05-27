@@ -92,14 +92,14 @@ export function showTab(tab) {
   }
   if (tab === 'config') {
     renderConfigAlertas();
-    if (window.renderConfigs) window.renderConfigs();
-    setTimeout(function () { if (window.atualizarStatusPush) window.atualizarStatusPush(); }, 200);
+    // CustomEvent → events.js chama renderConfigs() e atualizarStatusPush()
+    document.dispatchEvent(new CustomEvent('passagens:tab-active', { detail: { tab: 'config' } }));
   }
   if (tab === 'admin') {
-    if (window.carregarUsuarios) window.carregarUsuarios();
+    document.dispatchEvent(new CustomEvent('passagens:tab-active', { detail: { tab: 'admin' } }));
   }
   if (tab === 'dash') {
-    if (window.carregarDashboard) window.carregarDashboard();
+    document.dispatchEvent(new CustomEvent('passagens:tab-active', { detail: { tab: 'dash' } }));
   }
 }
 
@@ -138,14 +138,14 @@ export function renderAlertas() {
         '</div></div>' +
       '</div>' +
       (temHist ? '<div style="padding:0 16px 16px;"><canvas id="chart-' + a.id + '" height="80"></canvas></div>' : '') +
-      '<div class="card-action" onclick="window.open(\'' + escAttr(url) + '\',\'_blank\')">' +
+      '<div class="card-action" data-action="open-flights-url" data-url="' + escAttr(url) + '">' +
         '<div class="action-left">' +
           '<div class="action-title">Buscar no Google Flights</div>' +
           '<div class="action-sub">' + esc(a.origem) + ' → ' + esc(a.destino) + ' · ' + formatDataCurta(a.dataIda) + '</div>' +
         '</div>' +
         '<div class="action-arrow ' + (temQueda ? 'active' : '') + '">↗</div>' +
       '</div>' +
-      (temIA ? '<div class="ai-btn" id="btn-ai-' + a.id + '" onclick="solicitarAnalise(' + a.id + ')"><span>Analisar com IA</span></div>' : '') +
+      (temIA ? '<div class="ai-btn" id="btn-ai-' + a.id + '" data-action="solicitar-analise" data-id="' + a.id + '"><span>Analisar com IA</span></div>' : '') +
       '<div id="ai-' + a.id + '" style="display:none;" class="ai-block">' +
         '<div class="ai-label">analise · ia</div>' +
         '<div class="ai-verdict" id="ai-verdict-' + a.id + '"></div>' +
@@ -212,7 +212,7 @@ export function renderConfigAlertas() {
     return '<div class="alerta-item">' +
       '<div class="alerta-header">' +
         '<div class="alerta-route">' + esc(a.origem) + ' <span>→</span> ' + esc(a.destino) + '</div>' +
-        '<div class="remove-btn" onclick="removerAlerta(' + a.indice + ')">×</div>' +
+        '<div class="remove-btn" data-action="remover-alerta" data-indice="' + a.indice + '">×</div>' +
       '</div>' +
       '<div class="alerta-dates">' +
         '<div class="alerta-date">ida <strong>' + formatData(a.dataIda) + '</strong>' +
@@ -323,11 +323,9 @@ export function doAutocomplete(input, tipo) {
   if (!matches.length) { drop.classList.remove('open'); return; }
 
   drop.innerHTML = matches.map(function (a) {
-    // esc() nos dados mesmo sendo estáticos hoje — previne XSS se a lista
-    // passar a ser carregada de fonte externa no futuro.
+    // data-action em vez de onmousedown/ontouchstart — delegação em events.js
     return '<div class="autocomplete-item"' +
-      ' onmousedown="pickAirport(\'' + escAttr(a.code) + '\',\'' + escAttr(tipo) + '\')"' +
-      ' ontouchstart="pickAirport(\'' + escAttr(a.code) + '\',\'' + escAttr(tipo) + '\')">' +
+      ' data-action="pick-airport" data-code="' + esc(a.code) + '" data-tipo="' + esc(tipo) + '">' +
       '<div class="ac-code">' + esc(a.code) + '</div>' +
       '<div class="ac-info"><div class="ac-name">' + esc(a.name) + '</div><div class="ac-city">' + esc(a.city) + '</div></div>' +
       '<div class="ac-icon">' + esc(a.icon) + '</div>' +

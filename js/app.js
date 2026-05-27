@@ -1,120 +1,50 @@
 // ============================================================
-//  app.js — Entry point: expõe funções ao window, inicializa o app
+//  app.js — Entry point: inicializa o app e orquestra os módulos
 // ============================================================
 
 import { getSessao } from './config.js';
 import { carregarAlertas } from './api.js';
 import {
-  mostrarTelaLogin, mostrarLanding, mostrarFormLogin, ocultarTelaLogin,
-  solicitarOTP, verificarOTP, voltarParaEmail,
-  verificarConviteURL, criarContaConvite, _executarCriarContaConvite,
-  logout
+  mostrarTelaLogin, mostrarLanding, ocultarTelaLogin,
+  verificarConviteURL
 } from './auth.js';
 import {
   showTab, updateClock,
-  renderAlertas, renderHistorico, renderConfigAlertas,
-  adicionarAlerta, removerAlerta, solicitarAnalise,
-  doAutocomplete, pickAirport
+  renderAlertas, renderHistorico, renderConfigAlertas
 } from './ui.js';
-import { openCal, calNav, selectDay, confirmCal } from './calendar.js';
+import { initEvents } from './events.js';
 import {
-  renderConfigs, editarConfigs, cancelarEditConfigs, salvarConfigs,
-  editarConfigIA, cancelarEditConfigIA, salvarConfigIA,
-  adminEditarLimite,
-  adminAbrirEdicao, adminSalvarEdicao, adminFecharEdicao,
-  resetPrompt, toggleTokenVisibility, removerTokenIA,
-  carregarUsuarios, adminEnviarConvite, adminReenviarConvite, adminCancelarConvite,
-  adminCriarUsuario,
-  _executarCriarUsuarioManual, adminToggleIA, adminToggleAtivo, adminRemoverUsuario,
-  adminVerAlertas, fecharModalAlertasUsuario,
-  adminVerAudit, fecharModalAudit, recarregarAudit,
-  carregarDashboard
-} from './admin.js';
-import {
-  inicializarPush, togglePush, atualizarStatusPush,
-  mostrarInstallToast, fecharInstallToast, instalarPWA
+  inicializarPush, mostrarInstallToast
 } from './pwa.js';
 
-// ── EXPÕE AO WINDOW ───────────────────────────────────────────
+// ── WIRING — deve ocorrer antes do boot ───────────────────────
 
-window.solicitarOTP          = solicitarOTP;
-window.verificarOTP          = verificarOTP;
-window.voltarParaEmail       = voltarParaEmail;
-window.logout                = logout;
-window.mostrarTelaLogin      = mostrarTelaLogin;
-window.mostrarFormLogin      = mostrarFormLogin;
-window.criarContaConvite     = criarContaConvite;
+initEvents();
 
-window.showTab               = showTab;
-window.adicionarAlerta       = adicionarAlerta;
-window.removerAlerta         = removerAlerta;
-window.solicitarAnalise      = solicitarAnalise;
-window.doAutocomplete        = doAutocomplete;
-window.pickAirport           = pickAirport;
+// ── CUSTOM EVENTS ─────────────────────────────────────────────
 
-window.openCal               = openCal;
-window.calNav                = calNav;
-window.selectDay             = selectDay;
-window.confirmCal            = confirmCal;
+// auth.js → login bem-sucedido
+document.addEventListener('passagens:login-success', function () {
+  inicializarApp();
+});
 
-window.renderConfigs         = renderConfigs;
-window.editarConfigs         = editarConfigs;
-window.cancelarEditConfigs   = cancelarEditConfigs;
-window.salvarConfigs         = salvarConfigs;
-window.editarConfigIA        = editarConfigIA;
-window.cancelarEditConfigIA  = cancelarEditConfigIA;
-window.salvarConfigIA        = salvarConfigIA;
-window.resetPrompt           = resetPrompt;
-window.toggleTokenVisibility = toggleTokenVisibility;
-window.removerTokenIA        = removerTokenIA;
+// api.js → sessão expirada (401)
+document.addEventListener('passagens:session-expired', function () {
+  mostrarTelaLogin();
+});
 
-window.carregarUsuarios      = carregarUsuarios;
-window.adminEnviarConvite    = adminEnviarConvite;
-window.adminReenviarConvite  = adminReenviarConvite;
-window.adminCancelarConvite  = adminCancelarConvite;
-window.adminCriarUsuario     = adminCriarUsuario;
-window.adminEditarLimite     = adminEditarLimite;
-window.adminAbrirEdicao      = adminAbrirEdicao;
-window.adminSalvarEdicao     = adminSalvarEdicao;
-window.adminFecharEdicao     = adminFecharEdicao;
-window.adminToggleIA               = adminToggleIA;
-window.adminToggleAtivo            = adminToggleAtivo;
-window.adminRemoverUsuario         = adminRemoverUsuario;
-window.adminVerAlertas             = adminVerAlertas;
-window.fecharModalAlertasUsuario   = fecharModalAlertasUsuario;
-window.adminVerAudit               = adminVerAudit;
-window.fecharModalAudit            = fecharModalAudit;
-window.recarregarAudit             = recarregarAudit;
-window.carregarDashboard           = carregarDashboard;
+// pwa.js PTR → pull-to-refresh disparou
+document.addEventListener('passagens:reload', function () {
+  carregarAlertas().then(function () {
+    renderAlertas();
+    renderHistorico();
+    renderConfigAlertas();
+  });
+});
 
-window.inicializarPush       = inicializarPush;
-window.togglePush            = togglePush;
-window.atualizarStatusPush   = atualizarStatusPush;
-window.instalarPWA           = instalarPWA;
-window.fecharInstallToast    = fecharInstallToast;
+// ── EVENT LISTENERS GLOBAIS ───────────────────────────────────
 
-// ── MODAL SEM CHAT ID ─────────────────────────────────────────
-
-window._pendingNome = null;
-window._pendingTipo = null;
-
-window.confirmarSemChatId = function () {
-  document.getElementById('modal-sem-chatid').style.display = 'none';
-  if (window._pendingTipo === 'convite') {
-    _executarCriarContaConvite(window._pendingNome, '');
-  } else if (window._pendingTipo === 'manual') {
-    _executarCriarUsuarioManual();
-  }
-};
-
-window.fecharModalSemChatId = function () {
-  document.getElementById('modal-sem-chatid').style.display = 'none';
-  window._pendingNome = null;
-  window._pendingTipo = null;
-};
-
-// ── EVENT LISTENERS ───────────────────────────────────────────
-
+// Fecha dropdowns de autocomplete ao clicar fora
 document.addEventListener('click', function (e) {
   if (!e.target.closest('.autocomplete-wrap')) {
     document.querySelectorAll('.autocomplete-dropdown').forEach(function (d) {
@@ -123,6 +53,7 @@ document.addEventListener('click', function (e) {
   }
 });
 
+// Fecha overlay do calendário ao clicar no backdrop
 document.getElementById('cal-overlay').addEventListener('click', function (e) {
   if (e.target === this) this.classList.remove('open');
 });
@@ -158,8 +89,6 @@ export function inicializarApp() {
     mostrarLanding();
   }
 }
-
-window.inicializarApp = inicializarApp;
 
 // ── BOOT ──────────────────────────────────────────────────────
 

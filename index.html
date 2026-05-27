@@ -604,7 +604,7 @@
     <div class="landing-eyebrow">Alertas de preço</div>
     <h1 class="landing-h1">Monitor de<br>Passagens Aéreas</h1>
     <p class="landing-lead">Defina uma rota e receba alertas no Telegram, e-mail ou push quando o preço cair. Com análise de IA incluída.</p>
-    <button class="landing-cta-btn" onclick="mostrarFormLogin()">Acessar o app</button>
+    <button class="landing-cta-btn" data-action="mostrar-form-login">Acessar o app</button>
   </div>
 
   <!-- AdSense: após hero -->
@@ -689,7 +689,7 @@
   <!-- Footer -->
   <div class="landing-footer">
     <div style="margin-bottom:20px;">
-      <button class="landing-cta-btn" onclick="mostrarFormLogin()" style="max-width:280px;margin:0 auto;">Acessar o app</button>
+      <button class="landing-cta-btn" data-action="mostrar-form-login" style="max-width:280px;margin:0 auto;">Acessar o app</button>
     </div>
     <p>Acesso por convite</p>
     <p style="margin-top:6px;"><a href="https://passagens.fetadeu.com.br" style="color:var(--text4);text-decoration:none;">passagens.fetadeu.com.br</a></p>
@@ -712,12 +712,11 @@
         <div style="padding:16px 18px;">
           <div style="font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">e-mail</div>
           <input id="login-email" type="email" placeholder="seu@email.com"
-            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:var(--text);font-family:var(--font-body);padding:0;"
-            onkeyup="if(event.key==='Enter') solicitarOTP()" />
+            style="width:100%;background:transparent;border:none;outline:none;font-size:16px;color:var(--text);font-family:var(--font-body);padding:0;" />
         </div>
       </div>
       <div id="login-email-erro" style="font-size:12px;color:var(--red);padding:4px 4px 8px;display:none;"></div>
-      <div id="btn-solicitar-otp" onclick="solicitarOTP()"
+      <div id="btn-solicitar-otp"
         style="background:var(--accent);color:#070D1A;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-display);">
         Enviar código
       </div>
@@ -733,17 +732,16 @@
         <div style="padding:16px 18px;">
           <div style="font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">código de 6 dígitos</div>
           <input id="login-otp" type="number" placeholder="000000" maxlength="6"
-            style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:var(--accent);font-family:var(--font-mono);font-weight:600;letter-spacing:6px;padding:0;"
-            onkeyup="if(event.key==='Enter') verificarOTP()" />
+            style="width:100%;background:transparent;border:none;outline:none;font-size:28px;color:var(--accent);font-family:var(--font-mono);font-weight:600;letter-spacing:6px;padding:0;" />
         </div>
       </div>
       <div id="login-otp-erro" style="font-size:12px;color:var(--red);padding:4px 4px 8px;display:none;"></div>
-      <div id="btn-verificar-otp" onclick="verificarOTP()"
+      <div id="btn-verificar-otp"
         style="background:var(--accent);color:#070D1A;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;font-family:var(--font-display);">
         Entrar
       </div>
-      <div onclick="voltarParaEmail()" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;">← Usar outro e-mail</div>
-      <div id="btn-reenviar-otp" onclick="solicitarOTP(true)" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;display:none;">Reenviar código</div>
+      <div id="btn-voltar-email" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;">← Usar outro e-mail</div>
+      <div id="btn-reenviar-otp" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;display:none;">Reenviar código</div>
     </div>
 
     <!-- ETAPA 3: CADASTRO VIA CONVITE -->
@@ -768,7 +766,7 @@
         <div style="font-size:12px;color:var(--text3);line-height:1.6;">Para obter seu Chat ID:<br>1. Abra o Telegram<br>2. Busque <strong style="color:var(--text2);">@userinfobot</strong><br>3. Envie /start e copie o ID</div>
       </div>
       <div id="convite-erro" style="font-size:12px;color:var(--red);padding:4px 4px 8px;display:none;"></div>
-      <div id="btn-criar-conta" onclick="criarContaConvite()"
+      <div id="btn-criar-conta"
         style="background:var(--accent);color:#070D1A;border-radius:14px;padding:16px;text-align:center;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font-display);">
         Criar minha conta
       </div>
@@ -785,10 +783,10 @@
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('alertas')">Alertas</div>
-  <div class="tab" onclick="showTab('historico')">Histórico</div>
-  <div class="tab" onclick="showTab('config')">Config</div>
-  <div class="tab" id="tab-admin-btn" style="display:none;" onclick="showTab('admin')">Admin</div>
+  <div class="tab active" data-tab="alertas">Alertas</div>
+  <div class="tab" data-tab="historico">Histórico</div>
+  <div class="tab" data-tab="config">Config</div>
+  <div class="tab" id="tab-admin-btn" data-tab="admin" style="display:none;">Admin</div>
 </div>
 
 <!-- ABA ALERTAS -->
@@ -822,27 +820,25 @@
       <div class="form-col autocomplete-wrap">
         <div class="field-label">origem</div>
         <input class="autocomplete-input" id="input-origem" placeholder="ex: CGH" maxlength="3"
-          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-          oninput="doAutocomplete(this,'origem')" onkeyup="doAutocomplete(this,'origem')" />
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
         <div class="autocomplete-dropdown" id="drop-origem"></div>
       </div>
       <div class="form-col autocomplete-wrap">
         <div class="field-label" style="text-align:right;">destino</div>
         <input class="autocomplete-input" id="input-destino" placeholder="ex: FLN" maxlength="3"
           autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-          style="text-align:right;"
-          oninput="doAutocomplete(this,'destino')" onkeyup="doAutocomplete(this,'destino')" />
+          style="text-align:right;" />
         <div class="autocomplete-dropdown" id="drop-destino"></div>
       </div>
     </div>
-    <div class="form-row" onclick="openCal('range')" style="cursor:pointer;">
+    <div class="form-row" id="date-row-periodo" style="cursor:pointer;">
       <div class="field-label">período</div>
       <div id="display-range" class="field-placeholder">selecionar datas</div>
       <input type="hidden" id="input-ida" />
       <input type="hidden" id="input-volta" />
     </div>
   </div>
-  <div class="submit-btn" id="btn-adicionar" onclick="adicionarAlerta()">Criar alerta</div>
+  <div class="submit-btn" id="btn-adicionar">Criar alerta</div>
 
   <div class="section-label" style="margin-top:8px;">minhas configurações</div>
   <div class="card" style="margin-bottom:10px;">
@@ -861,11 +857,11 @@
       <input id="cfg-pct-input" type="number" min="0" max="100" placeholder="0"
         style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;outline:none;margin-bottom:12px;" />
       <div style="display:flex;gap:8px;">
-        <div onclick="salvarConfigs()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
-        <div onclick="cancelarEditConfigs()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
+        <div id="btn-salvar-cfg" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
+        <div id="btn-cancelar-cfg" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
       </div>
     </div>
-    <div class="card-action" onclick="editarConfigs()" style="cursor:pointer;">
+    <div class="card-action" id="btn-editar-cfg" style="cursor:pointer;">
       <div class="action-left"><div class="action-title">Editar configurações</div></div>
       <div class="action-arrow">→</div>
     </div>
@@ -902,7 +898,7 @@
       <div style="display:flex;gap:8px;margin-bottom:6px;">
         <input id="cfg-token-input" type="password" placeholder="sk-ant-... / sk-... / AIzaSy..."
           style="flex:1;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:monospace;" />
-        <div onclick="toggleTokenVisibility()"
+        <div id="btn-token-visibility"
           style="border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;color:var(--text3);">👁</div>
       </div>
       <div style="font-size:11px;color:var(--text4);margin-bottom:14px;">Deixe em branco para manter o token atual. O token é armazenado com segurança.</div>
@@ -910,7 +906,7 @@
       <!-- Prompt -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;">prompt de análise</div>
-        <div onclick="resetPrompt()" style="font-size:11px;color:var(--text4);cursor:pointer;text-decoration:underline;">restaurar padrão</div>
+        <div id="btn-reset-prompt" style="font-size:11px;color:var(--text4);cursor:pointer;text-decoration:underline;">restaurar padrão</div>
       </div>
       <textarea id="cfg-prompt-input" rows="10"
         style="width:100%;background:transparent;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text2);font-size:12px;outline:none;resize:vertical;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin-bottom:6px;"></textarea>
@@ -922,13 +918,13 @@
       </div>
 
       <div style="display:flex;gap:8px;">
-        <div onclick="salvarConfigIA()" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
-        <div onclick="cancelarEditConfigIA()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
+        <div id="btn-salvar-ia" style="flex:1;background:var(--text);color:var(--bg);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;">Salvar</div>
+        <div id="btn-cancelar-ia" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:10px;text-align:center;font-size:13px;cursor:pointer;">Cancelar</div>
       </div>
-      <div onclick="removerTokenIA()" style="text-align:center;font-size:12px;color:var(--red);cursor:pointer;padding:12px 0 4px;">Remover meu token</div>
+      <div id="btn-remover-token-ia" style="text-align:center;font-size:12px;color:var(--red);cursor:pointer;padding:12px 0 4px;">Remover meu token</div>
     </div>
 
-    <div class="card-action" onclick="editarConfigIA()" style="cursor:pointer;">
+    <div class="card-action" id="btn-editar-ia" style="cursor:pointer;">
       <div class="action-left"><div class="action-title">Configurar minha IA</div><div class="action-sub">Token próprio tem prioridade sobre o do sistema</div></div>
       <div class="action-arrow">→</div>
     </div>
@@ -942,7 +938,7 @@
           <div style="font-size:13px;color:var(--text2);">Alertas de queda de preço</div>
           <div style="font-size:11px;color:var(--text4);margin-top:3px;" id="push-status">verificando...</div>
         </div>
-        <div id="push-toggle-btn" onclick="togglePush()"
+        <div id="push-toggle-btn"
           style="background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;">
           Ativar
         </div>
@@ -952,7 +948,7 @@
 
   <div class="section-label" style="margin-top:8px;">conta</div>
   <div class="card" style="margin-bottom:10px;">
-    <div class="card-action" onclick="logout()" style="cursor:pointer;">
+    <div class="card-action" id="btn-logout" style="cursor:pointer;">
       <div class="action-left">
         <div class="action-title" style="color:var(--red);">Sair</div>
         <div class="action-sub" id="sessao-email"></div>
@@ -985,7 +981,7 @@
       <input class="autocomplete-input" id="convite-email" placeholder="email@exemplo.com" type="email" autocomplete="off" style="margin-top:4px;" />
     </div>
   </div>
-  <div id="btn-enviar-convite" class="submit-btn" onclick="adminEnviarConvite()" style="margin-bottom:8px;">Enviar convite</div>
+  <div id="btn-enviar-convite" class="submit-btn" style="margin-bottom:8px;">Enviar convite</div>
 
   <div class="section-label">cadastro manual</div>
   <div class="form-card">
@@ -1015,7 +1011,7 @@
       </div>
     </div>
   </div>
-  <div class="submit-btn" onclick="adminCriarUsuario()">Cadastrar usuário</div>
+  <div class="submit-btn" id="btn-criar-usuario">Cadastrar usuário</div>
 
 
 </div>
@@ -1024,7 +1020,7 @@
   <div class="form-card" style="margin-bottom:20px;">
     <div class="form-row">
       <div class="field-label">período</div>
-      <select id="dash-periodo" onchange="carregarDashboard()" style="background:transparent;border:none;color:var(--text);font-size:15px;font-weight:500;outline:none;margin-top:4px;width:100%;-webkit-appearance:none;">
+      <select id="dash-periodo" style="background:transparent;border:none;color:var(--text);font-size:15px;font-weight:500;outline:none;margin-top:4px;width:100%;-webkit-appearance:none;">
         <option value="7">Últimos 7 dias</option>
         <option value="15">Últimos 15 dias</option>
         <option value="30" selected>Últimos 30 dias</option>
@@ -1047,7 +1043,7 @@
   <div class="section-label" style="margin-top:16px;">rotas mais monitoradas</div>
   <div id="dash-rotas"><div class="empty">Carregando...</div></div>
 
-  <div class="dash-refresh" onclick="carregarDashboard()">↻ atualizar</div>
+  <div class="dash-refresh" id="btn-dash-refresh">↻ atualizar</div>
 </div>
 
 <!-- ── MODAIS ─────────────────────────────────────────────── -->
@@ -1093,8 +1089,8 @@
     </div>
 
     <div style="display:flex;gap:8px;">
-      <div onclick="adminSalvarEdicao()" style="flex:1;background:var(--accent);color:#070D1A;border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-display);">Salvar</div>
-      <div onclick="adminFecharEdicao()" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer;">Cancelar</div>
+      <div id="btn-salvar-edicao" style="flex:1;background:var(--accent);color:#070D1A;border-radius:10px;padding:12px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-display);">Salvar</div>
+      <div id="btn-fechar-edicao" style="flex:1;background:var(--bg3);color:var(--text2);border-radius:10px;padding:12px;text-align:center;font-size:14px;cursor:pointer;">Cancelar</div>
     </div>
   </div>
 </div>
@@ -1114,8 +1110,8 @@
         3. Atualize seu perfil nas configurações
       </div>
     </div>
-    <div onclick="confirmarSemChatId()" style="background:var(--accent);color:#070D1A;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:var(--font-display);">Entendido, continuar</div>
-    <div onclick="fecharModalSemChatId()" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;">← Voltar e adicionar Chat ID</div>
+    <div id="btn-confirmar-sem-chatid" style="background:var(--accent);color:#070D1A;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:var(--font-display);">Entendido, continuar</div>
+    <div id="btn-fechar-sem-chatid" style="text-align:center;font-size:13px;color:var(--text4);cursor:pointer;padding:8px;">← Voltar e adicionar Chat ID</div>
   </div>
 </div>
 
@@ -1124,9 +1120,9 @@
   <div class="calendar-sheet">
     <div class="cal-handle"></div>
     <div class="cal-header">
-      <div class="cal-nav" onclick="calNav(-1)">‹</div>
+      <div class="cal-nav" id="cal-nav-prev">‹</div>
       <div class="cal-title" id="cal-title">—</div>
-      <div class="cal-nav" onclick="calNav(1)">›</div>
+      <div class="cal-nav" id="cal-nav-next">›</div>
     </div>
     <div id="cal-step" style="text-align:center;font-size:12px;color:#888;padding:0 20px 10px;border-bottom:1px solid #2A2A2A;margin-bottom:4px;">Selecione a data de ida</div>
     <div id="cal-range-preview" style="display:none;text-align:center;font-size:12px;padding:8px 20px;color:#5A9E6F;"></div>
@@ -1134,7 +1130,7 @@
       <thead><tr><th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th></tr></thead>
       <tbody id="cal-body"></tbody>
     </table>
-    <div class="cal-confirm" onclick="confirmCal()">Confirmar</div>
+    <div class="cal-confirm" id="cal-confirm">Confirmar</div>
   </div>
 </div>
 
@@ -1148,12 +1144,12 @@
     <div class="install-toast-title">Adicionar à tela inicial</div>
     <div class="install-toast-sub">Acesse mais rápido como um app</div>
   </div>
-  <button class="install-toast-btn" onclick="instalarPWA()">Instalar</button>
-  <div class="install-toast-close" onclick="fecharInstallToast()">×</div>
+  <button class="install-toast-btn" id="btn-instalar-pwa">Instalar</button>
+  <div class="install-toast-close" id="btn-fechar-install-toast">×</div>
 </div>
 
 <!-- Modal iOS -->
-<div class="ios-modal" id="ios-modal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="ios-modal" id="ios-modal">
   <div class="ios-modal-sheet">
     <div class="ios-modal-handle"></div>
     <div style="text-align:center;margin-bottom:20px;">
@@ -1183,7 +1179,7 @@
         </div>
       </div>
     </div>
-    <div onclick="document.getElementById('ios-modal').classList.remove('open');fecharInstallToast();"
+    <div id="btn-ios-modal-ok"
       style="background:var(--accent);color:#070D1A;border-radius:12px;padding:14px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-display);">
       Entendido!
     </div>
@@ -1192,17 +1188,17 @@
 
 <!-- ── MODAL ALERTAS USUÁRIO (ADMIN) ───────────────────────── -->
 <!-- Modal Auditoria do Usuário (Admin) -->
-<div id="modal-audit-usuario" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);" onclick="if(event.target===this)fecharModalAudit()">
+<div id="modal-audit-usuario" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);">
   <div style="position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--bg2);border-radius:24px 24px 0 0;border-top:1px solid var(--border);max-height:85vh;display:flex;flex-direction:column;">
     <div style="padding:20px 20px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:2px;">auditoria de</div>
         <div style="font-size:17px;font-weight:600;" id="modal-audit-nome">—</div>
       </div>
-      <div onclick="fecharModalAudit()" style="font-size:22px;color:var(--text4);cursor:pointer;padding:4px 8px;">✕</div>
+      <div id="btn-fechar-audit" style="font-size:22px;color:var(--text4);cursor:pointer;padding:4px 8px;">✕</div>
     </div>
     <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
-      <select id="audit-periodo" onchange="recarregarAudit()" style="background:transparent;border:none;color:var(--text);font-size:13px;font-weight:500;outline:none;width:100%;-webkit-appearance:none;">
+      <select id="audit-periodo" style="background:transparent;border:none;color:var(--text);font-size:13px;font-weight:500;outline:none;width:100%;-webkit-appearance:none;">
         <option value="0">Hoje</option>
         <option value="6" selected>Últimos 7 dias</option>
         <option value="14">Últimos 15 dias</option>
@@ -1213,14 +1209,14 @@
   </div>
 </div>
 
-<div id="modal-alertas-usuario" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);" onclick="if(event.target===this)fecharModalAlertasUsuario()">
+<div id="modal-alertas-usuario" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);">
   <div style="position:absolute;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--bg2);border-radius:24px 24px 0 0;border-top:1px solid var(--border);max-height:80vh;display:flex;flex-direction:column;">
     <div style="padding:20px 20px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:2px;">alertas de</div>
         <div style="font-size:17px;font-weight:600;" id="modal-alertas-nome">—</div>
       </div>
-      <div onclick="fecharModalAlertasUsuario()" style="font-size:22px;color:var(--text4);cursor:pointer;padding:4px 8px;">✕</div>
+      <div id="btn-fechar-alertas-modal" style="font-size:22px;color:var(--text4);cursor:pointer;padding:4px 8px;">✕</div>
     </div>
     <div id="modal-alertas-lista" style="overflow-y:auto;padding:16px;flex:1;"></div>
   </div>
@@ -1229,23 +1225,23 @@
 <!-- ── BOTTOM NAV ──────────────────────────────────────────── -->
 
 <div class="bottom-nav">
-  <div class="nav-item" onclick="showTab('alertas')">
+  <div class="nav-item" data-tab="alertas">
     <div class="nav-icon on" id="nav-alertas">◈</div>
     <div class="nav-label on" id="navl-alertas">alertas</div>
   </div>
-  <div class="nav-item" onclick="showTab('historico')">
+  <div class="nav-item" data-tab="historico">
     <div class="nav-icon" id="nav-historico">◇</div>
     <div class="nav-label" id="navl-historico">histórico</div>
   </div>
-  <div class="nav-item" onclick="showTab('config')">
+  <div class="nav-item" data-tab="config">
     <div class="nav-icon" id="nav-config">○</div>
     <div class="nav-label" id="navl-config">config</div>
   </div>
-  <div class="nav-item" id="nav-admin-btn" style="display:none;" onclick="showTab('admin')">
+  <div class="nav-item" id="nav-admin-btn" data-tab="admin" style="display:none;">
     <div class="nav-icon" id="nav-admin">⚙</div>
     <div class="nav-label" id="navl-admin">admin</div>
   </div>
-  <div class="nav-item" id="nav-dash-btn" style="display:none;" onclick="showTab('dash')">
+  <div class="nav-item" id="nav-dash-btn" data-tab="dash" style="display:none;">
     <div class="nav-icon" id="nav-dash">◫</div>
     <div class="nav-label" id="navl-dash">dash</div>
   </div>

@@ -94,9 +94,8 @@ export function verificarOTP() {
     btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
     if (data.erro) { mostrarErroLogin('otp', data.erro); return; }
     salvarSessao(data.token, data.usuario);
-    // Usa window para evitar dependência circular com app.js
-    if (window.inicializarApp) window.inicializarApp();
-    setTimeout(function () { if (window.inicializarPush) window.inicializarPush(); }, 4000);
+    // CustomEvent desacopla auth.js de app.js — sem referência circular
+    document.dispatchEvent(new CustomEvent('passagens:login-success'));
   })
   .catch(function () {
     btn.textContent = 'Entrar'; btn.style.opacity = '1'; btn.style.pointerEvents = '';
@@ -148,9 +147,7 @@ export function criarContaConvite() {
   var chatId = document.getElementById('convite-chatid').value.trim();
   if (!nome) { mostrarErroConvite('Informe seu nome'); return; }
   if (!chatId) {
-    window._pendingNome = nome;
-    window._pendingTipo = 'convite';
-    document.getElementById('modal-sem-chatid').style.display = 'flex';
+    document.dispatchEvent(new CustomEvent('passagens:set-pending', { detail: { nome: nome, tipo: 'convite' } }));
     return;
   }
   _executarCriarContaConvite(nome, chatId);

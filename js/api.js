@@ -26,7 +26,7 @@ export function carregarAlertas() {
   .then(function (r) {
     if (r.status === 401) {
       limparSessao();
-      if (window.mostrarTelaLogin) window.mostrarTelaLogin();
+      document.dispatchEvent(new CustomEvent('passagens:session-expired'));
       return Promise.reject('Sessão expirada');
     }
     return r.json();

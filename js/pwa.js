@@ -245,14 +245,8 @@ if (_isIOS && !_isInStandalone) {
       // O GIF já é animado — só mantém visível
 
       setTimeout(function () {
-        // Em vez de recarregar a página, recarrega os alertas
-        if (window.carregarAlertas) {
-          window.carregarAlertas().then(function () {
-            if (window.renderAlertas)      window.renderAlertas();
-            if (window.renderHistorico)    window.renderHistorico();
-            if (window.renderConfigAlertas) window.renderConfigAlertas();
-          });
-        }
+        // CustomEvent — desacopla pwa.js de ui.js/api.js sem referência circular
+        document.dispatchEvent(new CustomEvent('passagens:reload'));
         // Esconde o indicador
         _indicator.style.top = '-60px';
       }, 600);
