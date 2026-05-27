@@ -6,6 +6,14 @@ import { WORKER_URL, getSessao, limparSessao, fetchComTimeout } from './config.j
 
 export var alertasData = [];
 
+// Timestamp do último fetch bem-sucedido — usado por showTab para evitar
+// re-fetch redundante quando o usuário alterna abas em menos de 30 segundos.
+var _alertasFetchedAt = 0;
+
+export function alertasSaoFrescos(maxAgeMs) {
+  return _alertasFetchedAt > 0 && (Date.now() - _alertasFetchedAt) < (maxAgeMs || 30000);
+}
+
 // ── ALERTAS ───────────────────────────────────────────────────
 
 export function carregarAlertas() {
@@ -25,6 +33,7 @@ export function carregarAlertas() {
   })
   .then(function (data) {
     alertasData = data || [];
+    _alertasFetchedAt = Date.now();
     var n = alertasData.length;
     document.getElementById('eyebrow').textContent =
       n + ' alerta' + (n !== 1 ? 's' : '') + ' ativo' + (n !== 1 ? 's' : '');

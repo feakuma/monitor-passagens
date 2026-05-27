@@ -3,7 +3,7 @@
 // ============================================================
 
 import { getSessao, showToast, formatData, formatDataCurta, esc, escAttr } from './config.js';
-import { alertasData, carregarAlertas, adicionarAlertaAPI, removerAlertaAPI, analisarAlertaAPI } from './api.js';
+import { alertasData, carregarAlertas, alertasSaoFrescos, adicionarAlertaAPI, removerAlertaAPI, analisarAlertaAPI } from './api.js';
 import { renderGraficos } from './charts.js';
 
 // ── AEROPORTOS ────────────────────────────────────────────────
@@ -82,7 +82,13 @@ export function showTab(tab) {
   document.getElementById('page-title').textContent = titles[tab] || 'Passagens';
 
   if (tab === 'alertas' || tab === 'historico') {
-    carregarAlertas().then(function () { renderAlertas(); renderHistorico(); });
+    // Pula o fetch se os dados foram buscados há menos de 30 segundos —
+    // evita round-trip desnecessário quando o usuário alterna abas rapidamente.
+    if (alertasSaoFrescos(30000)) {
+      renderAlertas(); renderHistorico();
+    } else {
+      carregarAlertas().then(function () { renderAlertas(); renderHistorico(); });
+    }
   }
   if (tab === 'config') {
     renderConfigAlertas();
@@ -225,12 +231,21 @@ export function adicionarAlerta() {
   var dataIda = document.getElementById('input-ida').value;
   var dataVolta = document.getElementById('input-volta').value;
 
-  if (!origem  || origem.length !== 3)  { showToast('Informe a origem', 'error'); return; }
-  if (!destino || destino.length !== 3) { showToast('Informe o destino', 'error'); return; }
+  if (!origem  || origem.length !== 3)  { showToast('Informe a origem (código IATA)', 'error'); return; }
+  if (!destino || destino.length !== 3) { showToast('Informe o destino (código IATA)', 'error'); return; }
+  if (origem === destino)               { showToast('Origem e destino não podem ser iguais', 'error'); return; }
   if (!dataIda)                          { showToast('Informe a data de ida', 'error'); return; }
+
+  // Data de ida deve ser futura (compara strings ISO — funciona pois formato é YYYY-MM-DD)
+  var hoje = new Date().toISOString().slice(0, 10);
+  if (dataIda < hoje) { showToast('A data de ida deve ser futura', 'error'); return; }
+
+  // Volta deve ser posterior à ida
+  if (dataVolta && dataVolta <= dataIda) { showToast('A data de volta deve ser após a ida', 'error'); return; }
 
   var btn = document.getElementById('btn-adicionar');
   btn.classList.add('loading'); btn.textContent = 'Criando...';
+  btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
 
   adicionarAlertaAPI(origem, destino, dataIda, dataVolta || null)
   .then(function (res) {
@@ -247,10 +262,12 @@ export function adicionarAlerta() {
       carregarAlertas().then(function () { renderAlertas(); renderHistorico(); renderConfigAlertas(); });
     }
     btn.classList.remove('loading'); btn.textContent = 'Criar alerta';
+    btn.style.opacity = ''; btn.style.pointerEvents = '';
   })
   .catch(function () {
     showToast('Erro ao criar', 'error');
     btn.classList.remove('loading'); btn.textContent = 'Criar alerta';
+    btn.style.opacity = ''; btn.style.pointerEvents = '';
   });
 }
 
@@ -306,12 +323,14 @@ export function doAutocomplete(input, tipo) {
   if (!matches.length) { drop.classList.remove('open'); return; }
 
   drop.innerHTML = matches.map(function (a) {
+    // esc() nos dados mesmo sendo estáticos hoje — previne XSS se a lista
+    // passar a ser carregada de fonte externa no futuro.
     return '<div class="autocomplete-item"' +
-      ' onmousedown="pickAirport(\'' + a.code + '\',\'' + tipo + '\')"' +
-      ' ontouchstart="pickAirport(\'' + a.code + '\',\'' + tipo + '\')">' +
-      '<div class="ac-code">' + a.code + '</div>' +
-      '<div class="ac-info"><div class="ac-name">' + a.name + '</div><div class="ac-city">' + a.city + '</div></div>' +
-      '<div class="ac-icon">' + a.icon + '</div>' +
+      ' onmousedown="pickAirport(\'' + escAttr(a.code) + '\',\'' + escAttr(tipo) + '\')"' +
+      ' ontouchstart="pickAirport(\'' + escAttr(a.code) + '\',\'' + escAttr(tipo) + '\')">' +
+      '<div class="ac-code">' + esc(a.code) + '</div>' +
+      '<div class="ac-info"><div class="ac-name">' + esc(a.name) + '</div><div class="ac-city">' + esc(a.city) + '</div></div>' +
+      '<div class="ac-icon">' + esc(a.icon) + '</div>' +
     '</div>';
   }).join('');
   drop.classList.add('open');

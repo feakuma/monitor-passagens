@@ -15,7 +15,14 @@ export function getSessao() {
   var t = localStorage.getItem('pm_token');
   var u = localStorage.getItem('pm_usuario');
   if (!t || !u) return null;
-  return { token: t, usuario: JSON.parse(u) };
+  try {
+    return { token: t, usuario: JSON.parse(u) };
+  } catch (e) {
+    // localStorage corrompido ou manipulado — força logout limpo em vez de
+    // deixar o app crashar com SyntaxError não capturado
+    limparSessao();
+    return null;
+  }
 }
 
 export function limparSessao() {
