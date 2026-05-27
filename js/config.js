@@ -50,6 +50,23 @@ export function formatDataCurta2(dt) {
   return dt.getDate() + ' ' + m[dt.getMonth()];
 }
 
+// FETCH COM TIMEOUT ───────────────────────────────────────────
+
+var _FETCH_TIMEOUT_MS = 15000; // 15s padrão
+
+/**
+ * Wrapper sobre fetch() com AbortController timeout.
+ * Se o servidor não responder em `ms` ms, a Promise rejeita com AbortError.
+ * Os .catch() existentes em cada módulo capturam o erro naturalmente.
+ */
+export function fetchComTimeout(url, opts, ms) {
+  ms = ms || _FETCH_TIMEOUT_MS;
+  var ctrl = new AbortController();
+  var tid  = setTimeout(function () { ctrl.abort(); }, ms);
+  var options = Object.assign({}, opts || {}, { signal: ctrl.signal });
+  return fetch(url, options).finally(function () { clearTimeout(tid); });
+}
+
 // XSS PREVENTION ──────────────────────────────────────────────
 
 /**

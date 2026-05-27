@@ -2,9 +2,10 @@
 //  admin.js — Painel admin, configs do usuário e config de IA
 // ============================================================
 
-import { WORKER_URL, getSessao, showToast, esc, escAttr } from './config.js';
+import { WORKER_URL, getSessao, showToast, esc, escAttr, fetchComTimeout } from './config.js';
 
-var _cfgPctAtual = 0;
+var _cfgPctAtual   = 0;
+var _usuariosCache = []; // evita re-fetch em adminAbrirEdicao
 
 export const DEFAULT_PROMPT =
 `Analise este voo como especialista em tarifas aéreas.
@@ -24,7 +25,7 @@ export function renderConfigs() {
   var sessao = getSessao();
   if (!sessao || !sessao.usuario) return;
 
-  fetch(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  fetchComTimeout(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
   .then(function (r) { return r.json(); })
   .then(function (u) {
     _cfgPctAtual = u.percentualMinimo || 0;
@@ -63,7 +64,7 @@ export function cancelarEditConfigs() {
 export function salvarConfigs() {
   var pct    = parseInt(document.getElementById('cfg-pct-input').value || '0');
   var sessao = getSessao();
-  fetch(WORKER_URL + '/auth/config', {
+  fetchComTimeout(WORKER_URL + '/auth/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ percentualMinimo: pct })
@@ -86,7 +87,7 @@ export function editarConfigIA() {
   if (!sessao) return;
 
   // Carrega dados atuais do usuário para preencher o form
-  fetch(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  fetchComTimeout(WORKER_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
   .then(function (r) { return r.json(); })
   .then(function (u) {
     var provInput   = document.getElementById('cfg-provider-input');
@@ -115,7 +116,7 @@ export function salvarConfigIA() {
   // Só envia tokenIA se o usuário digitou algo — campo vazio = mantém o token atual
   if (token) payload.tokenIA = token;
 
-  fetch(WORKER_URL + '/auth/config', {
+  fetchComTimeout(WORKER_URL + '/auth/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify(payload)
@@ -144,7 +145,7 @@ export function toggleTokenVisibility() {
 export function removerTokenIA() {
   if (!confirm('Remover seu token de IA? A análise voltará a usar o token do sistema (se habilitado pelo admin).')) return;
   var sessao = getSessao();
-  fetch(WORKER_URL + '/auth/config', {
+  fetchComTimeout(WORKER_URL + '/auth/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ tokenIA: '' })
@@ -165,11 +166,13 @@ export function carregarUsuarios() {
   el.innerHTML = '<div class="empty">Carregando...</div>';
   var sessao = getSessao();
 
-  fetch(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  fetchComTimeout(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
   .then(function (r) { return r.json(); })
   .then(function (usuarios) {
     if (!usuarios || usuarios.erro) { el.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>'; return; }
-    if (!usuarios.length)           { el.innerHTML = '<div class="empty">Nenhum usuário cadastrado.</div>'; return; }
+    if (!usuarios.length)           { _usuariosCache = []; el.innerHTML = '<div class="empty">Nenhum usuário cadastrado.</div>'; return; }
+
+    _usuariosCache = usuarios; // cache para adminAbrirEdicao reutilizar sem re-fetch
 
     el.innerHTML = usuarios.map(function (u) {
       // ── Card de convite pendente ────────────────────────────
@@ -233,7 +236,7 @@ export function adminEnviarConvite() {
   if (btn) { btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none'; btn.textContent = 'Enviando...'; }
 
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/convite', {
+  fetchComTimeout(WORKER_URL + '/admin/convite', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ email: email })
@@ -255,7 +258,7 @@ export function adminEnviarConvite() {
 export function adminReenviarConvite(email) {
   if (!confirm('Reenviar convite para ' + email + '?')) return;
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/convite', {
+  fetchComTimeout(WORKER_URL + '/admin/convite', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ email: email })
@@ -272,7 +275,7 @@ export function adminReenviarConvite(email) {
 export function adminCancelarConvite(token, email) {
   if (!confirm('Cancelar convite para ' + email + '?')) return;
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/convite/' + encodeURIComponent(token), {
+  fetchComTimeout(WORKER_URL + '/admin/convite/' + encodeURIComponent(token), {
     method: 'DELETE',
     headers: { 'Authorization': 'Bearer ' + sessao.token }
   })
@@ -307,7 +310,7 @@ export function _executarCriarUsuarioManual() {
   var pct    = parseInt(document.getElementById('admin-pct').value || '0');
   var sessao = getSessao();
 
-  fetch(WORKER_URL + '/admin/usuarios', {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ nome: nome, email: email, chatId: chatId, analiseIA: ia, percentualMinimo: pct })
@@ -330,24 +333,32 @@ export function _executarCriarUsuarioManual() {
 var _adminEditandoEmail = null;
 var _adminEditandoUsuario = null;
 
+function _abrirModalEdicao(u) {
+  _adminEditandoEmail   = u.email;
+  _adminEditandoUsuario = u;
+  document.getElementById('modal-edit-nome').textContent    = u.nome;
+  document.getElementById('modal-edit-email').textContent   = u.email;
+  document.getElementById('modal-edit-pct').value           = u.percentualMinimo || 0;
+  document.getElementById('modal-edit-limite').value        = u.limiteAlertas ?? 10;
+  document.getElementById('modal-edit-ia').value            = u.analiseIA ? 'true' : 'false';
+  document.getElementById('modal-edit-chatid').value        = u.chatId || '';
+  document.getElementById('modal-edit-usuario').style.display = 'flex';
+}
+
 export function adminAbrirEdicao(email) {
+  // Usa cache populado por carregarUsuarios() — sem re-fetch de todos os usuários
+  var cached = _usuariosCache.find(function (x) { return x.email === email; });
+  if (cached) { _abrirModalEdicao(cached); return; }
+
+  // Fallback: cache vazio (edge case — admin abriu link direto sem listar antes)
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  fetchComTimeout(WORKER_URL + '/admin/usuarios', { headers: { 'Authorization': 'Bearer ' + sessao.token } })
   .then(function (r) { return r.json(); })
   .then(function (usuarios) {
-    var u = usuarios.find(function(x) { return x.email === email; });
+    _usuariosCache = usuarios || [];
+    var u = _usuariosCache.find(function (x) { return x.email === email; });
     if (!u) { showToast('Usuário não encontrado', 'error'); return; }
-    _adminEditandoEmail   = email;
-    _adminEditandoUsuario = u;
-
-    // Preenche o modal
-    document.getElementById('modal-edit-nome').textContent    = u.nome;
-    document.getElementById('modal-edit-email').textContent   = u.email;
-    document.getElementById('modal-edit-pct').value           = u.percentualMinimo || 0;
-    document.getElementById('modal-edit-limite').value        = u.limiteAlertas ?? 10;
-    document.getElementById('modal-edit-ia').value            = u.analiseIA ? 'true' : 'false';
-    document.getElementById('modal-edit-chatid').value        = u.chatId || '';
-    document.getElementById('modal-edit-usuario').style.display = 'flex';
+    _abrirModalEdicao(u);
   })
   .catch(function () { showToast('Erro ao carregar dados', 'error'); });
 }
@@ -360,7 +371,7 @@ export function adminSalvarEdicao() {
   var ia     = document.getElementById('modal-edit-ia').value === 'true';
   var chatId = document.getElementById('modal-edit-chatid').value.trim();
 
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(_adminEditandoEmail) + '/config', {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(_adminEditandoEmail) + '/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ percentualMinimo: pct, limiteAlertas: limite, analiseIA: ia, chatId: chatId })
@@ -389,7 +400,7 @@ export function adminEditarLimite(email, limiteAtual) {
   var limite = parseInt(novoLimite);
   if (isNaN(limite) || limite < 1) { showToast('Limite inválido — mínimo 1', 'error'); return; }
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ limiteAlertas: limite })
@@ -405,7 +416,7 @@ export function adminEditarLimite(email, limiteAtual) {
 
 export function adminToggleIA(email, ativo) {
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ analiseIA: ativo })
@@ -417,7 +428,7 @@ export function adminToggleIA(email, ativo) {
 
 export function adminToggleAtivo(email, ativo) {
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ ativo: ativo })
@@ -434,7 +445,7 @@ export function adminToggleAtivo(email, ativo) {
 export function adminRemoverUsuario(email, nome) {
   if (!confirm('Remover ' + nome + '? Todos os alertas serão apagados.')) return;
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email), {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email), {
     method: 'DELETE',
     headers: { 'Authorization': 'Bearer ' + sessao.token }
   })
@@ -482,7 +493,7 @@ export function adminVerAlertas(email, nome) {
   modal.style.display = '';
 
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/alertas', {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/alertas', {
     headers: { 'Authorization': 'Bearer ' + sessao.token }
   })
   .then(function (r) { return r.json(); })
@@ -609,7 +620,7 @@ function _buscarAudit(email) {
   var de   = new Date(Date.now() - dias * 86400000).toISOString().slice(0, 10);
 
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/audit?de=' + de + '&ate=' + ate, {
+  fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(email) + '/audit?de=' + de + '&ate=' + ate, {
     headers: { 'Authorization': 'Bearer ' + sessao.token }
   })
   .then(function (r) { return r.json(); })
@@ -655,7 +666,7 @@ export function carregarDashboard() {
   var ate  = hoje;
 
   var sessao = getSessao();
-  fetch(WORKER_URL + '/admin/dashboard?de=' + de + '&ate=' + ate, { headers: { 'Authorization': 'Bearer ' + sessao.token } })
+  fetchComTimeout(WORKER_URL + '/admin/dashboard?de=' + de + '&ate=' + ate, { headers: { 'Authorization': 'Bearer ' + sessao.token } })
   .then(function (r) { return r.json(); })
   .then(function (data) {
     if (data.erro) { statsEl.innerHTML = '<div class="empty">Erro ao carregar.</div>'; return; }

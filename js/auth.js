@@ -2,7 +2,7 @@
 //  auth.js — Autenticação: login, OTP, convite, logout
 // ============================================================
 
-import { WORKER_URL, getSessao, salvarSessao, limparSessao, showToast } from './config.js';
+import { WORKER_URL, getSessao, salvarSessao, limparSessao, showToast, fetchComTimeout } from './config.js';
 
 export var _conviteToken = null;
 export var _conviteEmail = null;
@@ -54,7 +54,7 @@ export function solicitarOTP(reenvio) {
   btn.textContent = 'Enviando...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   document.getElementById('login-email-erro').style.display = 'none';
 
-  fetch(WORKER_URL + '/auth/request-otp', {
+  fetchComTimeout(WORKER_URL + '/auth/request-otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: email })
@@ -84,7 +84,7 @@ export function verificarOTP() {
   btn.textContent = 'Verificando...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
   document.getElementById('login-otp-erro').style.display = 'none';
 
-  fetch(WORKER_URL + '/auth/verify-otp', {
+  fetchComTimeout(WORKER_URL + '/auth/verify-otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: email, codigo: codigo })
@@ -114,7 +114,7 @@ export function voltarParaEmail() {
 
 export function logout() {
   var sessao = getSessao();
-  if (sessao) fetch(WORKER_URL + '/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao.token } });
+  if (sessao) fetchComTimeout(WORKER_URL + '/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao.token } });
   limparSessao();
   mostrarLanding();
 }
@@ -126,7 +126,7 @@ export function verificarConviteURL() {
   var token  = params.get('convite');
   if (!token) return false;
 
-  fetch(WORKER_URL + '/convite/' + token)
+  fetchComTimeout(WORKER_URL + '/convite/' + token)
   .then(function (r) { return r.json(); })
   .then(function (data) {
     if (data.erro) { mostrarTelaLogin(); showToast('Convite inválido ou expirado.', 'error'); return; }
@@ -160,7 +160,7 @@ export function _executarCriarContaConvite(nome, chatId) {
   var btn = document.getElementById('btn-criar-conta');
   btn.textContent = 'Criando conta...'; btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none';
 
-  fetch(WORKER_URL + '/convite/' + _conviteToken, {
+  fetchComTimeout(WORKER_URL + '/convite/' + _conviteToken, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nome: nome, chatId: chatId })

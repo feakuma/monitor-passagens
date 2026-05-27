@@ -2,7 +2,7 @@
 //  api.js — Chamadas para o Worker (alertas, análise IA)
 // ============================================================
 
-import { WORKER_URL, getSessao, limparSessao } from './config.js';
+import { WORKER_URL, getSessao, limparSessao, fetchComTimeout } from './config.js';
 
 export var alertasData = [];
 
@@ -12,7 +12,7 @@ export function carregarAlertas() {
   var sessao = getSessao();
   if (!sessao) return Promise.resolve([]);
 
-  return fetch(WORKER_URL + '/alertas', {
+  return fetchComTimeout(WORKER_URL + '/alertas', {
     headers: { 'Authorization': 'Bearer ' + sessao.token }
   })
   .then(function (r) {
@@ -39,7 +39,7 @@ export function carregarAlertas() {
 
 export function adicionarAlertaAPI(origem, destino, dataIda, dataVolta) {
   var sessao = getSessao();
-  return fetch(WORKER_URL + '/alertas', {
+  return fetchComTimeout(WORKER_URL + '/alertas', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ origem: origem, destino: destino, dataIda: dataIda, dataVolta: dataVolta || null })
@@ -48,7 +48,7 @@ export function adicionarAlertaAPI(origem, destino, dataIda, dataVolta) {
 
 export function removerAlertaAPI(indice) {
   var sessao = getSessao();
-  return fetch(WORKER_URL + '/alertas/' + indice, {
+  return fetchComTimeout(WORKER_URL + '/alertas/' + indice, {
     method: 'DELETE',
     headers: { 'Authorization': 'Bearer ' + sessao.token }
   }).then(function (r) { return r.json(); });
@@ -57,9 +57,9 @@ export function removerAlertaAPI(indice) {
 // Chama /analisar direto no Worker (não passa mais pelo Apps Script)
 export function analisarAlertaAPI(id) {
   var sessao = getSessao();
-  return fetch(WORKER_URL + '/analisar', {
+  return fetchComTimeout(WORKER_URL + '/analisar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ id: id })
-  }).then(function (r) { return r.json(); });
+  }, 30000).then(function (r) { return r.json(); }); // 30s — IA pode ser lenta
 }

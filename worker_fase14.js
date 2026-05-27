@@ -251,6 +251,28 @@ var worker_fase14_default = {
     }, "redisGet");
     const redisDel = /* @__PURE__ */ __name(async (key) => redisCmd("DEL", key), "redisDel");
     const redisKeys = /* @__PURE__ */ __name(async (pattern) => redisCmd("KEYS", pattern), "redisKeys");
+
+    // ── Índices SET — substituem KEYS scans em produção ──────────
+    // Auto-migrável: se o índice está vazio (primeiro deploy), faz um KEYS
+    // único para popular e depois nunca mais usa KEYS para usuários/convites.
+    const getAllUsuarioEmails = /* @__PURE__ */ __name(async () => {
+      const fromIndex = (await redisCmd("SMEMBERS", "idx:usuarios")) || [];
+      if (fromIndex.length > 0) return fromIndex;
+      // Migração única: popula o índice a partir de KEYS
+      const keys = (await redisKeys("usuario:*")) || [];
+      const emails = keys.map(k => k.replace("usuario:", ""));
+      for (const e of emails) await redisCmd("SADD", "idx:usuarios", e);
+      return emails;
+    }, "getAllUsuarioEmails");
+
+    const getAllConviteTokens = /* @__PURE__ */ __name(async () => {
+      const fromIndex = (await redisCmd("SMEMBERS", "idx:convites")) || [];
+      if (fromIndex.length > 0) return fromIndex;
+      const keys = (await redisKeys("convite:*")) || [];
+      const tokens = keys.map(k => k.replace("convite:", ""));
+      for (const t of tokens) await redisCmd("SADD", "idx:convites", t);
+      return tokens;
+    }, "getAllConviteTokens");
     const redisIncr = /* @__PURE__ */ __name(async (key) => redisCmd("INCR", key), "redisIncr");
     const redisExpire = /* @__PURE__ */ __name(async (key, ttl) => redisCmd("EXPIRE", key, ttl), "redisExpire");
     const auditLog = /* @__PURE__ */ __name(async (email, tipo, detalhe) => {
@@ -497,13 +519,13 @@ var worker_fase14_default = {
           pushPorEmail[emailKey] = (pushPorEmail[emailKey] || 0) + count;
         }
 
-        const chaves = await redisKeys("usuario:*") || [];
+        const emails = await getAllUsuarioEmails();
         let totalUsuarios = 0, totalAtivos = 0, totalAlertas = 0, totalChecagens = 0;
         const rotasCount = {};
         const acessos = [];
 
-        for (const chave of chaves) {
-          const u = await redisGet(chave);
+        for (const email of emails) {
+          const u = await redisGet(`usuario:${email}`);
           if (!u) continue;
           totalUsuarios++;
           if (u.ativo) totalAtivos++;
@@ -538,10 +560,10 @@ var worker_fase14_default = {
       try {
         const sessao = await requireAdmin(request);
         if (!sessao) return json({ erro: "Acesso negado" }, 403);
-        const chaves = await redisKeys("usuario:*");
+        const emails = await getAllUsuarioEmails();
         const usuarios = [];
-        for (const chave of chaves || []) {
-          const u = await redisGet(chave);
+        for (const email of emails) {
+          const u = await redisGet(`usuario:${email}`);
           if (u) {
             const alertas = await redisGet(`alertas:${u.email}`) || [];
             usuarios.push({ ...u, totalAlertas: alertas.length });
@@ -549,12 +571,11 @@ var worker_fase14_default = {
         }
         // Inclui convites pendentes (falha silenciosa para não quebrar a lista)
         try {
-          const conviteChaves = await redisKeys("convite:*");
-          for (const chave of conviteChaves || []) {
+          const conviteTokens = await getAllConviteTokens();
+          for (const token of conviteTokens) {
             try {
-              const c = await redisGet(chave);
+              const c = await redisGet(`convite:${token}`);
               if (c && c.email) {
-                const token = chave.replace("convite:", "");
                 usuarios.push({ email: c.email, criadoEm: c.criadoEm, pendente: true, token });
               }
             } catch (_) { /* ignora key inválida */ }
@@ -587,6 +608,7 @@ var worker_fase14_default = {
           criadoEm: (/* @__PURE__ */ new Date()).toISOString()
         });
         await redisSet(`alertas:${emailNorm}`, []);
+        await redisCmd("SADD", "idx:usuarios", emailNorm); // mantém índice
         return json({ ok: true, mensagem: `Usu\xE1rio ${nome} cadastrado com sucesso!` });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -678,6 +700,7 @@ var worker_fase14_default = {
         }
         await redisDel(`alertas:${email}`);
         await redisDel(`usuario:${email}`);
+        await redisCmd("SREM", "idx:usuarios", email); // mantém índice
         return json({ ok: true });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
@@ -691,6 +714,7 @@ var worker_fase14_default = {
         if (!token) return json({ erro: "Token obrigatório" }, 400);
         const convite = await redisGet(`convite:${token}`);
         await redisDel(`convite:${token}`);
+        await redisCmd("SREM", "idx:convites", token); // mantém índice
         await auditLog(sessao.email, "convite_cancelado", convite?.email || token);
         return json({ ok: true });
       } catch (err) {
@@ -708,6 +732,7 @@ var worker_fase14_default = {
         if (existe) return json({ erro: "E-mail j\xE1 cadastrado" }, 400);
         const token = gerarToken();
         await redisSetEx(`convite:${token}`, { email, criadoEm: (/* @__PURE__ */ new Date()).toISOString() }, 604800);
+        await redisCmd("SADD", "idx:convites", token); // mantém índice
         const linkConvite = `https://passagens.fetadeu.com.br/?convite=${token}`;
         await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -834,6 +859,8 @@ var worker_fase14_default = {
         });
         await redisSet(`alertas:${convite.email}`, []);
         await redisDel(`convite:${token}`);
+        await redisCmd("SADD", "idx:usuarios",  convite.email); // mantém índice
+        await redisCmd("SREM", "idx:convites",  token);          // remove do índice de convites
         await auditLog(convite.email, "cadastro", nome);
         return json({ ok: true, mensagem: "Conta criada com sucesso! Fa\xE7a login para continuar." });
       } catch (err) {

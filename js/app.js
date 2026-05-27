@@ -167,12 +167,30 @@ if (!verificarConviteURL()) {
   inicializarApp();
 }
 
+// ── POLLING ───────────────────────────────────────────────────
+// Não dispara requests quando a aba está em background (economiza bateria e
+// cota do Worker). Ao voltar para a aba, recarrega se passaram > 2 minutos.
+
+var _ultimoPolling = Date.now();
+
 setInterval(function () {
+  if (document.visibilityState !== 'visible') return; // aba oculta — pula
   var sessao = getSessao();
-  if (sessao) {
+  if (!sessao) return;
+  _ultimoPolling = Date.now();
+  carregarAlertas().then(function () { renderAlertas(); renderHistorico(); });
+}, 5 * 60 * 1000);
+
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState !== 'visible') return;
+  var sessao = getSessao();
+  if (!sessao) return;
+  // Recarrega ao voltar para a aba somente se passou mais de 2 minutos
+  if (Date.now() - _ultimoPolling > 2 * 60 * 1000) {
+    _ultimoPolling = Date.now();
     carregarAlertas().then(function () { renderAlertas(); renderHistorico(); });
   }
-}, 5 * 60 * 1000);
+});
 
 // ── SERVICE WORKER ────────────────────────────────────────────
 

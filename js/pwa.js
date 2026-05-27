@@ -2,7 +2,7 @@
 //  pwa.js — Push notifications e instalação PWA
 // ============================================================
 
-import { WORKER_URL, getSessao, showToast } from './config.js';
+import { WORKER_URL, getSessao, showToast, fetchComTimeout } from './config.js';
 
 var _pushAtivo      = false;
 var _deferredPrompt = null;
@@ -25,7 +25,7 @@ export async function inicializarPush() {
   try {
     var reg = await navigator.serviceWorker.ready;
 
-    var resp = await fetch(WORKER_URL + '/push/vapidkey');
+    var resp = await fetchComTimeout(WORKER_URL + '/push/vapidkey');
     var { publicKey } = await resp.json();
 
     var existingSub = await reg.pushManager.getSubscription();
@@ -58,7 +58,7 @@ export async function inicializarPush() {
 }
 
 async function _salvarSubscription(sub, token) {
-  await fetch(WORKER_URL + '/push/subscribe', {
+  await fetchComTimeout(WORKER_URL + '/push/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
     body: JSON.stringify(sub.toJSON())
@@ -75,7 +75,7 @@ export async function togglePush() {
       var sub = await reg.pushManager.getSubscription();
       if (sub) {
         await sub.unsubscribe();
-        await fetch(WORKER_URL + '/push/subscribe', {
+        await fetchComTimeout(WORKER_URL + '/push/subscribe', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token }
         });
