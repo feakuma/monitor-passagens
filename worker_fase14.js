@@ -397,7 +397,7 @@ var worker_fase14_default = {
         if (!sessao) return json({ erro: "N\xE3o autenticado" }, 401);
         const usuario = await redisGet(`usuario:${sessao.email}`);
         if (!usuario) return json({ erro: "N\xE3o encontrado" }, 404);
-        return json({ nome: usuario.nome, email: usuario.email, isAdmin: usuario.isAdmin, analiseIA: usuario.analiseIA, percentualMinimo: usuario.percentualMinimo || 0, limiteAlertas: usuario.limiteAlertas ?? 10, tokenIA: usuario.tokenIA ? true : false, providerIA: usuario.providerIA || "anthropic" });
+        return json({ nome: usuario.nome, email: usuario.email, isAdmin: usuario.isAdmin, analiseIA: usuario.analiseIA, buscaMilhas: usuario.buscaMilhas || false, percentualMinimo: usuario.percentualMinimo || 0, limiteAlertas: usuario.limiteAlertas ?? 10, tokenIA: usuario.tokenIA ? true : false, providerIA: usuario.providerIA || "anthropic" });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
       }
@@ -447,6 +447,67 @@ var worker_fase14_default = {
         }));
         return json(result);
       } catch (err) {
+        return json({ erro: "Erro interno" }, 500);
+      }
+    }
+    // ── BUSCA DE MILHAS (sob demanda, só para usuários com buscaMilhas=true) ──
+    if (path === "/alertas/milhas" && method === "POST") {
+      try {
+        const sessao = await requireAuth(request);
+        if (!sessao) return json({ erro: "N\xE3o autenticado" }, 401);
+
+        const usuario = await redisGet(`usuario:${sessao.email}`);
+        if (!usuario || !usuario.buscaMilhas) return json({ erro: "Busca de milhas n\xE3o habilitada para este usu\xE1rio" }, 403);
+
+        const APIDEVOOS_KEY = env.APIDEVOOS_KEY;
+        if (!APIDEVOOS_KEY) return json({ erro: "API de milhas n\xE3o configurada no servidor" }, 503);
+
+        const body = await request.json();
+        const { origem, destino, dataIda, dataVolta } = body;
+        if (!origem || !destino || !dataIda) return json({ erro: "origem, destino e dataIda s\xE3o obrigat\xF3rios" }, 400);
+
+        // Chama API de Voos (apidevoos.dev) — POST /v1/flights/search com searchMiles: true
+        // Documentação: https://apidevoos.dev/docs/api-reference
+        const payload = {
+          type: dataVolta ? "round_trip" : "one_way",
+          slices: [
+            { origin: origem.toUpperCase(), destination: destino.toUpperCase(), departureDate: dataIda },
+            ...(dataVolta ? [{ origin: destino.toUpperCase(), destination: origem.toUpperCase(), departureDate: dataVolta }] : []),
+          ],
+          passengers: [{ type: "adult", count: 1 }],
+          cabinClass: "economy",
+          searchMiles: true,
+        };
+
+        const apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/search", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${APIDEVOOS_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!apiResp.ok) {
+          console.error(`[milhas] API de Voos HTTP ${apiResp.status} para ${origem}-${destino}`);
+          return json({ erro: "Erro na consulta de milhas (API externa)" }, 502);
+        }
+
+        const apiData = await apiResp.json();
+
+        // Normaliza por programa — adapte os campos conforme resposta real da API de Voos
+        const voos = apiData.flights || apiData.results || apiData.data || [];
+        const mapa = {};
+        voos.forEach(v => {
+          const prog   = v.loyaltyProgram || v.program || v.programa || "";
+          const pontos = parseInt(v.miles || v.points || v.pontos || 0);
+          const taxas  = parseFloat(v.boardingFee || v.fees || v.taxa || 0);
+          const cia    = v.airline || v.companhia || "";
+          if (prog && pontos > 0) {
+            if (!mapa[prog] || pontos < mapa[prog].pontos) mapa[prog] = { programa: prog, pontos, taxas, cia };
+          }
+        });
+
+        return json({ ok: true, programas: Object.values(mapa) });
+      } catch (err) {
+        console.error("[milhas] erro:", err && err.message ? err.message : String(err));
         return json({ erro: "Erro interno" }, 500);
       }
     }
@@ -626,11 +687,12 @@ var worker_fase14_default = {
         const usuario = await redisGet(`usuario:${email}`);
         if (!usuario) return json({ erro: "Usu\xE1rio n\xE3o encontrado" }, 404);
         const body = await request.json();
-        if (body.analiseIA !== void 0) usuario.analiseIA = body.analiseIA;
+        if (body.analiseIA    !== void 0) usuario.analiseIA    = body.analiseIA;
+        if (body.buscaMilhas  !== void 0) usuario.buscaMilhas  = body.buscaMilhas;
         if (body.percentualMinimo !== void 0) usuario.percentualMinimo = body.percentualMinimo;
-        if (body.ativo !== void 0) usuario.ativo = body.ativo;
+        if (body.ativo        !== void 0) usuario.ativo        = body.ativo;
         if (body.limiteAlertas !== void 0) usuario.limiteAlertas = body.limiteAlertas;
-        if (body.chatId !== void 0) usuario.chatId = body.chatId;
+        if (body.chatId       !== void 0) usuario.chatId       = body.chatId;
         await redisSet(`usuario:${email}`, usuario);
         return json({ ok: true });
       } catch (err) {

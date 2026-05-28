@@ -2,7 +2,7 @@
 //  ui.js — Render de alertas, histórico, config, tabs, autocomplete, CRUD
 // ============================================================
 
-import { getSessao, showToast, formatData, formatDataCurta, esc, escAttr } from './config.js';
+import { getSessao, WORKER_URL, fetchComTimeout, showToast, formatData, formatDataCurta, esc, escAttr } from './config.js';
 import { alertasData, carregarAlertas, alertasSaoFrescos, adicionarAlertaAPI, removerAlertaAPI, analisarAlertaAPI } from './api.js';
 import { renderGraficos } from './charts.js';
 
@@ -112,8 +112,9 @@ export function renderAlertas() {
     return;
   }
 
-  var sessao = getSessao();
-  var temIA  = sessao && sessao.usuario && sessao.usuario.analiseIA;
+  var sessao    = getSessao();
+  var temIA     = sessao && sessao.usuario && sessao.usuario.analiseIA;
+  var temMilhas = sessao && sessao.usuario && sessao.usuario.buscaMilhas;
 
   el.innerHTML = alertasData.map(function (a) {
     var temQueda = a.variacao < -0.5;
@@ -151,11 +152,82 @@ export function renderAlertas() {
         '<div class="ai-verdict" id="ai-verdict-' + a.id + '"></div>' +
         '<div class="ai-text" id="ai-text-' + a.id + '"></div>' +
       '</div>' +
+      (temMilhas ? '<div class="milhas-btn" id="btn-milhas-' + a.id + '" data-action="ver-milhas" data-id="' + a.id + '">✈ Ver em milhas</div>' : '') +
+      '<div id="milhas-' + a.id + '" style="display:none;" class="milhas-panel"></div>' +
       '<div style="height:8px;"></div>' +
     '</div>';
   }).join('');
 
   setTimeout(function () { renderGraficos(alertasData); }, 100);
+}
+
+// ── BUSCA DE MILHAS (sob demanda) ─────────────────────────────
+
+export function verMilhasAlerta(alertaId) {
+  var btn   = document.getElementById('btn-milhas-' + alertaId);
+  var panel = document.getElementById('milhas-' + alertaId);
+  if (!btn || !panel) return;
+
+  // Se o painel já está aberto, toggle fecha
+  if (panel.style.display !== 'none') {
+    panel.style.display = 'none';
+    btn.textContent = '✈ Ver em milhas';
+    return;
+  }
+
+  btn.textContent = 'Buscando...';
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+
+  var a = alertasData.find(function (x) { return String(x.id) === String(alertaId); });
+  if (!a) { btn.textContent = '✈ Ver em milhas'; btn.style.opacity = ''; btn.style.pointerEvents = ''; return; }
+
+  var sessao = getSessao();
+  fetchComTimeout(WORKER_URL + '/alertas/milhas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
+    body: JSON.stringify({ origem: a.origem, destino: a.destino, dataIda: a.dataIda, dataVolta: a.dataVolta || null })
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (data) {
+    btn.textContent = '✈ Ver em milhas';
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+
+    if (data.erro) {
+      panel.innerHTML = '<div class="milhas-vazio">' + esc(data.erro) + '</div>';
+      panel.style.display = '';
+      return;
+    }
+    if (!data.programas || !data.programas.length) {
+      panel.innerHTML = '<div class="milhas-vazio">Sem disponibilidade em milhas para esta rota.</div>';
+      panel.style.display = '';
+      return;
+    }
+
+    // Ordena por pontos (menor primeiro)
+    var ordenados = data.programas.slice().sort(function (x, y) { return x.pontos - y.pontos; });
+
+    panel.innerHTML =
+      '<div class="milhas-titulo">Disponível em milhas</div>' +
+      ordenados.map(function (p) {
+        var taxaStr = p.taxas > 0
+          ? ' <span class="milhas-taxa">+ R$ ' + p.taxas.toFixed(2).replace('.', ',') + ' taxas</span>'
+          : ' <span class="milhas-taxa sem-taxa">sem taxas</span>';
+        return '<div class="milhas-linha">' +
+          '<span class="milhas-prog">' + esc(p.programa) + '</span>' +
+          '<span class="milhas-pts">' + p.pontos.toLocaleString('pt-BR') + ' pts' + taxaStr + '</span>' +
+        '</div>';
+      }).join('');
+    panel.style.display = '';
+  })
+  .catch(function () {
+    btn.textContent = '✈ Ver em milhas';
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+    panel.innerHTML = '<div class="milhas-vazio">Erro ao consultar milhas.</div>';
+    panel.style.display = '';
+  });
 }
 
 // ── RENDER HISTÓRICO ──────────────────────────────────────────

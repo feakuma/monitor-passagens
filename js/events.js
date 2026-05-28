@@ -9,7 +9,7 @@ import {
 } from './auth.js';
 import {
   showTab, adicionarAlerta, removerAlerta, solicitarAnalise,
-  doAutocomplete, pickAirport
+  verMilhasAlerta, doAutocomplete, pickAirport
 } from './ui.js';
 import { openCal, calNav, selectDay, confirmCal } from './calendar.js';
 import {
@@ -237,6 +237,8 @@ export function initEvents() {
     if (!el) return;
     if (el.dataset.action === 'solicitar-analise') {
       solicitarAnalise(parseInt(el.dataset.id, 10));
+    } else if (el.dataset.action === 'ver-milhas') {
+      verMilhasAlerta(el.dataset.id);
     } else if (el.dataset.action === 'open-flights-url') {
       window.open(el.dataset.url, '_blank');
     }

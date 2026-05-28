@@ -337,7 +337,8 @@ function _abrirModalEdicao(u) {
   document.getElementById('modal-edit-email').textContent   = u.email;
   document.getElementById('modal-edit-pct').value           = u.percentualMinimo || 0;
   document.getElementById('modal-edit-limite').value        = u.limiteAlertas ?? 10;
-  document.getElementById('modal-edit-ia').value            = u.analiseIA ? 'true' : 'false';
+  document.getElementById('modal-edit-ia').value            = u.analiseIA    ? 'true' : 'false';
+  document.getElementById('modal-edit-milhas').value        = u.buscaMilhas  ? 'true' : 'false';
   document.getElementById('modal-edit-chatid').value        = u.chatId || '';
   document.getElementById('modal-edit-usuario').style.display = 'flex';
 }
@@ -366,12 +367,13 @@ export function adminSalvarEdicao() {
   var pct    = parseInt(document.getElementById('modal-edit-pct').value || '0');
   var limite = parseInt(document.getElementById('modal-edit-limite').value || '10');
   var ia     = document.getElementById('modal-edit-ia').value === 'true';
+  var milhas = document.getElementById('modal-edit-milhas').value === 'true';
   var chatId = document.getElementById('modal-edit-chatid').value.trim();
 
   fetchComTimeout(WORKER_URL + '/admin/usuarios/' + encodeURIComponent(_adminEditandoEmail) + '/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-    body: JSON.stringify({ percentualMinimo: pct, limiteAlertas: limite, analiseIA: ia, chatId: chatId })
+    body: JSON.stringify({ percentualMinimo: pct, limiteAlertas: limite, analiseIA: ia, buscaMilhas: milhas, chatId: chatId })
   })
   .then(function (r) { return r.json(); })
   .then(function (data) {

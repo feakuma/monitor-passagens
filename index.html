@@ -135,6 +135,19 @@
   .ai-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border: 1px solid rgba(6,182,212,0.15); border-radius: var(--radius-sm); background: transparent; cursor: pointer; font-size: 13px; color: var(--text2); margin-top: 8px; transition: background 0.15s; }
   .ai-btn:active { background: var(--accent-glow); }
 
+  /* MILHAS */
+  .milhas-btn { display: flex; align-items: center; justify-content: center; padding: 11px; border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius-sm); background: transparent; cursor: pointer; font-size: 13px; color: var(--text2); margin-top: 8px; transition: background 0.15s; }
+  .milhas-btn:active { background: rgba(74,222,128,0.08); }
+  .milhas-panel { margin: 8px 0 0; padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid rgba(74,222,128,0.2); background: rgba(74,222,128,0.05); }
+  .milhas-titulo { font-size: 10px; color: #4ade80; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 10px; }
+  .milhas-linha { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .milhas-linha:last-child { border-bottom: none; }
+  .milhas-prog { font-size: 13px; color: var(--text2); font-weight: 500; }
+  .milhas-pts { font-size: 13px; color: var(--text); font-weight: 600; text-align: right; }
+  .milhas-taxa { font-size: 11px; color: var(--text3); font-weight: 400; }
+  .milhas-taxa.sem-taxa { color: #4ade80; }
+  .milhas-vazio { font-size: 13px; color: var(--text3); text-align: center; padding: 4px 0; }
+
   /* MONITOR DOT */
   .monitor-row { display: flex; align-items: center; gap: 7px; padding: 4px 2px 16px; }
   .monitor-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 3s ease-in-out infinite; }
@@ -1075,6 +1088,16 @@
     <div style="margin-bottom:14px;">
       <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">análise de ia</div>
       <select id="modal-edit-ia"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;">
+        <option value="false">Inativa</option>
+        <option value="true">Ativa</option>
+      </select>
+    </div>
+
+    <!-- Busca de Milhas -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">busca de milhas</div>
+      <select id="modal-edit-milhas"
         style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;">
         <option value="false">Inativa</option>
         <option value="true">Ativa</option>
