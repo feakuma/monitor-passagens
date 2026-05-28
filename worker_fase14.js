@@ -251,6 +251,17 @@ var worker_fase14_default = {
     }, "redisGet");
     const redisDel = /* @__PURE__ */ __name(async (key) => redisCmd("DEL", key), "redisDel");
     const redisKeys = /* @__PURE__ */ __name(async (pattern) => redisCmd("KEYS", pattern), "redisKeys");
+    // Executa múltiplos comandos em 1 HTTP request via Upstash pipeline.
+    // Retorna array com os .result de cada comando na mesma ordem.
+    const redisPipeline = /* @__PURE__ */ __name(async (commands) => {
+      const resp = await fetch(`${UPSTASH_URL}/pipeline`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
+        body: JSON.stringify(commands),
+      });
+      const data = await resp.json();
+      return Array.isArray(data) ? data.map((d) => d.result) : [];
+    }, "redisPipeline");
 
     // ── Índices SET — substituem KEYS scans em produção ──────────
     // Auto-migrável: se o índice está vazio (primeiro deploy), faz um KEYS
@@ -521,14 +532,18 @@ var worker_fase14_default = {
             totalChecagens += hist.length;
           }
 
-          // Soma acessos e push no período — lookup direto por email:data sem KEYS scan
+          // Soma acessos e push via pipeline — 1 HTTP call para todos os dias + último acesso
+          const pipelineCmds = [
+            ...dates.map((d) => ["GET", `acessos:${email}:${d}`]),
+            ...dates.map((d) => ["GET", `notif_push:${email}:${d}`]),
+            ["GET", `ultimo_acesso:${email}`],
+          ];
+          const pipelineRes = await redisPipeline(pipelineCmds);
+          const n = dates.length;
           let totalAcesso = 0, totalPush = 0;
-          for (const date of dates) {
-            totalAcesso += parseInt(await redisCmd("GET", `acessos:${email}:${date}`) || 0);
-            totalPush   += parseInt(await redisCmd("GET", `notif_push:${email}:${date}`) || 0);
-          }
-
-          const ultimoAcesso = await redisCmd("GET", `ultimo_acesso:${u.email}`);
+          for (let i = 0; i < n; i++) totalAcesso += parseInt(pipelineRes[i]     || 0);
+          for (let i = 0; i < n; i++) totalPush   += parseInt(pipelineRes[n + i] || 0);
+          const ultimoAcesso = pipelineRes[2 * n] || null;
           acessos.push({ nome: u.nome, email: u.email, acessos: totalAcesso, push: totalPush, ultimoAcesso: ultimoAcesso || null });
         }
 
@@ -541,6 +556,7 @@ var worker_fase14_default = {
 
         return json({ totalUsuarios, totalAtivos, totalAlertas, totalChecagens, rotasTop, acessos, de, ate });
       } catch (err) {
+        console.error("[dashboard] erro:", err && err.message ? err.message : String(err));
         return json({ erro: "Erro interno" }, 500);
       }
     }
