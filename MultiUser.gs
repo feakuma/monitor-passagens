@@ -8,43 +8,51 @@ const WORKER_URL_MU    = 'https://passagens-proxy.felipe-akuma.workers.dev';
 
 // Todas as chaves vêm do PropertiesService — NUNCA hardcode aqui.
 // Para configurar: Extensões → Apps Script → Configurações do projeto → Propriedades do script
-const _PROPS          = PropertiesService.getScriptProperties();
-const UPSTASH_TOKEN_MU = _PROPS.getProperty('UPSTASH_TOKEN');
-const ADMIN_SECRET_MU  = _PROPS.getProperty('ADMIN_SECRET');
-const RESEND_KEY_MU    = _PROPS.getProperty('RESEND_KEY');
-const SERPAPI_KEY_MU   = _PROPS.getProperty('SERPAPI_KEY');
-const APIFY_KEY_MU     = _PROPS.getProperty('APIFY_KEY');
+const _PROPS            = PropertiesService.getScriptProperties();
+const UPSTASH_TOKEN_MU  = _PROPS.getProperty('UPSTASH_TOKEN');
+const ADMIN_SECRET_MU   = _PROPS.getProperty('ADMIN_SECRET');
+const RESEND_KEY_MU     = _PROPS.getProperty('RESEND_KEY');
+const SERPAPI_KEY_MU    = _PROPS.getProperty('SERPAPI_KEY');
+const APIFY_KEY_MU      = _PROPS.getProperty('APIFY_KEY');
+const TELEGRAM_TOKEN_MU = _PROPS.getProperty('TELEGRAM_TOKEN');   // token do bot (@userinfobot)
+const ANTHROPIC_KEY_MU  = _PROPS.getProperty('ANTHROPIC_KEY');    // chave sistema (fallback quando usuário não tem token próprio)
 
 // ============================================================
 //  REDIS HELPERS
 // ============================================================
 
-function redisGetMU(key) {
-  const resp = UrlFetchApp.fetch(
-    `${UPSTASH_URL_MU}/${['GET', key].map(encodeURIComponent).join('/')}`,
-    { headers: { Authorization: `Bearer ${UPSTASH_TOKEN_MU}` }, muteHttpExceptions: true }
-  );
-  const data = JSON.parse(resp.getContentText());
-  return data.result ? JSON.parse(data.result) : null;
+/** Executa um comando Redis via REST (path encoding). Retorna data.result bruto. */
+function redisCmdMU() {
+  var args = Array.prototype.slice.call(arguments);
+  var path = args.map(encodeURIComponent).join('/');
+  var resp = UrlFetchApp.fetch(UPSTASH_URL_MU + '/' + path, {
+    headers: { Authorization: 'Bearer ' + UPSTASH_TOKEN_MU },
+    muteHttpExceptions: true
+  });
+  return JSON.parse(resp.getContentText()).result;
 }
 
-function redisSetMU(key, value) {
-  UrlFetchApp.fetch(UPSTASH_URL_MU, {
+/** Executa múltiplos comandos em uma única requisição HTTP (pipeline). */
+function redisPipelineMU(commands) {
+  UrlFetchApp.fetch(UPSTASH_URL_MU + '/pipeline', {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${UPSTASH_TOKEN_MU}`,
-      'Content-Type': 'application/json'
-    },
-    payload: JSON.stringify(['SET', key, JSON.stringify(value)]),
+    headers: { Authorization: 'Bearer ' + UPSTASH_TOKEN_MU, 'Content-Type': 'application/json' },
+    payload: JSON.stringify(commands),
     muteHttpExceptions: true
   });
 }
 
+function redisGetMU(key) {
+  var raw = redisCmdMU('GET', key);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function redisSetMU(key, value) {
+  redisCmdMU('SET', key, JSON.stringify(value));
+}
+
 function redisSetExMU(key, value, ttl) {
-  UrlFetchApp.fetch(
-    `${UPSTASH_URL_MU}/${['SET', key, JSON.stringify(value), 'EX', ttl].map(encodeURIComponent).join('/')}`,
-    { headers: { Authorization: `Bearer ${UPSTASH_TOKEN_MU}` }, muteHttpExceptions: true }
-  );
+  redisCmdMU('SET', key, JSON.stringify(value), 'EX', String(ttl));
 }
 
 // ============================================================
@@ -76,16 +84,25 @@ function auditLogMU(email, tipo, detalhe) {
 // ============================================================
 
 function getUsuariosAtivos() {
-  const resp = UrlFetchApp.fetch(
-    `${UPSTASH_URL_MU}/${['KEYS', 'usuario:*'].map(encodeURIComponent).join('/')}`,
-    { headers: { Authorization: `Bearer ${UPSTASH_TOKEN_MU}` }, muteHttpExceptions: true }
-  );
-  const data   = JSON.parse(resp.getContentText());
-  const chaves = data.result || [];
+  // Usa idx:usuarios (SET) para evitar KEYS scan O(N).
+  // Fallback automático na primeira execução: popula o índice a partir de KEYS
+  // e nunca mais faz scan depois.
+  var emails = redisCmdMU('SMEMBERS', 'idx:usuarios') || [];
 
-  const usuarios = [];
-  chaves.forEach(chave => {
-    const usuario = redisGetMU(chave);
+  if (!emails.length) {
+    // Migração única: popula o índice
+    var chaves = redisCmdMU('KEYS', 'usuario:*') || [];
+    emails = chaves.map(function(k) { return k.replace('usuario:', ''); });
+    if (emails.length) {
+      var pipeline = emails.map(function(e) { return ['SADD', 'idx:usuarios', e]; });
+      redisPipelineMU(pipeline);
+      Logger.log('idx:usuarios populado com ' + emails.length + ' email(s) via migração.');
+    }
+  }
+
+  var usuarios = [];
+  emails.forEach(function(email) {
+    var usuario = redisGetMU('usuario:' + email);
     if (usuario && usuario.ativo) usuarios.push(usuario);
   });
   return usuarios;
@@ -243,7 +260,7 @@ function buscarViaApify(voo) {
 
 function analisarComIAMU(usuario, voo, precoAtual, historico, mercado) {
   try {
-    const apiKey   = usuario.tokenIA || CONFIG.anthropic.apiKey;
+    const apiKey   = usuario.tokenIA || ANTHROPIC_KEY_MU;
     const provider = usuario.providerIA || 'anthropic';
 
     const precoInicial  = parseFloat(getPrecoMU(usuario.email, voo.id) || precoAtual);
@@ -351,7 +368,7 @@ function analisarComIAMU(usuario, voo, precoAtual, historico, mercado) {
 
 function enviarTelegramMU(chatId, mensagem) {
   try {
-    const resp = UrlFetchApp.fetch(`https://api.telegram.org/bot${CONFIG.telegram.token}/sendMessage`, {
+    const resp = UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_TOKEN_MU + '/sendMessage', {
       method: 'post',
       contentType: 'application/json',
       payload: JSON.stringify({ chat_id: chatId, text: mensagem, parse_mode: 'Markdown' }),
@@ -517,6 +534,18 @@ function enviarEmailAlertaMU(usuario, voo, precoAtual, precoAnterior, economia, 
 // ============================================================
 
 function monitorarPassagensMultiUser() {
+  // ── Lock de execução: evita disparos paralelos da trigger ──────────────────
+  // GAS pode executar a mesma trigger duas vezes ao mesmo tempo, causando
+  // alertas duplicados e chamadas dobradas ao SerpAPI/Apify.
+  // tryLock(0) = "pega o lock agora ou desiste imediatamente".
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(0)) {
+    Logger.log('⏸️  Outra execução em andamento — abortando para evitar alertas duplicados.');
+    return;
+  }
+
+  try {
+
   const usuarios = getUsuariosAtivos();
   if (!usuarios.length) { Logger.log('Nenhum usuário ativo.'); return; }
   Logger.log(`Monitorando ${usuarios.length} usuário(s)...`);
@@ -637,6 +666,10 @@ function monitorarPassagensMultiUser() {
   });
 
   Logger.log('Monitoramento multiusuário concluído.');
+
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 // ============================================================
@@ -657,8 +690,8 @@ function monitorarPassagensMultiUser() {
 // ============================================================
 
 function verificarPropriedades() {
-  const obrigatorias = ['UPSTASH_TOKEN', 'ADMIN_SECRET', 'RESEND_KEY', 'SERPAPI_KEY'];
-  const opcionais    = ['APIFY_KEY'];
+  const obrigatorias = ['UPSTASH_TOKEN', 'ADMIN_SECRET', 'RESEND_KEY', 'SERPAPI_KEY', 'TELEGRAM_TOKEN'];
+  const opcionais    = ['APIFY_KEY', 'ANTHROPIC_KEY'];
   const props = PropertiesService.getScriptProperties();
   const faltando = obrigatorias.filter(k => !props.getProperty(k));
   if (faltando.length) {
