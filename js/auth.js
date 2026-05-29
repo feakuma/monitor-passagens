@@ -3,6 +3,7 @@
 // ============================================================
 
 import { WORKER_URL, getSessao, salvarSessao, limparSessao, showToast, fetchComTimeout } from './config.js';
+import { initAdsIn } from './ui.js';
 
 export var _conviteToken = null;
 export var _conviteEmail = null;
@@ -22,6 +23,8 @@ function _esconderApp() {
 export function mostrarLanding() {
   _esconderApp();
   document.getElementById('page-landing').style.display = 'block';
+  // Inicializa ads agora que a landing está visível (display:block)
+  setTimeout(function () { initAdsIn('page-landing'); }, 50);
 }
 
 export function mostrarFormLogin() {

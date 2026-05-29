@@ -58,6 +58,22 @@ export function updateClock() {
     now.getMinutes().toString().padStart(2, '0');
 }
 
+// ── ADS ───────────────────────────────────────────────────────
+// Inicializa anúncios AdSense somente quando o contêiner está visível.
+// Evita o erro "No slot size for availableWidth=0" que ocorre quando
+// adsbygoogle.push() é chamado dentro de elementos com display:none.
+
+export function initAdsIn(el) {
+  if (!el) return;
+  var container = (typeof el === 'string') ? document.getElementById(el) : el;
+  if (!container) return;
+  container.querySelectorAll('ins.adsbygoogle').forEach(function (ins) {
+    if (ins.dataset.adsPushed) return; // já inicializado
+    ins.dataset.adsPushed = '1';
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+  });
+}
+
 // ── TABS ──────────────────────────────────────────────────────
 
 export function showTab(tab) {
@@ -101,6 +117,9 @@ export function showTab(tab) {
   if (tab === 'dash') {
     document.dispatchEvent(new CustomEvent('passagens:tab-active', { detail: { tab: 'dash' } }));
   }
+
+  // Inicializa ads da aba apenas agora que ela está visível (display:block)
+  setTimeout(function () { initAdsIn('tab-' + tab); }, 50);
 }
 
 // ── RENDER ALERTAS ────────────────────────────────────────────
