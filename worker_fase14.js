@@ -470,11 +470,19 @@ var worker_fase14_default = {
         if (alertaId) {
           const cacheKey = `milhas_cache:${sessao.email}:${alertaId}`;
           const precoKey = `preco:${sessao.email}:${alertaId}`;
-          const [cached, precoStr] = await Promise.all([redisGet(cacheKey), redisCmd("GET", precoKey)]);
-          const precoAtual = parseFloat(precoStr || 0);
-          if (cached && Math.abs((cached.preco || 0) - precoAtual) < 0.01 && (Date.now() - (cached.cachedAt || 0)) < 6 * 3600 * 1000) {
+          // Usa pipeline para buscar ambas as chaves em 1 request (mais rápido e confiável)
+          const [cacheRaw, precoRaw] = await redisPipeline([["GET", cacheKey], ["GET", precoKey]]);
+          let cached = null;
+          try { cached = cacheRaw ? JSON.parse(cacheRaw) : null; } catch (_) {}
+          const precoAtual = parseFloat(precoRaw || 0);
+          console.log(`[milhas cache] key=${cacheKey} found=${!!cached} preco=${precoAtual} cachedPreco=${cached?.preco}`);
+          if (cached && cached.programas && cached.programas.length > 0 &&
+              Math.abs((cached.preco || 0) - precoAtual) < 0.01 &&
+              (Date.now() - (cached.cachedAt || 0)) < 6 * 3600 * 1000) {
+            console.log(`[milhas cache] HIT — ${cached.programas.length} programas`);
             return json({ ok: true, programas: cached.programas, fromCache: true });
           }
+          console.log(`[milhas cache] MISS — buscando na API`);
         }
 
         // Chama API de Voos (apidevoos.dev) — POST /v1/flights/search
@@ -536,9 +544,12 @@ var worker_fase14_default = {
         const programas = Object.values(mapa);
 
         // Salva no cache atrelado ao preço atual (invalidado se preço mudar)
+        // Usa redisPipeline (POST) para evitar problemas de URL encoding com JSON complexo
         if (alertaId && programas.length > 0) {
-          const precoStr = await redisCmd("GET", `preco:${sessao.email}:${alertaId}`);
-          await redisSetEx(`milhas_cache:${sessao.email}:${alertaId}`, { programas, preco: parseFloat(precoStr || 0), cachedAt: Date.now() }, 6 * 3600);
+          const [precoRaw] = await redisPipeline([["GET", `preco:${sessao.email}:${alertaId}`]]);
+          const cachePayload = JSON.stringify({ programas, preco: parseFloat(precoRaw || 0), cachedAt: Date.now() });
+          await redisPipeline([["SET", `milhas_cache:${sessao.email}:${alertaId}`, cachePayload, "EX", 6 * 3600]]);
+          console.log(`[milhas cache] SAVED — ${programas.length} programas, key=milhas_cache:${sessao.email}:${alertaId}`);
         }
 
         return json({ ok: true, programas, fromCache: false });

@@ -191,6 +191,10 @@ function _nomeProg(s) {
   return map[s.toLowerCase()] || (s.charAt(0).toUpperCase() + s.slice(1));
 }
 
+// Cache em memória: alertaId → { programas, fromCache }
+// Evita nova chamada à API quando o usuário fecha e reabre o painel
+var _milhasMemCache = {};
+
 export function verMilhasAlerta(alertaId) {
   var btn   = document.getElementById('btn-milhas-' + alertaId);
   var panel = document.getElementById('milhas-' + alertaId);
@@ -200,6 +204,13 @@ export function verMilhasAlerta(alertaId) {
   if (panel.style.display !== 'none') {
     panel.style.display = 'none';
     btn.textContent = '✈ Ver em milhas';
+    return;
+  }
+
+  // Se já temos resultado em memória, exibe na hora sem nova chamada
+  if (_milhasMemCache[alertaId]) {
+    _renderMilhasPanel(panel, _milhasMemCache[alertaId].programas, true);
+    panel.style.display = '';
     return;
   }
 
@@ -258,21 +269,9 @@ export function verMilhasAlerta(alertaId) {
       panel.style.display = '';
       return;
     }
-
-    var ordenados = data.programas.slice().sort(function (x, y) { return x.pontos - y.pontos; });
-    var cacheTag = data.fromCache ? ' <span class="milhas-cache-tag">cache</span>' : '';
-
-    panel.innerHTML =
-      '<div class="milhas-titulo">Disponível em milhas' + cacheTag + '</div>' +
-      ordenados.map(function (p) {
-        var taxaStr = p.taxas > 0
-          ? ' <span class="milhas-taxa">+ R$ ' + p.taxas.toFixed(2).replace('.', ',') + ' taxas</span>'
-          : ' <span class="milhas-taxa sem-taxa">sem taxas</span>';
-        return '<div class="milhas-linha">' +
-          '<span class="milhas-prog">' + esc(_nomeProg(p.programa)) + '</span>' +
-          '<span class="milhas-pts">' + p.pontos.toLocaleString('pt-BR') + ' pts' + taxaStr + '</span>' +
-        '</div>';
-      }).join('');
+    // Salva em memória para reabertura instantânea do painel
+    _milhasMemCache[alertaId] = { programas: data.programas };
+    _renderMilhasPanel(panel, data.programas, data.fromCache);
     panel.style.display = '';
   })
   .catch(function () {
@@ -280,6 +279,24 @@ export function verMilhasAlerta(alertaId) {
     panel.innerHTML = '<div class="milhas-vazio">Erro ao consultar milhas.</div>';
     panel.style.display = '';
   });
+}
+
+// Renderiza os resultados de milhas no panel (reutilizado pelo cache de memória)
+function _renderMilhasPanel(panel, programas, fromCache) {
+  var ordenados = programas.slice().sort(function (x, y) { return x.pontos - y.pontos; });
+  var cacheTag = fromCache ? ' <span class="milhas-cache-tag">cache</span>' : '';
+
+  panel.innerHTML =
+    '<div class="milhas-titulo">Disponível em milhas' + cacheTag + '</div>' +
+    ordenados.map(function (p) {
+      var taxaStr = p.taxas > 0
+        ? ' <span class="milhas-taxa">+ R$ ' + p.taxas.toFixed(2).replace('.', ',') + ' taxas</span>'
+        : ' <span class="milhas-taxa sem-taxa">sem taxas</span>';
+      return '<div class="milhas-linha">' +
+        '<span class="milhas-prog">' + esc(_nomeProg(p.programa)) + '</span>' +
+        '<span class="milhas-pts">' + p.pontos.toLocaleString('pt-BR') + ' pts' + taxaStr + '</span>' +
+      '</div>';
+    }).join('');
 }
 
 // ── RENDER HISTÓRICO ──────────────────────────────────────────
