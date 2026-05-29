@@ -379,6 +379,18 @@ export function adminSalvarEdicao() {
   .then(function (data) {
     if (data.erro) { showToast(data.erro, 'error'); return; }
     showToast('Usuário atualizado!', 'success');
+    // Se editou o próprio usuário logado, atualiza a sessão local para
+    // refletir imediatamente flags como buscaMilhas e analiseIA
+    var emailEditado = _adminEditandoEmail;
+    if (sessao && sessao.usuario && sessao.usuario.email === emailEditado) {
+      var usuarioAtualizado = Object.assign({}, sessao.usuario, {
+        analiseIA: ia, buscaMilhas: milhas,
+        percentualMinimo: pct, limiteAlertas: limite,
+        chatId: chatId
+      });
+      localStorage.setItem('pm_usuario', JSON.stringify(usuarioAtualizado));
+      document.dispatchEvent(new CustomEvent('passagens:reload'));
+    }
     document.getElementById('modal-edit-usuario').style.display = 'none';
     _adminEditandoEmail   = null;
     _adminEditandoUsuario = null;
