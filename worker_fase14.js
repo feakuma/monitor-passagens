@@ -476,21 +476,35 @@ var worker_fase14_default = {
           ],
           passengers: [{ type: "adult", count: 1 }],
           cabinClass: "economy",
-          searchMiles: true,
+          searchType: "milhas",
         };
 
-        const apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/search", {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${APIDEVOOS_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        const apiCtrl = new AbortController();
+        const apiTimer = setTimeout(() => apiCtrl.abort(), 25000); // 25s timeout
+        let apiResp;
+        try {
+          apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/search", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${APIDEVOOS_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: apiCtrl.signal,
+          });
+        } catch (fetchErr) {
+          clearTimeout(apiTimer);
+          const isTimeout = fetchErr && fetchErr.name === "AbortError";
+          console.error(`[milhas] ${isTimeout ? "timeout" : "fetch error"} chamando apidevoos para ${origem}-${destino}:`, fetchErr && fetchErr.message);
+          return json({ erro: isTimeout ? "Consulta de milhas demorou demais — tente novamente." : "Erro de conexão com API de milhas." }, 504);
+        }
+        clearTimeout(apiTimer);
 
         if (!apiResp.ok) {
-          console.error(`[milhas] API de Voos HTTP ${apiResp.status} para ${origem}-${destino}`);
-          return json({ erro: "Erro na consulta de milhas (API externa)" }, 502);
+          const errBody = await apiResp.text().catch(() => "");
+          console.error(`[milhas] API de Voos HTTP ${apiResp.status} para ${origem}-${destino}:`, errBody.slice(0, 200));
+          return json({ erro: `Erro na consulta de milhas (API externa ${apiResp.status})` }, 502);
         }
 
         const apiData = await apiResp.json();
+        console.log(`[milhas] resposta apidevoos para ${origem}-${destino}:`, JSON.stringify(apiData).slice(0, 500));
 
         // Normaliza por programa — adapte os campos conforme resposta real da API de Voos
         const voos = apiData.flights || apiData.results || apiData.data || [];
