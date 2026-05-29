@@ -102,12 +102,19 @@ if (!verificarConviteURL()) {
 
 var _ultimoPolling = Date.now();
 
+// Não re-renderiza cards se o usuário estiver vendo um painel de milhas aberto
+function _temMilhasAberto() {
+  return !!document.querySelector('#alertas-list .milhas-panel[style*="display: "]');
+}
+
 setInterval(function () {
   if (document.visibilityState !== 'visible') return; // aba oculta — pula
   var sessao = getSessao();
   if (!sessao) return;
   _ultimoPolling = Date.now();
-  carregarAlertas().then(function () { renderAlertas(); renderHistorico(); });
+  carregarAlertas().then(function () {
+    if (!_temMilhasAberto()) { renderAlertas(); renderHistorico(); }
+  });
 }, 5 * 60 * 1000);
 
 document.addEventListener('visibilitychange', function () {
@@ -117,7 +124,9 @@ document.addEventListener('visibilitychange', function () {
   // Recarrega ao voltar para a aba somente se passou mais de 2 minutos
   if (Date.now() - _ultimoPolling > 2 * 60 * 1000) {
     _ultimoPolling = Date.now();
-    carregarAlertas().then(function () { renderAlertas(); renderHistorico(); });
+    carregarAlertas().then(function () {
+      if (!_temMilhasAberto()) { renderAlertas(); renderHistorico(); }
+    });
   }
 });
 
