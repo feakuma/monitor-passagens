@@ -463,8 +463,19 @@ var worker_fase14_default = {
         if (!APIDEVOOS_KEY) return json({ erro: "API de milhas n\xE3o configurada no servidor" }, 503);
 
         const body = await request.json();
-        const { origem, destino, dataIda, dataVolta } = body;
+        const { origem, destino, dataIda, dataVolta, alertaId } = body;
         if (!origem || !destino || !dataIda) return json({ erro: "origem, destino e dataIda s\xE3o obrigat\xF3rios" }, 400);
+
+        // ── Cache Redis: serve resultado se preço não mudou (TTL 6h) ──
+        if (alertaId) {
+          const cacheKey = `milhas_cache:${sessao.email}:${alertaId}`;
+          const precoKey = `preco:${sessao.email}:${alertaId}`;
+          const [cached, precoStr] = await Promise.all([redisGet(cacheKey), redisCmd("GET", precoKey)]);
+          const precoAtual = parseFloat(precoStr || 0);
+          if (cached && Math.abs((cached.preco || 0) - precoAtual) < 0.01 && (Date.now() - (cached.cachedAt || 0)) < 6 * 3600 * 1000) {
+            return json({ ok: true, programas: cached.programas, fromCache: true });
+          }
+        }
 
         // Chama API de Voos (apidevoos.dev) — POST /v1/flights/search
         const payload = {
@@ -522,7 +533,15 @@ var worker_fase14_default = {
           });
         });
 
-        return json({ ok: true, programas: Object.values(mapa) });
+        const programas = Object.values(mapa);
+
+        // Salva no cache atrelado ao preço atual (invalidado se preço mudar)
+        if (alertaId && programas.length > 0) {
+          const precoStr = await redisCmd("GET", `preco:${sessao.email}:${alertaId}`);
+          await redisSetEx(`milhas_cache:${sessao.email}:${alertaId}`, { programas, preco: parseFloat(precoStr || 0), cachedAt: Date.now() }, 6 * 3600);
+        }
+
+        return json({ ok: true, programas, fromCache: false });
       } catch (err) {
         console.error("[milhas] erro:", err && err.message ? err.message : String(err));
         return json({ erro: "Erro interno" }, 500);

@@ -163,41 +163,91 @@ export function renderAlertas() {
 
 // ── BUSCA DE MILHAS (sob demanda) ─────────────────────────────
 
+var _MILHAS_TIPS = [
+  'Consultando LATAM Pass, Smiles, Livelo e TudoAzul...',
+  'Resultados em cache são instantâneos na próxima consulta.',
+  'Voos de madrugada costumam ter mais disponibilidade em milhas.',
+  'Resgate com 60+ dias de antecedência para mais opções.',
+  'Pontos Livelo podem ser transferidos para Smiles e LATAM Pass.',
+  'Em voos internacionais, milhas costumam valer até 3× mais.',
+  'Smiles permite complementar pontos com dinheiro no resgate.',
+  'LATAM Pass tem programa de família para somar pontos.',
+];
+
+var _CIDADES = {
+  GRU:'São Paulo', CGH:'São Paulo', VCP:'Campinas',
+  GIG:'Rio de Janeiro', SDU:'Rio de Janeiro',
+  BSB:'Brasília', SSA:'Salvador', FOR:'Fortaleza',
+  REC:'Recife', POA:'Porto Alegre', CWB:'Curitiba',
+  BEL:'Belém', MAO:'Manaus', FLN:'Florianópolis',
+  MCZ:'Maceió', NAT:'Natal', THE:'Teresina',
+  CGB:'Cuiabá', GYN:'Goiânia', SLZ:'São Luís',
+  MCP:'Macapá', PVH:'Porto Velho', BOA:'Boa Vista',
+  PMW:'Palmas', MAN:'Manaus',
+};
+
+function _nomeProg(s) {
+  var map = { latam:'LATAM Pass', smiles:'Smiles', livelo:'Livelo', tudoazul:'TudoAzul', azul:'Azul Fidelidade', gol:'Smiles (GOL)', multiplus:'Multiplus' };
+  return map[s.toLowerCase()] || (s.charAt(0).toUpperCase() + s.slice(1));
+}
+
 export function verMilhasAlerta(alertaId) {
   var btn   = document.getElementById('btn-milhas-' + alertaId);
   var panel = document.getElementById('milhas-' + alertaId);
   if (!btn || !panel) return;
 
-  // Se o painel já está aberto, toggle fecha
+  // Toggle fecha se já aberto
   if (panel.style.display !== 'none') {
     panel.style.display = 'none';
     btn.textContent = '✈ Ver em milhas';
     return;
   }
 
-  btn.textContent = 'Buscando...';
+  var a = alertasData.find(function (x) { return String(x.id) === String(alertaId); });
+  if (!a) return;
+
+  // ── Estado de loading ───────────────────────────────────────
+  btn.textContent = '✈ Buscando...';
   btn.style.opacity = '0.75';
   btn.style.pointerEvents = 'none';
   var _prog = document.createElement('div');
   _prog.className = 'milhas-progress';
   btn.appendChild(_prog);
 
-  var a = alertasData.find(function (x) { return String(x.id) === String(alertaId); });
-  if (!a) { btn.textContent = '✈ Ver em milhas'; btn.style.opacity = ''; btn.style.pointerEvents = ''; if (_prog.parentNode) _prog.parentNode.removeChild(_prog); return; }
+  // Painel de loading com dica rotativa
+  var cidade = _CIDADES[a.destino] || a.destino;
+  var tipIdx = 0;
+  panel.innerHTML =
+    '<div class="milhas-loading">' +
+      '<div class="milhas-loading-dest">✈ ' + esc(a.origem) + ' → ' + esc(cidade) + '</div>' +
+      '<div class="milhas-loading-tip" id="mlh-tip-' + alertaId + '">' + _MILHAS_TIPS[0] + '</div>' +
+      '<div class="milhas-loading-sub">pode levar até 45 segundos</div>' +
+    '</div>';
+  panel.style.display = '';
+
+  var _tipTimer = setInterval(function () {
+    tipIdx = (tipIdx + 1) % _MILHAS_TIPS.length;
+    var el = document.getElementById('mlh-tip-' + alertaId);
+    if (el) { el.style.opacity = '0'; setTimeout(function () { if (el) { el.textContent = _MILHAS_TIPS[tipIdx]; el.style.opacity = '1'; } }, 300); }
+  }, 4000);
+
+  function _cleanup() {
+    clearInterval(_tipTimer);
+    btn.textContent = '✈ Ver em milhas';
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+    if (_prog.parentNode) _prog.parentNode.removeChild(_prog);
+  }
 
   var sessao = getSessao();
   fetchComTimeout(WORKER_URL + '/alertas/milhas', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
-    body: JSON.stringify({ origem: a.origem, destino: a.destino, dataIda: a.dataIda, dataVolta: a.dataVolta || null })
+    body: JSON.stringify({ origem: a.origem, destino: a.destino, dataIda: a.dataIda, dataVolta: a.dataVolta || null, alertaId: a.id })
   }, 65000)
   .then(function (r) { return r.json(); })
   .then(function (data) {
-    btn.textContent = '✈ Ver em milhas';
-    btn.style.opacity = '';
-    btn.style.pointerEvents = '';
-    if (_prog.parentNode) _prog.parentNode.removeChild(_prog);
-
+    _cleanup();
     if (data.erro) {
       panel.innerHTML = '<div class="milhas-vazio">' + esc(data.erro) + '</div>';
       panel.style.display = '';
@@ -209,27 +259,24 @@ export function verMilhasAlerta(alertaId) {
       return;
     }
 
-    // Ordena por pontos (menor primeiro)
     var ordenados = data.programas.slice().sort(function (x, y) { return x.pontos - y.pontos; });
+    var cacheTag = data.fromCache ? ' <span class="milhas-cache-tag">cache</span>' : '';
 
     panel.innerHTML =
-      '<div class="milhas-titulo">Disponível em milhas</div>' +
+      '<div class="milhas-titulo">Disponível em milhas' + cacheTag + '</div>' +
       ordenados.map(function (p) {
         var taxaStr = p.taxas > 0
           ? ' <span class="milhas-taxa">+ R$ ' + p.taxas.toFixed(2).replace('.', ',') + ' taxas</span>'
           : ' <span class="milhas-taxa sem-taxa">sem taxas</span>';
         return '<div class="milhas-linha">' +
-          '<span class="milhas-prog">' + esc(p.programa) + '</span>' +
+          '<span class="milhas-prog">' + esc(_nomeProg(p.programa)) + '</span>' +
           '<span class="milhas-pts">' + p.pontos.toLocaleString('pt-BR') + ' pts' + taxaStr + '</span>' +
         '</div>';
       }).join('');
     panel.style.display = '';
   })
   .catch(function () {
-    btn.textContent = '✈ Ver em milhas';
-    btn.style.opacity = '';
-    btn.style.pointerEvents = '';
-    if (_prog.parentNode) _prog.parentNode.removeChild(_prog);
+    _cleanup();
     panel.innerHTML = '<div class="milhas-vazio">Erro ao consultar milhas.</div>';
     panel.style.display = '';
   });
