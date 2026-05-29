@@ -136,8 +136,11 @@
   .ai-btn:active { background: var(--accent-glow); }
 
   /* MILHAS */
-  .milhas-btn { display: flex; align-items: center; justify-content: center; padding: 11px; border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius-sm); background: transparent; cursor: pointer; font-size: 13px; color: var(--text2); margin-top: 8px; transition: background 0.15s; }
+  .milhas-btn { display: flex; align-items: center; justify-content: center; padding: 11px; border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius-sm); background: transparent; cursor: pointer; font-size: 13px; color: var(--text2); margin-top: 8px; transition: background 0.15s; position: relative; overflow: hidden; }
   .milhas-btn:active { background: rgba(74,222,128,0.08); }
+  .milhas-progress { position: absolute; bottom: 0; left: 0; height: 2px; width: 100%; background: rgba(74,222,128,0.12); overflow: hidden; }
+  .milhas-progress::after { content: ''; position: absolute; left: -50%; width: 50%; height: 100%; background: #4ade80; border-radius: 2px; animation: milhas-slide 1.4s ease-in-out infinite; }
+  @keyframes milhas-slide { 0% { left: -50%; } 100% { left: 110%; } }
   .milhas-panel { margin: 8px 0 0; padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid rgba(74,222,128,0.2); background: rgba(74,222,128,0.05); }
   .milhas-titulo { font-size: 10px; color: #4ade80; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 10px; }
   .milhas-linha { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }

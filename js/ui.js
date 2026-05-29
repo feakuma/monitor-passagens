@@ -176,11 +176,14 @@ export function verMilhasAlerta(alertaId) {
   }
 
   btn.textContent = 'Buscando...';
-  btn.style.opacity = '0.6';
+  btn.style.opacity = '0.75';
   btn.style.pointerEvents = 'none';
+  var _prog = document.createElement('div');
+  _prog.className = 'milhas-progress';
+  btn.appendChild(_prog);
 
   var a = alertasData.find(function (x) { return String(x.id) === String(alertaId); });
-  if (!a) { btn.textContent = '✈ Ver em milhas'; btn.style.opacity = ''; btn.style.pointerEvents = ''; return; }
+  if (!a) { btn.textContent = '✈ Ver em milhas'; btn.style.opacity = ''; btn.style.pointerEvents = ''; if (_prog.parentNode) _prog.parentNode.removeChild(_prog); return; }
 
   var sessao = getSessao();
   fetchComTimeout(WORKER_URL + '/alertas/milhas', {
@@ -193,6 +196,7 @@ export function verMilhasAlerta(alertaId) {
     btn.textContent = '✈ Ver em milhas';
     btn.style.opacity = '';
     btn.style.pointerEvents = '';
+    if (_prog.parentNode) _prog.parentNode.removeChild(_prog);
 
     if (data.erro) {
       panel.innerHTML = '<div class="milhas-vazio">' + esc(data.erro) + '</div>';
@@ -225,6 +229,7 @@ export function verMilhasAlerta(alertaId) {
     btn.textContent = '✈ Ver em milhas';
     btn.style.opacity = '';
     btn.style.pointerEvents = '';
+    if (_prog.parentNode) _prog.parentNode.removeChild(_prog);
     panel.innerHTML = '<div class="milhas-vazio">Erro ao consultar milhas.</div>';
     panel.style.display = '';
   });
