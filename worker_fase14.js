@@ -466,8 +466,7 @@ var worker_fase14_default = {
         const { origem, destino, dataIda, dataVolta } = body;
         if (!origem || !destino || !dataIda) return json({ erro: "origem, destino e dataIda s\xE3o obrigat\xF3rios" }, 400);
 
-        // Chama API de Voos via SSE stream — recebe resultados progressivamente
-        // Documentação: https://apidevoos.dev/docs/api-reference/voos
+        // Chama API de Voos (apidevoos.dev) — POST /v1/flights/search
         const payload = {
           type: dataVolta ? "round_trip" : "one_way",
           slices: [
@@ -479,12 +478,12 @@ var worker_fase14_default = {
           searchType: "milhas",
         };
 
+        // API leva ~45s para responder — timeout de 55s no worker, 65s no cliente
         const apiCtrl = new AbortController();
-        const apiTimer = setTimeout(() => apiCtrl.abort(), 25000); // 25s wall timeout
-
+        const apiTimer = setTimeout(() => apiCtrl.abort(), 55000);
         let apiResp;
         try {
-          apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/stream", {
+          apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/search", {
             method: "POST",
             headers: { "Authorization": `Bearer ${APIDEVOOS_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -493,76 +492,30 @@ var worker_fase14_default = {
         } catch (fetchErr) {
           clearTimeout(apiTimer);
           const isTimeout = fetchErr && fetchErr.name === "AbortError";
-          console.error(`[milhas] ${isTimeout ? "timeout" : "fetch error"} stream para ${origem}-${destino}:`, fetchErr && fetchErr.message);
+          console.error(`[milhas] ${isTimeout ? "timeout" : "fetch error"} para ${origem}-${destino}:`, fetchErr && fetchErr.message);
           return json({ erro: isTimeout ? "Consulta de milhas demorou demais — tente novamente." : "Erro de conexão com API de milhas." }, 504);
         }
+        clearTimeout(apiTimer);
 
         if (!apiResp.ok) {
-          clearTimeout(apiTimer);
           const errBody = await apiResp.text().catch(() => "");
-          console.error(`[milhas] stream HTTP ${apiResp.status} para ${origem}-${destino}:`, errBody.slice(0, 300));
+          console.error(`[milhas] HTTP ${apiResp.status} para ${origem}-${destino}:`, errBody.slice(0, 300));
           return json({ erro: `Erro na consulta de milhas (${apiResp.status})` }, 502);
         }
 
-        // Lê o stream SSE e coleta grupos de voos
-        const reader = apiResp.body.getReader();
-        const decoder = new TextDecoder();
-        let sseBuffer = "";
-        const grupos = [];
-        let done = false;
+        const apiData = await apiResp.json();
 
-        try {
-          while (!done) {
-            const { value, done: streamDone } = await reader.read();
-            if (streamDone) break;
-            sseBuffer += decoder.decode(value, { stream: true });
-
-            // Processa eventos SSE completos (separados por \n\n)
-            const eventos = sseBuffer.split("\n\n");
-            sseBuffer = eventos.pop(); // último pode estar incompleto
-
-            for (const bloco of eventos) {
-              let eventType = null;
-              let eventData = null;
-              for (const linha of bloco.split("\n")) {
-                if (linha.startsWith("event: ")) eventType = linha.slice(7).trim();
-                if (linha.startsWith("data: "))  eventData = linha.slice(6).trim();
-              }
-              if (!eventType || !eventData) continue;
-
-              if (eventType === "flight-update") {
-                try {
-                  const d = JSON.parse(eventData);
-                  const novos = [...(d.newGroups || []), ...(d.updatedGroups || [])];
-                  grupos.push(...novos);
-                } catch (_) {}
-              } else if (eventType === "search-complete") {
-                console.log(`[milhas] search-complete para ${origem}-${destino}, grupos:`, grupos.length);
-                done = true;
-                break;
-              } else if (eventType === "search-error") {
-                console.error(`[milhas] search-error para ${origem}-${destino}:`, eventData.slice(0, 200));
-                done = true;
-                break;
-              }
-            }
-          }
-        } finally {
-          clearTimeout(apiTimer);
-          reader.cancel().catch(() => {});
-        }
-
-        console.log(`[milhas] total grupos coletados para ${origem}-${destino}:`, grupos.length, "— amostra:", JSON.stringify(grupos[0] || {}).slice(0, 300));
-
-        // Normaliza por programa de fidelidade
+        // Estrutura: { flightGroups: [{ offers: [{ price: { pointsInfo: { totalPoints, pointsType }, total } }] }] }
+        // price.total em centavos (ex: 2516 = R$25,16)
+        const grupos = apiData.flightGroups || [];
         const mapa = {};
         grupos.forEach(g => {
-          // Estrutura esperada: group.options[] com loyalty info
-          const opts = g.options || g.itineraries || g.flights || [g];
-          opts.forEach(v => {
-            const prog   = v.loyaltyProgram || v.program || v.programa || g.loyaltyProgram || g.program || "";
-            const pontos = parseInt(v.miles || v.points || v.pontos || g.miles || g.points || 0);
-            const taxas  = parseFloat(v.boardingFee || v.fees || v.taxa || g.boardingFee || g.fees || 0);
+          (g.offers || []).forEach(offer => {
+            const pi = offer.price && offer.price.pointsInfo;
+            if (!pi || !pi.totalPoints) return;
+            const prog   = pi.pointsType || offer.providerId || "";
+            const pontos = parseInt(pi.totalPoints || 0);
+            const taxas  = parseFloat((offer.price.total || 0) / 100); // centavos → BRL
             if (prog && pontos > 0) {
               if (!mapa[prog] || pontos < mapa[prog].pontos) mapa[prog] = { programa: prog, pontos, taxas };
             }

@@ -187,7 +187,7 @@ export function verMilhasAlerta(alertaId) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessao.token },
     body: JSON.stringify({ origem: a.origem, destino: a.destino, dataIda: a.dataIda, dataVolta: a.dataVolta || null })
-  }, 30000)
+  }, 65000)
   .then(function (r) { return r.json(); })
   .then(function (data) {
     btn.textContent = '✈ Ver em milhas';
