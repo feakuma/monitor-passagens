@@ -466,8 +466,8 @@ var worker_fase14_default = {
         const { origem, destino, dataIda, dataVolta } = body;
         if (!origem || !destino || !dataIda) return json({ erro: "origem, destino e dataIda s\xE3o obrigat\xF3rios" }, 400);
 
-        // Chama API de Voos (apidevoos.dev) — POST /v1/flights/search com searchMiles: true
-        // Documentação: https://apidevoos.dev/docs/api-reference
+        // Chama API de Voos via SSE stream — recebe resultados progressivamente
+        // Documentação: https://apidevoos.dev/docs/api-reference/voos
         const payload = {
           type: dataVolta ? "round_trip" : "one_way",
           slices: [
@@ -480,10 +480,11 @@ var worker_fase14_default = {
         };
 
         const apiCtrl = new AbortController();
-        const apiTimer = setTimeout(() => apiCtrl.abort(), 25000); // 25s timeout
+        const apiTimer = setTimeout(() => apiCtrl.abort(), 25000); // 25s wall timeout
+
         let apiResp;
         try {
-          apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/search", {
+          apiResp = await fetch("https://app.apidevoos.dev/api/v1/flights/stream", {
             method: "POST",
             headers: { "Authorization": `Bearer ${APIDEVOOS_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -492,31 +493,80 @@ var worker_fase14_default = {
         } catch (fetchErr) {
           clearTimeout(apiTimer);
           const isTimeout = fetchErr && fetchErr.name === "AbortError";
-          console.error(`[milhas] ${isTimeout ? "timeout" : "fetch error"} chamando apidevoos para ${origem}-${destino}:`, fetchErr && fetchErr.message);
+          console.error(`[milhas] ${isTimeout ? "timeout" : "fetch error"} stream para ${origem}-${destino}:`, fetchErr && fetchErr.message);
           return json({ erro: isTimeout ? "Consulta de milhas demorou demais — tente novamente." : "Erro de conexão com API de milhas." }, 504);
         }
-        clearTimeout(apiTimer);
 
         if (!apiResp.ok) {
+          clearTimeout(apiTimer);
           const errBody = await apiResp.text().catch(() => "");
-          console.error(`[milhas] API de Voos HTTP ${apiResp.status} para ${origem}-${destino}:`, errBody.slice(0, 200));
-          return json({ erro: `Erro na consulta de milhas (API externa ${apiResp.status})` }, 502);
+          console.error(`[milhas] stream HTTP ${apiResp.status} para ${origem}-${destino}:`, errBody.slice(0, 300));
+          return json({ erro: `Erro na consulta de milhas (${apiResp.status})` }, 502);
         }
 
-        const apiData = await apiResp.json();
-        console.log(`[milhas] resposta apidevoos para ${origem}-${destino}:`, JSON.stringify(apiData).slice(0, 500));
+        // Lê o stream SSE e coleta grupos de voos
+        const reader = apiResp.body.getReader();
+        const decoder = new TextDecoder();
+        let sseBuffer = "";
+        const grupos = [];
+        let done = false;
 
-        // Normaliza por programa — adapte os campos conforme resposta real da API de Voos
-        const voos = apiData.flights || apiData.results || apiData.data || [];
-        const mapa = {};
-        voos.forEach(v => {
-          const prog   = v.loyaltyProgram || v.program || v.programa || "";
-          const pontos = parseInt(v.miles || v.points || v.pontos || 0);
-          const taxas  = parseFloat(v.boardingFee || v.fees || v.taxa || 0);
-          const cia    = v.airline || v.companhia || "";
-          if (prog && pontos > 0) {
-            if (!mapa[prog] || pontos < mapa[prog].pontos) mapa[prog] = { programa: prog, pontos, taxas, cia };
+        try {
+          while (!done) {
+            const { value, done: streamDone } = await reader.read();
+            if (streamDone) break;
+            sseBuffer += decoder.decode(value, { stream: true });
+
+            // Processa eventos SSE completos (separados por \n\n)
+            const eventos = sseBuffer.split("\n\n");
+            sseBuffer = eventos.pop(); // último pode estar incompleto
+
+            for (const bloco of eventos) {
+              let eventType = null;
+              let eventData = null;
+              for (const linha of bloco.split("\n")) {
+                if (linha.startsWith("event: ")) eventType = linha.slice(7).trim();
+                if (linha.startsWith("data: "))  eventData = linha.slice(6).trim();
+              }
+              if (!eventType || !eventData) continue;
+
+              if (eventType === "flight-update") {
+                try {
+                  const d = JSON.parse(eventData);
+                  const novos = [...(d.newGroups || []), ...(d.updatedGroups || [])];
+                  grupos.push(...novos);
+                } catch (_) {}
+              } else if (eventType === "search-complete") {
+                console.log(`[milhas] search-complete para ${origem}-${destino}, grupos:`, grupos.length);
+                done = true;
+                break;
+              } else if (eventType === "search-error") {
+                console.error(`[milhas] search-error para ${origem}-${destino}:`, eventData.slice(0, 200));
+                done = true;
+                break;
+              }
+            }
           }
+        } finally {
+          clearTimeout(apiTimer);
+          reader.cancel().catch(() => {});
+        }
+
+        console.log(`[milhas] total grupos coletados para ${origem}-${destino}:`, grupos.length, "— amostra:", JSON.stringify(grupos[0] || {}).slice(0, 300));
+
+        // Normaliza por programa de fidelidade
+        const mapa = {};
+        grupos.forEach(g => {
+          // Estrutura esperada: group.options[] com loyalty info
+          const opts = g.options || g.itineraries || g.flights || [g];
+          opts.forEach(v => {
+            const prog   = v.loyaltyProgram || v.program || v.programa || g.loyaltyProgram || g.program || "";
+            const pontos = parseInt(v.miles || v.points || v.pontos || g.miles || g.points || 0);
+            const taxas  = parseFloat(v.boardingFee || v.fees || v.taxa || g.boardingFee || g.fees || 0);
+            if (prog && pontos > 0) {
+              if (!mapa[prog] || pontos < mapa[prog].pontos) mapa[prog] = { programa: prog, pontos, taxas };
+            }
+          });
         });
 
         return json({ ok: true, programas: Object.values(mapa) });
