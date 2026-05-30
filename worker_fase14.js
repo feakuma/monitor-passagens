@@ -386,7 +386,7 @@ var worker_fase14_default = {
         const usuario = await redisGet(`usuario:${email}`);
         await redisSetEx(`sessao:${token}`, { email, nome: usuario.nome, isAdmin: usuario.isAdmin }, 604800);
         await auditLog(email, "login", "Login realizado com sucesso");
-        return json({ ok: true, token, usuario: { nome: usuario.nome, email: usuario.email, isAdmin: usuario.isAdmin, analiseIA: usuario.analiseIA } });
+        return json({ ok: true, token, usuario: { nome: usuario.nome, email: usuario.email, isAdmin: usuario.isAdmin, analiseIA: usuario.analiseIA, buscaMilhas: usuario.buscaMilhas || false } });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
       }

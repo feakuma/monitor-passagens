@@ -2,7 +2,7 @@
 //  app.js — Entry point: inicializa o app e orquestra os módulos
 // ============================================================
 
-import { getSessao } from './config.js';
+import { getSessao, salvarSessao, WORKER_URL } from './config.js';
 import { carregarAlertas } from './api.js';
 import {
   mostrarTelaLogin, mostrarLanding, ocultarTelaLogin,
@@ -77,7 +77,23 @@ export function inicializarApp() {
     var emailEl = document.getElementById('sessao-email');
     if (emailEl && sessao.usuario) emailEl.textContent = sessao.usuario.email;
 
-    carregarAlertas().then(function () {
+    // Atualiza perfil via /auth/me em paralelo com carregarAlertas.
+    // Garante que buscaMilhas, analiseIA etc. estejam atualizados
+    // antes de renderizar (corrige sessões antigas no PWA).
+    var promessaPerfil = fetch(WORKER_URL + '/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + sessao.token }
+    }).then(function (r) { return r.json(); }).then(function (me) {
+      if (me && me.email) {
+        salvarSessao(sessao.token, me);
+        if (me.isAdmin) {
+          document.getElementById('tab-admin-btn').style.display = '';
+          document.getElementById('nav-admin-btn').style.display = '';
+          document.getElementById('nav-dash-btn').style.display  = '';
+        }
+      }
+    }).catch(function () {});
+
+    Promise.all([carregarAlertas(), promessaPerfil]).then(function () {
       renderAlertas();
       renderHistorico();
       renderConfigAlertas();
