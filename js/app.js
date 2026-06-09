@@ -82,7 +82,10 @@ export function inicializarApp() {
     // antes de renderizar (corrige sessões antigas no PWA).
     var promessaPerfil = fetch(WORKER_URL + '/auth/me', {
       headers: { 'Authorization': 'Bearer ' + sessao.token }
-    }).then(function (r) { return r.json(); }).then(function (me) {
+    }).then(function (r) {
+      if (!r.ok) return null; // 401/403/5xx → ignora silenciosamente
+      return r.json();
+    }).then(function (me) {
       if (me && me.email) {
         salvarSessao(sessao.token, me);
         if (me.isAdmin) {
@@ -94,6 +97,11 @@ export function inicializarApp() {
     }).catch(function () {});
 
     Promise.all([carregarAlertas(), promessaPerfil]).then(function () {
+      renderAlertas();
+      renderHistorico();
+      renderConfigAlertas();
+    }).catch(function () {
+      // Se carregarAlertas falhar, renderiza mesmo assim (mostrará estado vazio)
       renderAlertas();
       renderHistorico();
       renderConfigAlertas();

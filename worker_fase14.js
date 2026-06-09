@@ -396,7 +396,7 @@ var worker_fase14_default = {
         const sessao = await requireAuth(request);
         if (!sessao) return json({ erro: "N\xE3o autenticado" }, 401);
         const usuario = await redisGet(`usuario:${sessao.email}`);
-        if (!usuario) return json({ erro: "N\xE3o encontrado" }, 404);
+        if (!usuario) return json({ erro: "N\xE3o autenticado" }, 401);
         return json({ nome: usuario.nome, email: usuario.email, isAdmin: usuario.isAdmin, analiseIA: usuario.analiseIA, buscaMilhas: usuario.buscaMilhas || false, percentualMinimo: usuario.percentualMinimo || 0, limiteAlertas: usuario.limiteAlertas ?? 10, tokenIA: usuario.tokenIA ? true : false, providerIA: usuario.providerIA || "anthropic" });
       } catch (err) {
         return json({ erro: "Erro interno" }, 500);
